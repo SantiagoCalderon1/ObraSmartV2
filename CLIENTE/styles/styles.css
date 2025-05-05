@@ -1,0 +1,97 @@
+/* VARIABLES GLOBALES PARA LOS ESTILOS */
+:root {
+  --mainWhite: #fff;
+  --mainBlack: #000;
+  --mainDarkBlue: #2D558C;
+
+  --secondaryWhite: #f0f0f0;
+  --secondaryBlack: #1d1d1d;
+  --secondaryDarkBlue: #284B7D;
+  --secondaryRed: #D83B2E;
+
+  --secondaryLigthGreen: #00B2A9;
+  --secondaryLigthBlue: #18A0FB;
+}
+
+
+/* Estilos personalizados para Toastify */
+.toastify-success {
+  background: #28a745 !important;
+  /* Verde */
+  color: #fff;
+  border-radius: 10px;
+}
+
+.toastify-error {
+  background: #dc3545 !important;
+  /* Rojo */
+  color: #fff;
+  border-radius: 10px;
+}
+
+.toastify-warning {
+  background: #ffc107 !important;
+  /* Amarillo */
+  color: #000;
+  border-radius: 10px;
+}
+
+.toastify-info {
+  background: #17a2b8 !important;
+  /* Azul clarito */
+  color: #fff;
+  border-radius: 10px;
+}
+
+/* Opcional: Estilo general para todos */
+.toastify {
+  font-size: 16px;
+  padding: 15px 20px;
+  margin-top: 8vh;
+  /* Para que no tape el header */
+}
+
+/* 
+
+// Notificación de éxito
+Toastify({
+  text: "¡Operación exitosa!",
+  className: "toastify-success",
+  duration: 3000,
+  close: true,
+  gravity: "top", // "top" o "bottom"
+  position: "right" // "left", "center" o "right"
+}).showToast();
+
+// Notificación de error
+Toastify({
+  text: "¡Algo salió mal!",
+  className: "toastify-error",
+  duration: 3000,
+  close: true,
+  gravity: "top",
+  position: "right"
+}).showToast();
+
+// Notificación de advertencia
+Toastify({
+  text: "¡Cuidado con esto!",
+  className: "toastify-warning",
+  duration: 3000,
+  close: true,
+  gravity: "top",
+  position: "right"
+}).showToast();
+
+// Notificación de información
+Toastify({
+  text: "Dato interesante",
+  className: "toastify-info",
+  duration: 3000,
+  close: true,
+  gravity: "top",
+  position: "right"
+}).showToast();
+
+
+*/
