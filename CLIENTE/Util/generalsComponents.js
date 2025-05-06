@@ -14,7 +14,7 @@ export function isAuthenticated() {
 // ==================== Componentes para la estructura Header ========================================
 export function HeaderComponent() {
     const MENU_ITEM = [
-        { label: "Presupuestos", route: "/budgets", icon: "fa-file-signature" },
+        { label: "Presupuestos", route: "/estimates", icon: "fa-file-signature" },
         { label: "Facturas", route: "/invoices", icon: "fa-file-invoice-dollar" },
         { label: "Materiales", route: "/materials", icon: "fa-shapes" },
         { label: "Proyectos", route: "/projects", icon: "fa-hammer" },
@@ -222,7 +222,7 @@ export function ModalComponent() {
                             m("h1.modal-title.fs-5", { id: "ModalGeneral", style: { fontWeight: "bold" } }, title),
                             m("button.btn-close", { "data-bs-dismiss": "modal", arialLabel: "close", }),
                         ]),
-                        slots.header && m("div.modal-header.d-flex.justify-content-center.gap-2", slots.header),
+                        slots.header && m("div.modal-header.d-flex.justify-content-center.gap-5", slots.header),
                         m("div.modal-body.d-flex.justify-content-center", slots.body ? slots.body : "Cargando detalles..."),
                         m("div.modal-footer", [
                             slots.footer && slots.footer,
@@ -232,6 +232,39 @@ export function ModalComponent() {
                 ]),
             ])
         },
+    }
+
+}
+
+export function ModalConfirmation() {
+    return {
+        view: function ({ attrs }) {
+            const { idModal, tituloModal, mensaje, actions } = attrs
+
+                
+            const ContentFooterModal = () =>
+                m("div", { class: "col-12 d-flex justify-content-center" }, [
+                    m("div", { class: "col-8 col-md-4 d-flex justify-content-between gap-5" }, [
+                        m(ButtonComponent, {
+                            closeModal: true,
+                            bclass: "btn btn-danger ",
+                        }, ["Cancelar"]),
+                        m(ButtonComponent, {
+                            closeModal: true,
+                            bclass: "btn btn-success ",
+                            actions: actions,
+                        }, ["aceptar"])
+                    ])
+                ])
+            return m(ModalComponent, {
+                idModal: idModal,
+                title: tituloModal,
+                slots: {
+                    body: m("p.text-center", mensaje),
+                    footer: ContentFooterModal(),
+                }
+            })
+        }
     }
 }
 

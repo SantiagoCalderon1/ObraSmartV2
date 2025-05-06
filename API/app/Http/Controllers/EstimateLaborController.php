@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\estimate_labor;
+use App\Models\EstimateLabor;
 use Illuminate\Http\Request;
 
 class EstimateLaborController
@@ -34,7 +34,7 @@ class EstimateLaborController
     /**
      * Display the specified resource.
      */
-    public function show(estimate_labor $estimate_labor)
+    public function show(EstimateLabor $estimateLabor)
     {
         //
     }
@@ -42,7 +42,7 @@ class EstimateLaborController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(estimate_labor $estimate_labor)
+    public function edit(EstimateLabor $estimateLabor)
     {
         //
     }
@@ -50,7 +50,7 @@ class EstimateLaborController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, estimate_labor $estimate_labor)
+    public function update(Request $request, EstimateLabor $estimateLabor)
     {
         //
     }
@@ -58,7 +58,7 @@ class EstimateLaborController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(estimate_labor $estimate_labor)
+    public function destroy(EstimateLabor $estimateLabor)
     {
         //
     }

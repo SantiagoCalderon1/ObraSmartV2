@@ -5,10 +5,10 @@ import { URL_LOGOUT, URL_AUTH } from "./Util/constantes.js"
 import { request } from "./Util/util.js";
 
 // IMPORTADOR DE PÁGINAS
-import { HeaderComponent } from "./Pages/generalsComponents.js"
+import { HeaderComponent } from "./Util/generalsComponents.js"
 import { HomePage } from "./Pages/home.js"
 import { LoginPage } from "./Pages/login.js"
-import { BudgetsPage } from "./Pages/budgets.js";
+import { EstimatesPage } from "./Pages/Estimates/estimates.js";
 
 /*
 import { RegisterPage } from "./pages/register.js" 
@@ -70,7 +70,7 @@ const routes = {
     // Rutas protegidas (Solo accesibles si se está autenticado)
     '/logout': { view: () => { Logout(); m(LoginPage) } },
     '/home': { view: () => m(authGuard, m(HomePage)) },
-    '/budgets': { view: () => m(authGuard, m(BudgetsPage, { option: "list" })) },
+    '/estimates': { view: () => m(authGuard, m(EstimatesPage, { option: "show" })) },
     '/budget/:option/:id': { view: ({ attrs }) => m(authGuard, m(BudgetsPage, { option: attrs.option, id: attrs.id })) },
 
 }

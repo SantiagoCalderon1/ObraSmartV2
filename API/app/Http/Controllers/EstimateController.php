@@ -17,13 +17,28 @@ class EstimateController
      */
     public function index()
     {
-        $estimates = Estimate::all();
+        //$estimates = Estimate::all();
+        $estimates = Estimate::with([
+            'materials.material',
+            'labors.laborType',
+            'client',
+            'project',
+            'user',
+            'invoice',
+        ])->get();
+
+
         if ($estimates->isEmpty()) {
             return response()->json([
                 'message' => 'No estimates found',
             ], 404);
         }
-        return response()->json($estimates, 200);
+
+        //return response()->json($estimates, 200);
+        return response()->json([
+            'message' => 'Lista de presupuestos',
+            'data' => $estimates
+        ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -126,8 +141,6 @@ class EstimateController
             ], 500);
         }
     }
-
-
 
     /**
      * Display the specified resource. 
@@ -269,7 +282,6 @@ class EstimateController
     }
 
 
-
     /**
      * Remove the specified resource from storage.
      */
@@ -298,9 +310,6 @@ class EstimateController
             ], 500);
         }
     }
-
-
-
 
     // Funciones Auxiliares
     private function headerRules(): array

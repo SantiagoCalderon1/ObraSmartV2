@@ -2,7 +2,9 @@
 :root {
   --mainWhite: #fff;
   --mainBlack: #000;
+  --mainGray: #F3F4F8;
   --mainDarkBlue: #2D558C;
+  --mainPurple: #8044FE;
 
   --secondaryWhite: #f0f0f0;
   --secondaryBlack: #1d1d1d;
@@ -11,6 +13,8 @@
 
   --secondaryLigthGreen: #00B2A9;
   --secondaryLigthBlue: #18A0FB;
+
+
 }
 
 

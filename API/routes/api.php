@@ -4,16 +4,13 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BudgetController;
 use App\Http\Controllers\BudgetDetailController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Middleware\IsAdminAuth;
 use App\Http\Middleware\IsUserAuth;
 use App\Models\BudgetDetail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
 
 
 //PUBLIC ROUTE
@@ -30,15 +27,21 @@ Route::middleware([IsUserAuth::class])->group(function () {
     });
 
     //Rutas de BudgetController
-    Route::controller(BudgetController::class)->group(function () {
-        Route::get('/budgets', 'index');
-        Route::get('/budgets/{id}', 'show');
-        Route::post('/budgets', 'store');
-        Route::put('/budgets/{id}', 'update');
-        Route::patch('/budgets/{id}', 'update');
-        Route::delete('/budgets/{id}', 'destroy');
+    Route::controller(EstimateController::class)->group(function () {
+        Route::get('/estimates', 'index');
+        Route::post('/estimates', 'store');
+        Route::get('/estimates/{estimate}', 'show');
+        Route::put('/estimates/{estimate}', 'update');
+        Route::patch('/estimates/{estimate}', 'update');
+        Route::delete('/estimates/{estimate}', 'destroy');
     });
 
+
+
+
+
+
+    
     //Rutas de BudgetDetailController
     Route::controller(BudgetDetailController::class)->group(function () {
         Route::get('/budgets-details/{id?}', 'index');

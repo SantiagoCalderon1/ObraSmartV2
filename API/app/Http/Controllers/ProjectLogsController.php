@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Project_log;
+use App\Models\ProjectLog;
 use Illuminate\Http\Request;
 
 class ProjectLogsController
@@ -34,7 +34,7 @@ class ProjectLogsController
     /**
      * Display the specified resource.
      */
-    public function show(Project_log $project_log)
+    public function show(ProjectLog $projectLog)
     {
         //
     }
@@ -42,7 +42,7 @@ class ProjectLogsController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Project_log $project_log)
+    public function edit(ProjectLog $projectLog)
     {
         //
     }
@@ -50,7 +50,7 @@ class ProjectLogsController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Project_log $project_log)
+    public function update(Request $request, ProjectLog $projectLog)
     {
         //
     }
@@ -58,7 +58,7 @@ class ProjectLogsController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Project_log $project_log)
+    public function destroy(ProjectLog $projectLog)
     {
         //
     }

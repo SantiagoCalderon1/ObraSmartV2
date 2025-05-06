@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Labor_type;
+use App\Models\LaborType;
 use Illuminate\Http\Request;
 
 class LaborTypeController
@@ -34,7 +34,7 @@ class LaborTypeController
     /**
      * Display the specified resource.
      */
-    public function show(Labor_type $labor_type)
+    public function show(LaborType $laborType)
     {
         //
     }
@@ -42,7 +42,7 @@ class LaborTypeController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Labor_type $labor_type)
+    public function edit(LaborType $laborType)
     {
         //
     }
@@ -50,7 +50,7 @@ class LaborTypeController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Labor_type $labor_type)
+    public function update(Request $request, LaborType $laborType)
     {
         //
     }
@@ -58,7 +58,7 @@ class LaborTypeController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Labor_type $labor_type)
+    public function destroy(LaborType $laborType)
     {
         //
     }

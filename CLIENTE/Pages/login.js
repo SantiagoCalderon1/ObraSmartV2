@@ -1,28 +1,20 @@
-// Global Variabales
-const urlLogin = "http://127.0.0.1:8000/api/login"
+import { ButtonComponent } from "../Util/generalsComponents.js";
+import { loginUser } from "../Services/auth.js";
 
-function LoginPage() {
-    let style = { width: "100%", height: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f0f0" };
+
+export function LoginPage() {
     return {
         oncreate: () => { window.scrollTo(0, 0); },
         view: function () {
-            return m("div", { style: { ...style } }, m(FormComponent));
+            return m("div", { class: "w-100 vh-100 d-flex align-items-center justify-content-center" }, m(FormComponent));
         }
     }
 }
 
 function FormComponent() {
-    let style = {
-        containerStyle: { minHeight: "90vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#fff", padding: "20px", borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)", overflow: "hidden" },
-        inputStyle: { width: "100%", padding: "10px", marginBottom: "10px", borderRadius: "5px", border: "1px solid #ccc" },
-        buttonStyle: { width: "100%", padding: "10px", borderRadius: "50px", border: "none" },
-        primaryButton: { color: "#fff", marginBottom: "10px" },
-        secondaryButton: { color: "#fff" },
-        badCredentials: { border: "1px solid red", color: "red" },
-    }
+    let showPassword = false, badCredentials = false
     return {
-        badCredentials: false,
-        login: function (e) {
+        login: async function (e) {
             e.preventDefault();
             let loginData = {
                 email: e.target.email.value,
@@ -30,89 +22,119 @@ function FormComponent() {
                 remember: document.getElementById("rememberMe").checked
             };
             //console.log("Enviando datos: ", JSON.stringify(loginData));
-            m.request({
-                method: "POST",
-                url: urlLogin,
-                body: loginData,
-                extract: (xhr) => {
-                    return {
-                        status: xhr.status,
-                        response: JSON.parse(xhr.responseText)
-                    }
-                }
-            }).then((data) => {
-                console.log("data: ", data);
-                if (data.status === 200 && data.response.token ) {
-                    this.badCredentials = false;
-                    // se guardar token de acuerdo a la opción "Recuérdame"
-                    if (loginData.remember) {
-                        localStorage.setItem("token", data.response.token);
-                    } else {
-                        sessionStorage.setItem("token", data.response.token);
-                    }
+            try {
+                const data = await loginUser(loginData);
+                if (data.status === 200 && data.response.token) {
+                    badCredentials = false;
+                    // Guardar el token según la preferencia del usuario
+                    const storage = loginData.remember ? localStorage : sessionStorage;
+                    storage.setItem("token", data.response.token);
                     m.route.set("/home");
-                }
-                if (data.status === 401 && !data.response.token) {
-                    this.badCredentials = true;
+                } else {
+                    badCredentials = true;
                     localStorage.clear();
                     sessionStorage.clear();
                 }
-                m.redraw();
-            }).catch((error) => {
-                console.log("Error: ", error);
-            });
-        },
-        /* oninit: function () {
-            let token = localStorage.getItem("token") || sessionStorage.getItem("token")
-            if (token) {
-                m.route.set("/home");
+            } catch (error) {
+                console.error("Error en login:", error);
+                badCredentials = true;
             }
-        }, */
+            m.redraw();
+        },
         view: function () {
-            return m("div.col-lg-6.col-10", { style: { ...style.containerStyle } }, [
-                m("div.g-3", [
-                    m("img", { src: "./assets/logosObraSmart/logo-2.png", style: { width: "200px", height: "200px", marginBottom: "40px" } }),
-                ]),
-                m("div.col-lg-8.col-md-10.col-12", [
-                    m("form.row.g-3", { onsubmit: (e) => this.login(e) }, [
-                        m("input", { type: "text", name: "email", placeholder: "Username or Email", style: { ...style.inputStyle, ...(this.badCredentials ? style.badCredentials : {}) } }),
-                        m("input", { type: "password", name: "password", placeholder: "Password", autocomplete: "current-password", style: { ...style.inputStyle, ...(this.badCredentials ? style.badCredentials : {}) } }),
-                        this.badCredentials ?
-                            m("p.text-center", { style: { color: "red", fontSize: "14px" } }, "Usuario o contraseña incorrectos")
-                            : null,
-                        m("div.row", [
-                            m("div.col-6", { style: { marginBottom: "10px" } }, [
-                                m("input", { type: "checkbox", id: "rememberMe" }),
-                                m("label", { for: "rememberMe", style: { marginLeft: "5px" } }, "Recuerdame")
+            return m("div.container-fluid", { class: "min-vh-100 d-flex flex-row p-0" }, [
+                // Columna izquierda (Formulario)
+                m("div", { class: "col-md-7 d-flex flex-column justify-content-center align-items-center p-5 gap-5" }, [
+                    // Logo y título
+                    m("div.text-center", { style: {} }, [
+                        m("img", { src: "./assets/logosObraSmart/logo-2.png", style: { width: "150px", height: "150px" } }),
+                        m("h1", { class: " mt-3 text-nowrap" }, "¡Bienvenido de nuevo!"),
+                    ]),
+                    m("div", { class: "w-100", style: { maxWidth: "400px" } }, [
+                        m("form.row.g-3", { onsubmit: (e) => this.login(e) }, [
+                            // Email
+                            m("div.col-12", [
+                                m("input", {
+                                    type: "email",
+                                    name: "email",
+                                    class: `form-control px-3 py-2 rounded-pill ${badCredentials ? "is-invalid" : ""}`,
+                                    style: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
+                                    placeholder: "Correo electrónico",
+                                    autocomplete: "email"
+                                })
                             ]),
-                            m("div.col-6.text-end", [m("a", { href: "/forgot-password", style: { textDecoration: "none", color: "#1B8EF2" } }, "¿Olvidaste tu contraseña?")])
-                        ]),
-                        m("div.col-12", [
-                            m("button.primaryBtn", {
-                                type: "submit",
-                                style: { ...style.buttonStyle, ...style.primaryButton }
-                            },
-                                "Iniciar Sesión"),
-                            m("div", { style: { display: "flex", alignItems: "center", width: "100%" } }, [
-                                m("hr", { style: { flex: 1 } }),
-                                m("span", { style: { margin: "0 10px" } }, "O"),
-                                m("hr", { style: { flex: 1 } })
-                            ]),
-                            m("div.col-6", { style: { display: "flex", alignItems: "center", justifyContent: "center", width: "100%" } },
-                                m("div", { style: { display: "flex", alignItems: "center", justifyContent: "space-evenly", gap: "20px", width: "50%", padding: "10px", borderRadius: "5px", border: "1px solid #ccc" } }, [
-                                    //m("i.fa-brands.fa-google"),
-                                    m("img", { src: "./assets/google-logo.png", style: { width: "30px", height: "30px" } }),
-                                    m("span", { style: { paddingLeft: "25px", borderLeft: "1px solid #ccc", textAling: "center" } }, "Inicia sesión con Google")
+                            // Contraseña
+                            m("div.col-12", [
+                                m("div.input-group", [
+                                    m("input", {
+                                        type: showPassword ? "text" : "password",
+                                        name: "password",
+                                        class: `form-control px-3 py-2 me-2 rounded-pill ${badCredentials ? "is-invalid" : ""}`,
+                                        style: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
+                                        placeholder: "Contraseña",
+                                        autocomplete: "current-password"
+                                    }),
+                                    m(ButtonComponent,
+                                        {
+                                            bclass: "btn btn-outline-secondary rounded-pill fw-normal",
+                                            type: "button",
+                                            style: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
+                                            actions: () => {
+                                                showPassword = !showPassword;
+                                                m.redraw();
+                                            }
+                                        },
+                                        m("i", { class: `fa-solid ${showPassword ? "fa-eye" : "fa-eye-slash"}` })
+                                    )
                                 ])
+                            ]),
+                            // Mensaje de error
+                            badCredentials ?
+                                m("p.text-center", { style: { color: "red", fontSize: "14px" } }, "Usuario o contraseña incorrectos")
+                                : null,
+                            // Recuérdame
+                            m("div.col-6", { class: "my-3 mx-2" }, [
+                                m("input", { type: "checkbox", id: "rememberMe", }),
+                                m("label", { for: "rememberMe", class: "ms-3" }, "Recuerdame")
+                            ]),
+                            // Botón de iniciar sesión
+                            m(ButtonComponent,
+                                {
+                                    type: "submit",
+                                    bclass: "btn-primary w-100 py-2 rounded-pill fw-semibold", style: { backgroundColor: "var(--mainPurple)" }
+                                },
+                                ["Iniciar Sesión"]
                             ),
-                            m("hr"),
-                            m("button.secondaryBtn", { style: { ...style.buttonStyle, ...style.secondaryButton }, onclick: () => (window.location.href = "register.html") }, "Crear una cuenta")
                         ]),
-                    ])
-                ])
-            ]);
+                        // Separador
+                        m("hr.my-5"),
+                        // Registro y recuperación
+                        m("div.text-center", [
+                            m(m.route.Link, { class: "small", href: "/forgot-password" }, "¿Olvidaste tu contraseña?"),
+                            m("p.py-3", "¿No tienes una cuenta?"),
+                        ]),
+                        m(ButtonComponent,
+                            {
+                                bclass: "btn btn-warning w-100 py-2 rounded-pill fw-normal",
+                                type: "submit",
+                                actions: () => m.route.set("/register")
+                            },
+                            ["Crear una cuenta"]
+                        ),
+                    ]),
+                ]),
+                // Columna derecha (imagen de fondo solo en desktop)
+                m("div.d-none.d-md-block", {
+                    class: "col-md-5 p-0",
+                    style: {
+                        backgroundImage: "url('./assets/background-login.webp')",
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                        backgroundRepeat: "no-repeat"
+                    }
+                })
+            ])
         }
     };
 }
 
-export { LoginPage }

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\stock_movement;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 
 class StockMovementsController
@@ -34,7 +34,7 @@ class StockMovementsController
     /**
      * Display the specified resource.
      */
-    public function show(stock_movement $stock_movement)
+    public function show(StockMovement $stockMovement)
     {
         //
     }
@@ -42,7 +42,7 @@ class StockMovementsController
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(stock_movement $stock_movement)
+    public function edit(StockMovement $stockMovement)
     {
         //
     }
@@ -50,7 +50,7 @@ class StockMovementsController
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, stock_movement $stock_movement)
+    public function update(Request $request, StockMovement $stockMovement)
     {
         //
     }
@@ -58,7 +58,7 @@ class StockMovementsController
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(stock_movement $stock_movement)
+    public function destroy(StockMovement $stockMovement)
     {
         //
     }
