@@ -71,7 +71,8 @@ const routes = {
     '/logout': { view: () => { Logout(); m(LoginPage) } },
     '/home': { view: () => m(authGuard, m(HomePage)) },
     '/estimates': { view: () => m(authGuard, m(EstimatesPage, { option: "show" })) },
-    '/budget/:option/:id': { view: ({ attrs }) => m(authGuard, m(BudgetsPage, { option: attrs.option, id: attrs.id })) },
+    '/estimates/create': { view: () => m(authGuard, m(EstimatesPage, { option: "create" })) },
+    '/estimates/update/:id': { view: ({ attrs }) => m(authGuard, m(EstimatesPage, { option: "update", id: attrs.id })) },
 
 }
 

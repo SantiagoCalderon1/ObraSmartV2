@@ -23,6 +23,7 @@ class EstimateMaterial extends Model
         'material_id',
         'quantity',
         'unit_price',
+        'discount',
         'total_price',
     ];
 

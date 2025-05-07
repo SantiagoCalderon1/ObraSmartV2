@@ -1,7 +1,7 @@
 import { ModalComponent, ModalConfirmation, ButtonComponent } from "../../Util/generalsComponents.js";
 
 // IMPORTADOR DE FUNCIONES
-import { fetchEstimates, fetchBudgetDetails, fetchClients, fetchProjects, deleteEstimate } from "../../Services/estimates-service.js";
+import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
 
 export function EstimatesListPage() {
     let estimates = [];
@@ -71,12 +71,19 @@ export function EstimatesListPage() {
                     columns: columns,
                     data: normalizedEstimates,
                     onRowClick: onSelect
-                }),
+                }, [m(ButtonComponent,
+                    {
+                        type: "submit",
+                        bclass: "btn-primary py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                        actions: () => m.route.set("/estimates/create")
+                    },
+                    ["Crear Presupuesto"]
+                ),]),
                 m(ModalDetailsComponent, {
                     estimate: selectedEstimate,
                 }),
                 m(ModalConfirmation, {
-                    idModal: "ModalDeleteBudget",
+                    idModal: "ModalDeleteEstimate",
                     tituloModal: "Confirmación de eliminación",
                     mensaje: `¿Está seguro de eliminar el presupuesto con #${selectedEstimate?.estimate_number}?`,
                     actions: onDelete
@@ -125,7 +132,7 @@ function TableListComponent() {
     }
 
     return {
-        oninit: function ({ attrs }) {
+        oninit: function ({ attrs, children }) {
             localData = attrs.data;
             filteredData = [...localData];
         },
@@ -140,14 +147,7 @@ function TableListComponent() {
             }, [
                 m("div",
                     { class: "d-flex flex-column flex-md-row justify-content-between mb-3 gap-3" }, [
-                    m(ButtonComponent,
-                        {
-                            type: "submit",
-                            bclass: "btn-primary py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                            actions: () => m.route.set("/budget/create/0")
-                        },
-                        ["Crear Presupuesto"]
-                    ),
+                    children,
                     m("div.input-group",
                         { style: { maxWidth: "400px" } }, [
                         m("input", {
@@ -343,7 +343,7 @@ function ModalDetailsComponent() {
                 }, [
                     m("h5.mt-1", "Detalles"),
                     Table({ columns: columnsEstimate, data: [estimate] }),
-                    m("h5.mt-1", "Materiales"),
+                    m("h5.mt-3", "Materiales"),
                     Table({ columns: columnsMaterials, data: normalizedMaterials }),
                     m("h5.mt-3", "Mano de Obra"),
                     Table({ columns: columnsLabors, data: normalizedLabors }),

@@ -216,7 +216,7 @@ export function ModalComponent() {
             const { idModal, title, addBtnClose } = attrs
             const slots = attrs.slots || {};
             return m("div.modal.fade", { id: idModal, tabindex: "-1", ariaLabelledby: idModal, ariaHidden: "true", }, [
-                m("div.modal-dialog.modal-lg.modal-dialog-centered", [
+                m("div.modal-dialog.modal-xl.modal-dialog-centered", [
                     m("div.modal-content", [
                         m("div.modal-header", [
                             m("h1.modal-title.fs-5", { id: "ModalGeneral", style: { fontWeight: "bold" } }, title),

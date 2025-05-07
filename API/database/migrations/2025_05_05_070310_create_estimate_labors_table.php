@@ -17,6 +17,7 @@ return new class extends Migration
             $table->unsignedBigInteger('labor_type_id')->nullable();
             $table->integer('hours');
             $table->decimal('cost_per_hour', 10, 2);
+            $table->decimal('discount', 10, 2)->nullable();
             $table->decimal('total_cost', 10, 2);
 
             $table->timestamps();

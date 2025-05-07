@@ -1,5 +1,5 @@
 // IMPORTADOR DE CONSTANTES
-import { URL_ESTIMATES, URL_BUDGETS_DETAILS, URL_CLIENTS, URL_PROJECTS } from "../Util/constantes.js"
+import { URL_ESTIMATES, URL_CLIENTS, URL_PROJECTS } from "../Util/constantes.js"
 
 // IMPORTADOR DE FUNCIONES
 import { request } from "../Util/util.js";
@@ -11,8 +11,9 @@ export async function fetchEstimates() {
     return (await request("GET", URL_ESTIMATES));
 }
 
-export async function fetchBudgetDetails(id) {
-    return await request("GET", `${URL_BUDGETS_DETAILS}/${id}`, null, false);
+
+export async function fetchEstimate(id) {
+    return await request("GET", `${URL_ESTIMATES}/${id}`);
 }
 
 export async function fetchClients() {

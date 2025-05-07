@@ -59,34 +59,32 @@ class EstimateController
             DB::beginTransaction();
 
             $data = $request->all();
-            $header = $data['header'] ?? [];
+            $EstimateData = $data['EstimateData'] ?? [];
             $estimateMaterials = $data['estimate_materials'] ?? [];
             $estimateLabors = $data['estimate_labors'] ?? [];
-            $footer = $data['footer'] ?? [];
 
             // Validaciones
-            $headerValidator = Validator::make($header, $this->headerRules());
-            $footerValidator = Validator::make($footer, $this->footerRules());
+            $EstimateDataValidator = Validator::make($EstimateData, $this->estimateRules());
 
-            if ($headerValidator->fails() || $footerValidator->fails()) {
+            if ($EstimateDataValidator->fails()) {
                 return response()->json([
                     'message' => 'Error al crear el presupuesto, datos inválidos.',
-                    'errors' => $headerValidator->errors()->merge($footerValidator->errors()),
+                    'errors' => $EstimateDataValidator->errors(),
                 ], 400);
             }
 
             // Crear Estimate
             $estimate = Estimate::create([
                 'user_id'        => Auth::id(),
-                'estimate_number' => $header['estimate_number'],
-                'project_id'     => $header['project_id'],
-                'client_id'      => $header['client_id'],
-                'issue_date'     => $header['issue_date'],
-                'due_date'       => $header['due_date'],
-                'status'         => $header['status'],
-                'iva'            => $footer['iva'],
-                'total_cost'     => $footer['total_cost'],
-                'conditions'     => $footer['conditions'] ?? $header['conditions'] ?? null,
+                'estimate_number' => $EstimateData['estimate_number'],
+                'project_id'     => $EstimateData['project_id'],
+                'client_id'      => $EstimateData['client_id'],
+                'issue_date'     => $EstimateData['issue_date'],
+                'due_date'       => $EstimateData['due_date'],
+                'status'         => $EstimateData['status'],
+                'iva'            => $EstimateData['iva'],
+                'total_cost'     => $EstimateData['total_cost'],
+                'conditions'     => $EstimateData['conditions'] ?? $EstimateData['conditions'] ?? null,
             ]);
 
             // Insertar materiales
@@ -104,6 +102,7 @@ class EstimateController
                     'material_id' => $item['material_id'],
                     'quantity'    => $item['quantity'],
                     'unit_price'  => $item['unit_price'],
+                    'discount'    => $item['discount'] ?? null,
                     'total_price' => $item['total_price'],
                 ]);
             }
@@ -123,6 +122,7 @@ class EstimateController
                     'labor_type_id'  => $item['labor_type_id'],
                     'hours'          => $item['hours'],
                     'cost_per_hour'  => $item['cost_per_hour'],
+                    'discount'    => $item['discount'] ?? null,
                     'total_cost'     => $item['total_cost'],
                 ]);
             }
@@ -178,19 +178,18 @@ class EstimateController
 
             $data = $request->all();
 
-            $header = $data['header'] ?? [];
-            $footer = $data['footer'] ?? [];
-            $estimateMaterials = $data['estimate_materials'] ?? [];
-            $estimateLabors = $data['estimate_labors'] ?? [];
+            $EstimateData = $data['EstimateData'] ?? [];
+            $estimateMaterials = $data['estimateMaterialData'] ?? [];
+            $estimateLabors = $data['estimateLaborsData'] ?? [];
 
-            $headerValidator = Validator::make($header, $this->headerRules());
-            $footerValidator = Validator::make($footer, $this->footerRules());
+            // Validaciones
+            $EstimateDataValidator = Validator::make($EstimateData, $this->estimateRules());
 
-            if ($headerValidator->fails() || $footerValidator->fails()) {
+            if ($EstimateDataValidator->fails()) {
                 return response()->json([
-                    'message' => 'Datos inválidos',
-                    'errors' => $headerValidator->errors()->merge($footerValidator->errors()),
-                ], 422);
+                    'message' => 'Error al crear el presupuesto, datos inválidos.',
+                    'errors' => $EstimateDataValidator->errors(),
+                ], 400);
             }
 
             // Validar materiales y mano de obra
@@ -206,16 +205,16 @@ class EstimateController
 
             // Actualizar cabecera del presupuesto
             $estimate->update([
-                'estimate_number' => $header['estimate_number'],
-                'client_id'       => $header['client_id'],
-                'project_id'      => $header['project_id'],
-                'status'          => $header['status'],
-                'issue_date'      => $header['issue_date'],
-                'due_date'        => $header['due_date'],
-                'discount'        => $footer['discount'] ?? null,
-                'iva'             => $footer['iva'],
-                'total_cost'      => $footer['total_cost'],
-                'conditions'      => $footer['conditions'] ?? null,
+                'user_id'        => Auth::id(),
+                'estimate_number' => $EstimateData['estimate_number'],
+                'project_id'     => $EstimateData['project_id'],
+                'client_id'      => $EstimateData['client_id'],
+                'issue_date'     => $EstimateData['issue_date'],
+                'due_date'       => $EstimateData['due_date'],
+                'status'         => $EstimateData['status'],
+                'iva'            => $EstimateData['iva'],
+                'total_cost'     => $EstimateData['total_cost'],
+                'conditions'     => $EstimateData['conditions'] ?? $EstimateData['conditions'] ?? null,
             ]);
 
             // Actualizar o crear materiales
@@ -312,7 +311,7 @@ class EstimateController
     }
 
     // Funciones Auxiliares
-    private function headerRules(): array
+    private function estimateRules(): array
     {
         return [
             'estimate_number' => 'required|string|unique:estimates,estimate_number',
@@ -320,17 +319,10 @@ class EstimateController
             'project_id'      => 'nullable|exists:projects,project_id',
             'status'          => 'nullable|in:aceptado,pendiente,rechazado',
             'issue_date'      => 'required|date',
+            'iva'             => 'nullable|numeric|min:0',
+            'total_cost'       => 'required|numeric|min:0',
             'due_date'        => 'required|date|after_or_equal:issue_date',
-        ];
-    }
-
-    private function footerRules(): array
-    {
-        return [
-            'discount'    => 'nullable|numeric|min:0',
-            'iva'         => 'required|numeric|min:0',
-            'total_cost'  => 'required|numeric|min:0',
-            'conditions'  => 'nullable|string',
+            'conditions'  => 'nullable|string'
         ];
     }
 
@@ -340,6 +332,7 @@ class EstimateController
             'material_id' => 'required|exists:materials,material_id',
             'quantity'    => 'required|numeric|min:0',
             'unit_price'  => 'required|numeric|min:0',
+            'discount'    => 'nullable|numeric|min:0',
             'total_price' => 'nullable|numeric|min:0',
         ];
     }
@@ -350,6 +343,7 @@ class EstimateController
             'labor_type_id' => 'required|exists:labor_types,labor_type_id',
             'hours'         => 'required|numeric|min:0',
             'cost_per_hour' => 'required|numeric|min:0',
+            'discount'    => 'nullable|numeric|min:0',
             'total_cost'    => 'nullable|numeric|min:0',
         ];
     }

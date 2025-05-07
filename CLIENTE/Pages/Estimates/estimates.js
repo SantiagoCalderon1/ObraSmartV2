@@ -1,4 +1,6 @@
 import { EstimatesListPage } from "./estimates-list.js";
+import { EstimateFormPage } from "./estimates-form.js";
+
 
 export function EstimatesPage() {
     return {
@@ -9,10 +11,10 @@ export function EstimatesPage() {
                     content = m(EstimatesListPage);
                     break;
                 case "create":
-                    content = m(BudgetFormPage);
+                    content = m(EstimateFormPage, { type: "create" });
                     break;
                 case "update":
-                    content = m(BudgetFormPage, { typeForm: "update", budget_number: attrs.id });
+                    content = m(EstimateFormPage, { type: "update", estimate_number: attrs.id });
                     break;
                 default:
                     content = m("div", "Vista no encontrada");

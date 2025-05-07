@@ -26,7 +26,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('me', 'getUser');
     });
 
-    //Rutas de BudgetController
+    //Rutas de EstimateController
     Route::controller(EstimateController::class)->group(function () {
         Route::get('/estimates', 'index');
         Route::post('/estimates', 'store');
@@ -41,7 +41,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
 
 
-    
+
     //Rutas de BudgetDetailController
     Route::controller(BudgetDetailController::class)->group(function () {
         Route::get('/budgets-details/{id?}', 'index');
@@ -55,11 +55,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
     //Rutas de ClientController
     Route::controller(ClientController::class)->group(function () {
         Route::get('/clients', 'index');
-        Route::get('/clients/{id}', 'show');
+        Route::get('/clients/{client}', 'show');
         Route::post('/clients', 'store');
-        Route::put('/clients/{id}', 'update');
-        Route::patch('/clients/{id}', 'update');
-        Route::delete('/clients/{id}', 'destroy');
+        Route::put('/clients/{client}', 'update');
+        Route::patch('/clients/{client}', 'update');
+        Route::delete('/clients/{client}', 'destroy');
     });
 
 
@@ -67,11 +67,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
     //Rutas de ProjectController
     Route::controller(ProjectController::class)->group(function () {
         Route::get('/projects', 'index');
-        Route::get('/projects/{id}', 'show');
+        Route::get('/projects/{project}', 'show');
         Route::post('/projects', 'store');
-        Route::put('/projects/{id}', 'update');
-        Route::patch('/projects/{id}', 'update');
-        Route::delete('/projects/{id}', 'destroy');
+        Route::put('/projects/{project}', 'update');
+        Route::patch('/projects/{project}', 'update');
+        Route::delete('/projects/{project}', 'destroy');
     });
 
     /*  // Aqui van las rutas que pueden acceder bien sea Admin o User

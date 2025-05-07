@@ -35,7 +35,7 @@ class Project extends Model
 
     public function projectLogs()
     {
-        return $this->hasMany(EstimateLabor::class, 'project_id', 'project_id');
+        return $this->hasMany(ProjectLog::class, 'project_id', 'project_id');
     }
 
     public function stockMovements()

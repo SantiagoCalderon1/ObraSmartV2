@@ -1,31 +1,30 @@
-import { ButtonComponent } from "../../Util/generalsComponents.js";
+import { ButtonComponent, ModalConfirmation } from "../../Util/generalsComponents.js";
 
 // IMPORTADOR DE FUNCIONES
-import { fetchEstimates, fetchBudgetDetails, fetchClients, fetchProjects, createBudget, updateBudget } from "../../Services/estimates-service.js";
+import { fetchEstimates, fetchEstimate, fetchClients, fetchProjects, createBudget, updateBudget } from "../../Services/services.js";
 
 
-export function BudgetFormPage() {
+export function EstimateFormPage() {
     return {
         view: function ({ attrs }) {
-            const isUpdate = attrs.typeForm === "update";
-            const title = isUpdate
-                ? `Actualizando el Presupuesto ${attrs.budget_number}`
-                : "Nuevo Presupuesto";
+            const { type, estimate_number } = attrs
+            const isUpdate = type === "update";
+            const title = isUpdate ? `Actualizando el Presupuesto #${estimate_number}` : "Creando Nuevo Presupuesto";
 
             return [
-                m("h1.text-center", { style: { padding: "30px 0", textTransform: "uppercase" } }, title),
-                m(FormBudgetComponent, {
-                    typeForm: attrs.typeForm,
-                    budget_number: attrs.budget_number // puede ser `undefined` en creación
+                m("h1.text-center.fw-semibold.text-uppercase", { style: { padding: "2rem 1rem", textTransform: "uppercase" } }, title),
+                m(EstimateFormComponent, {
+                    type: type,
+                    estimate_number: estimate_number // puede ser `undefined` en creación
                 }),
-                m(BudgetModalConfirmation, {
-                    idModal: "ModalCancelationBudget",
+                m(ModalConfirmation, {
+                    idModal: "ModalCancelation",
                     tituloModal: "Confirmación de cancelación",
                     mensaje: isUpdate
                         ? "¿Está seguro de cancelar la actualización del presupuesto?"
                         : "¿Está seguro de cancelar la creación del nuevo presupuesto?",
                     actions: () => {
-                        m.route.set("/budgets");
+                        m.route.set("/estimates");
                         m.redraw();
                     }
                 })
@@ -34,6 +33,645 @@ export function BudgetFormPage() {
     }
 }
 
+
+
+
+function EstimateFormComponent() {
+    let style = {
+        _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
+        _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
+    }
+ 
+    // Fecha Actual
+    const today = new Date().toISOString().split("T")[0];
+    // Impuestos
+    const taxes = [{ value: 10, content: "10% IVA" }, { value: 21, content: "21% IVA" }, { value: 3, content: "3% IGIC" }, { value: 7, content: "7% IGIC" }, { value: 4, content: "4% IPSI" }, { value: 10, content: "10% IPSI" }]
+    // Opciones de estado
+    const status = [{ value: "Aceptado", content: "Aceptado" }, { value: "Pendiente", content: "Pendiente" }, { value: "Rechazado", content: "Rechazado" },];
+
+    const EstimateData = ({
+        estimate_number = "",
+        project_id = "",
+        client_id = "",
+        status = "",
+        issue_date = today,
+        due_date = today,
+        iva = 0,
+        total_cost = 0,
+        conditions = ""
+    } = {}) => ({
+        estimate_number,
+        project_id,
+        client_id,
+        status,
+        issue_date,
+        due_date,
+        iva,
+        total_cost,
+        conditions
+    });
+
+    const estimateMaterialData = ({
+        material_id = "",
+        quantity = 0,
+        unit_price = 0,
+        discount = 0,
+        total_price = 0
+    } = {}) => ({
+        material_id,
+        quantity,
+        unit_price,
+        discount,
+        total_price,
+    });
+
+    const estimateLaborsData = ({
+        labor_type_id = "",
+        hours = 0,
+        cost_per_hour = 0,
+        discount = 0,
+        total_cost = 0
+    } = {}) => ({
+        labor_type_id,
+        hours,
+        cost_per_hour,
+        discount,
+        total_cost,
+    });
+
+
+    const state = {
+        estimateData: EstimateData(),
+        estimateMaterialData: [estimateMaterialData()],
+        estimateLaborsData: [estimateLaborsData()],
+        clients: [],
+        projects: [],
+        selectedEstimate: null,
+        filterClients: "",
+        filterProjects: "",
+        estimateMaterialDataUpdate: [],
+        estimateLaborsDataDataUpdate: []
+    };
+
+    const collectFormData = () => {
+        return {
+            header: { ...state.headerDocument[0] },
+            concepts: [...(state.conceptItemsUpdate.length ? state.conceptItemsUpdate : state.conceptItems)]
+        };
+    }
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        const dataToSend = collectFormData();
+        // Validación básica
+        if (!dataToSend.header.inputClient || !dataToSend.header.inputProject) {
+            Toastify({
+                text: "¡Por favor, selecciona cliente y proyecto.!",
+                className: "toastify-error",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right"
+            }).showToast();
+            return;
+        }
+
+        try {
+            state.isLoading = true;
+            const isUpdate = !!state.selectedBudget;
+            const data = isUpdate
+                ? await updateBudget(dataToSend, state.selectedBudget.budget_id)
+                : await createBudget(dataToSend);
+            console.log("Response form: ", data);
+
+            // Resetear solo si se creó nuevo
+            if (!isUpdate) { state.headerDocument = [EstimateData()]; state.conceptItems = [createConcept()]; }
+
+            Toastify({
+                text: "¡Operación exitosa!",
+                className: "toastify-success",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right"
+            }).showToast();
+
+            m.route.set("/budgets")
+        } catch (error) {
+            console.error("Error al enviar el formulario:", error);
+            Toastify({
+                text: "¡Algo salió mal!",
+                className: "toastify-error",
+                duration: 3000,
+                close: true,
+                gravity: "top",
+                position: "right"
+            }).showToast();
+        } finally {
+            state.isLoading = false;
+        }
+    }
+
+    const totalBudget = () => {
+        const pBruto = state.conceptItems.reduce((acc, item) => acc + item.subtotal, 0).toFixed(2);
+        return pBruto * (1 + state.selectedBudget?.tax / 100);
+        //state.conceptItems.reduce((acc, item) => acc + item.subtotal, 0).toFixed(2)
+    }
+
+
+    const updateConceptSubtotal = (item) => {
+        //const tax = parseFloat(item.tax || 0);
+        const quantity = parseFloat(item.quantity || 0);
+        const unit_price = parseFloat(item.unit_price || 0);
+        const discount = parseFloat(item.discount || 0);
+
+        const pBruto = quantity * unit_price;
+        const pNeto = pBruto //* (1 + tax / 100);
+
+        item.subtotal = Math.max(pNeto - discount, 0);
+        m.redraw();
+    };
+
+    async function loadEstimate(estimate_id = null) {
+        try {
+            // Clientes
+            state.clients = (await fetchClients()).data
+            state.projects = (await fetchProjects()).data
+
+            console.log("Clientes: ", state.clients);
+            console.log("Proyectos: ", state.projects);
+
+
+            // Solo si es modo edición (update)
+            if (estimate_id) {
+                state.selectedEstimate = await fetchEstimate(estimate_id);
+                console.log("selectedEstimate:", state.selectedEstimate);
+                // Estimate
+                state.estimateData = [
+                    EstimateData({
+                        estimate_number: state.selectedEstimate.estimate_number,
+                        project_id: state.selectedEstimate.project_id,
+                        client_id: state.selectedEstimate.client_id,
+                        status: state.selectedEstimate.status,
+                        issue_date: today,
+                        due_date: today,
+                        iva: state.selectedEstimate.tax,
+                        conditions: state.selectedEstimate.conditions
+                    })
+                ]
+                console.log("EstimateData:", state.estimateData);
+                // materials
+                state.estimateMaterialDataUpdate = state.estimateData?.materials.map((item) =>
+                    estimateMaterialData({
+                        material_id: item.estimate_material_id,
+                        concept: item.concept,
+                        quantity: item.quantity,
+                        unit_price: item.unit_price,
+                        discount: item.discount,
+                        total_price: item.total_price
+                    })
+                )
+                console.log("Items materials actualizables:", state.estimateMaterialDataUpdate);
+                //labors
+                state.estimateLaborsDataDataUpdate = state.estimateData?.labors.map((item) =>
+                    estimateMaterialData({
+                        labor_type_id: item.labor_type_id,
+                        hours: item.hours,
+                        cost_per_hour: item.cost_per_hour,
+                        discount: item.discount,
+                        total_cost: item.total_cost,
+                    })
+                )
+                console.log("Items labors actualizables:", state.estimateLaborsDataDataUpdate);
+            }
+            m.redraw();
+        } catch (error) {
+            console.error("Error cargando datos del formulario:", error);
+        }
+    }
+
+    return {
+        oncreate: ({ attrs }) => {
+            loadEstimate(attrs.estimate_id);
+        },
+        view: ({ attrs }) => {
+            const { type } = attrs;
+
+            const filterList = (list, keyword) =>
+                list.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(keyword.toLowerCase())));
+
+            // Btns Eliminar y Añadir concepto
+            const btnsAction = ({ keyPop, keyPush, createConcept }) => {
+                const isEmpty = state[keyPop].length === 0;
+                return m("div.col-12.mt-3.d-flex.justify-content-center", [
+                    m("div.col-md-8.d-flex.flex-column.flex-md-row.justify-content-between.gap-4", [
+                        // Botón Eliminar
+                        m(ButtonComponent, {
+                            bclass: "btn btn-danger",
+                            disabled: isEmpty,
+                            actions: () => state[keyPop].pop(),
+                        }, [
+                            "Eliminar concepto",
+                            m("i.fa.fa-trash-can.me-2.ms-2", { style: { color: "white" } })
+                        ]),
+                        // Botón Añadir
+                        m(ButtonComponent, {
+                            bclass: "btn-warning",
+                            actions: () => state[keyPush].push(createConcept()),
+                        }, [
+                            "Añadir concepto",
+                            m("i.fa.fa-plus.me-2.ms-2")
+                        ])
+                    ])
+                ]);
+            };
+
+            const renderEstimate = () =>
+                m("div", { class: "row col-12 p-0 m-0" }, [
+                    m("hr"),
+                    //Titulo
+                    m("span", { class: "fw-semibold text-uppercase fs-5 py-3" }, "Cabecera del documento"),
+                    // Cliente filter
+                    m("div", { class: "col-md-4 d-flex flex-column align-items-start py-2" }, [
+                        m("div.input-group.flex-nowrap", [
+                            m("input.form-control", {
+                                style: { ...style._input_main },
+                                value: state.filterClients || "",
+                                placeholder: " Filtrar cliente",
+                                oninput: e => {
+                                    state.filterClients = e.target.value;
+                                    m.redraw();
+                                }
+                            }),
+                            m("span.input-group-text", {
+                                style: { ...style._input_main },
+                                onclick: e => e.target.closest(".input-group").querySelector("input").focus()
+                            }, m("i.fa", { class: "fa-magnifying-glass" }))
+                        ])
+                    ]),
+                    // Cliente input
+                    m("div.col-md-4.py-1", [
+                        m("label.form-label.ps-1", "Cliente"),
+                        m("select.form-select", {
+                            style: { ...style._input_secondary },
+                            id: "client_id",
+                            value: state.estimateData?.client_id,
+                            onchange: e => {
+                                state.estimateData.client_id = e.target.value;
+                                m.redraw();
+                            }
+                        }, [
+                            m("option", { value: "", disabled: true, selected: !state.estimateData?.client_id }, "-- Selecciona Cliente --"),
+                            ...(Array.isArray(state.clients) ? filterList(state.clients, state.filterClients) : []).map(opt =>
+                                m("option", { value: opt.client_id }, opt.name || opt.content)
+                            )
+                        ])
+                    ]),
+                    m("div.col-md-4.py-2",),
+
+                    // Proyecto filter
+                    m("div", { class: "col-md-4 d-flex flex-column align-items-start py-3" }, [
+                        m("div.input-group.flex-nowrap", [
+                            m("input.form-control", {
+                                style: { ...style._input_main },
+                                placeholder: " Filtrar proyecto",
+                                value: state.filterProjects || "",
+                                oninput: e => {
+                                    state.filterProjects = e.target.value;
+                                    m.redraw();
+                                }
+                            }),
+                            m("span.input-group-text", {
+                                style: { ...style._input_main },
+                                onclick: e => e.target.closest(".input-group").querySelector("input").focus()
+                            }, m("i.fa", { class: "fa-magnifying-glass" }))
+                        ])
+                    ]),
+                    //projecto input
+                    m("div.col-md-4.py-1", [
+                        m("label.form-label.ps-1", "Proyecto"),
+                        m("select.form-select", {
+                            style: { ...style._input_secondary },
+                            id: "project_id",
+                            value: state.estimateData?.project_id,
+                            onchange: e => {
+                                state.estimateData.project_id = e.target.value;
+                                m.redraw();
+                            }
+                        }, [
+                            m("option", { value: "", disabled: true, selected: !state.estimateData?.project_id }, "-- Selecciona Proyecto --"),
+                            ...(Array.isArray(state.projects) ? filterList(state.projects, state.filterProjects) : []).map(opt =>
+                                m("option", { value: opt.project_id }, opt.name || opt.content)
+                            )
+                        ])
+                    ]),
+                    m("div.col-md-4.py-2",),
+
+                    // Estado
+                    m("div.col-md-2.py-2", [
+                        m("label.form-label.ps-1", "Estado"),
+                        m("select.form-select", {
+                            style: { ...style._input_secondary },
+                            id: "status",
+                            value: state.estimateData?.status,
+                            onchange: e => { state.estimateData.status = e.target.value; m.redraw(); }
+                        }, [
+                            m("option", { value: "", disabled: true, selected: !state.estimateData?.status }, "-- Selecciona Estado--"),
+                            ...status.map(opt =>
+                                m("option", { value: opt.value }, opt.label || opt.content)
+                            )
+                        ])
+                    ]),
+
+                    // IVA
+                    m("div.col-md-2.py-2", [
+                        m("label.form-label.ps-1", "IVA"),
+                        m("select.form-select", {
+                            style: { ...style._input_secondary },
+                            id: "iva",
+                            value: Number(state.estimateData?.iva) || 21,
+                            onchange: e => { state.estimateData.iva = Number(e.target.value); m.redraw(); }
+                        }, [
+                            m("option", { value: "", disabled: true, selected: !state.estimateData?.iva }, "-- Selecciona --"),
+                            ...taxes.map(opt =>
+                                m("option", { value: Number(opt.value) }, opt.content)
+                            )
+                        ])
+                    ]),
+
+                    // Fecha de creación
+                    m("div.col-md-2.py-2", [
+                        m("label.form-label.ps-1", "Creación*"),
+                        m("input.form-control", {
+                            style: { ...style._input_secondary },
+                            type: "date",
+                            id: "issue_date",
+                            value: state.estimateData?.issue_date || today,
+                            max: today,
+                            oninput: e => { state.estimateData.issue_date = e.target.value; m.redraw(); }
+                        })
+                    ]),
+
+                    // Fecha de expiración
+                    m("div.col-md-2.py-2", [
+                        m("label.form-label.ps-1", "Expiración*"),
+                        m("input.form-control", {
+                            style: { ...style._input_secondary },
+                            type: "date",
+                            id: "due_date",
+                            value: state.estimateData?.due_date || today,
+                            min: today,
+                            oninput: e => { state.estimateData.due_date = e.target.value; m.redraw(); }
+                        })
+                    ]),
+                    m("hr.mt-4")
+                ])
+
+            // Grupo de conceptos
+            const renderEstimateMaterialData = (item, index) =>
+                m("div.row.col-12.mt-3.p-0.m-0", [
+                    m("input", { id: `material_id`, type: "hidden", value: item.material_id, }),
+                    //  Nombre 
+                    m("div.col-md-6", [
+                        m("label.form-label", `Material* #${index + 1}`),
+                        m("input.form-control", {
+                            id: "material",
+                            value: item.material?.name,
+                            oninput: e => item.material.name = e.target.value
+                        })
+                    ]),
+                    // Cantidad
+                    m("div.col-md-2", [
+                        m("label.form-label", "Cantidad *"),
+                        m("input.form-control", {
+                            id: "quantity",
+                            type: "number",
+                            min: 0,
+                            placeholder: `${item.quantity} ${item.material?.unit} `,
+                            value: item.quantity,
+                            oninput: e => { item.quantity = +e.target.value; updateConceptSubtotal(item); }
+                        })
+                    ]),
+                    // Precio unitario
+                    m("div.col-md-2", [
+                        m("label.form-label", " P / U *"),
+                        m("input.form-control", {
+                            id: "unit_price",
+                            type: "number",
+                            min: 0,
+                            step: "any",
+                            placeholder: "0",
+                            value: item.unit_price,
+                            oninput: e => { item.unit_price = +e.target.value; updateConceptSubtotal(item); }
+                        })
+                    ]),
+                    // Descuentos
+                    m("div.col-md-2", [
+                        m("label.form-label", "Descuento"),
+                        m("input.form-control", {
+                            id: "discount",
+                            type: "number",
+                            step: "any",
+                            min: 0,
+                            placeholder: "0 €",
+                            value: item.discount,
+                            oninput: e => { item.discount = +e.target.value; updateConceptSubtotal(item); }
+                        })
+                    ]),
+                    m("div.col-md-4"),
+                    // Suub Total
+                    m("div.col-md-2.mt-2", [
+                        m("label.form-label", "SubTotal"),
+                        m("input.form-control[readonly]", { id: "subtotal", value: `${Number(item.total_price ?? 0).toFixed(2)} €` })
+                    ]),
+                ])
+
+            const renderEstimateLaborsData = (item, index) =>
+                m("div.row.col-12.mt-3.p-0.m-0", [
+                    m("input", { id: `material_id`, type: "hidden", value: item.labor_type_id, }),
+                    //  Nombre 
+                    m("div.col-md-6", [
+                        m("label.form-label", `Servicio* #${index + 1}`),
+                        m("input.form-control", {
+                            id: "material",
+                            value: item.labor_type?.name,
+                            oninput: e => item.labor_type.name = e.target.value
+                        })
+                    ]),
+                    // Cantidad
+                    m("div.col-md-2", [
+                        m("label.form-label", "Horas *"),
+                        m("input.form-control", {
+                            id: "hours",
+                            type: "number",
+                            min: 0,
+                            placeholder: `${item.hours} h`,
+                            value: item.hours,
+                            oninput: e => { item.hours = +e.target.value; updateConceptSubtotal(item); }
+                        })
+                    ]),
+                    // Precio unitario
+                    m("div.col-md-2", [
+                        m("label.form-label", " P / U *"),
+                        m("input.form-control", {
+                            id: "cost_per_hour",
+                            type: "number",
+                            min: 0,
+                            step: "any",
+                            placeholder: "0",
+                            value: item.cost_per_hour,
+                            oninput: e => { item.cost_per_hour = +e.target.value; updateConceptSubtotal(item); }
+                        })
+                    ]),
+                    // Descuentos
+                    m("div.col-md-2", [
+                        m("label.form-label", "Descuento"),
+                        m("input.form-control", {
+                            id: "discount",
+                            type: "number",
+                            step: "any",
+                            min: 0,
+                            placeholder: "0 €",
+                            value: item.discount,
+                            oninput: e => { item.discount = +e.target.value; updateConceptSubtotal(item); }
+                        })
+                    ]),
+                    m("div.col-md-4"),
+                    // Suub Total
+                    m("div.col-md-2.mt-2", [
+                        m("label.form-label", "SubTotal"),
+                        m("input.form-control[readonly]", { id: "subtotal", value: `${Number(item.total_cost ?? 0).toFixed(2)} €` })
+                    ]),
+
+                ])
+
+            // Btns volver y aceptar
+            const renderButtonsFoot = () =>
+                m("div.col-12.d-flex.justify-content-center.mt-5", [
+                    m("div.col-md-8.d-flex.justify-content-between.gap-4", [
+                        m(ButtonComponent, {
+                            bclass: "btn-warning ",
+                            actions: () => new bootstrap.Modal(document.getElementById("ModalCancelation")).show()
+                            ,
+                        }, ["Volver", m("i.fa.fa-arrow-left.me-2.ms-2")]),
+                        m(ButtonComponent, {
+                            type: "submit",
+                            class: "btn-success ",
+                        }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
+                    ])
+                ])
+
+            //Formulario completo y renderizado
+            return m("div",
+                {
+                    class: "col-11 col-md-10 d-flex flex-column justify-content-center align-items-center p-3 overflow-hidden",
+                    style: { backgroundColor: "var(--mainWhite)", borderRadius: "8px", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }
+                }, [
+                m("form", {
+                    class: "row col-12",
+                    onsubmit: handleFormSubmit
+                }, [
+
+
+                    renderEstimate(),
+
+                    m("h5", "Conceptos"),
+                    // Conceptos dinámicos
+
+                    type == "update" ?
+                        state.estimateMaterialDataUpdate.map(renderEstimateMaterialData)
+                        :
+                        state.estimateMaterialData.map(renderEstimateMaterialData),
+                    type == "update" ?
+                        btnsAction({ keyPop: "estimateMaterialDataUpdate", keyPush: "estimateMaterialDataUpdate", createConcept: estimateMaterialData })
+                        :
+                        btnsAction({ keyPop: "estimateMaterialData", keyPush: "estimateMaterialData", createConcept: estimateMaterialData }),
+                    type == "update" ?
+                        state.estimateLaborsDataDataUpdate.map(renderEstimateLaborsData)
+                        :
+                        state.estimateLaborsData.map(renderEstimateLaborsData),
+                    type == "update" ?
+                        btnsAction({ keyPop: "estimateLaborsDataUpdate", keyPush: "estimateLaborsDataUpdate", createConcept: estimateLaborsData })
+                        :
+                        btnsAction({ keyPop: "estimateLaborsData", keyPush: "estimateLaborsData", createConcept: estimateLaborsData }),
+                    // Botones añadir/eliminar concepto
+
+                    // Total
+                    m("hr.mt-4"),
+                    //m("div.col-12.text-end", [m("h5", `Total presupuesto: ${totalBudget()} €`)]),
+                    m("hr.mt-4"),
+                    m("div.col-md-12", [
+                        m("label.form-label", 'Condiciones del presupuesto'),
+                        m("input.form-control", {
+                            id: 'inputConditions',
+                            value: state.estimateData[0]?.conditions,
+                            oninput: e => {
+                                state.estimateData[0].conditions = e.target.value;
+                                m.redraw();
+                            },
+                        })
+                    ]),
+                    renderButtonsFoot()
+                ])
+            ])
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* // Descripción
+m("div.col-md-6.mt-2", [
+    m("label.form-label", "Descripción"),
+    m("input.form-control", {
+        id: "total_price",
+        type: "number",
+        step: "any",
+        min: 0,
+        placeholder: "0 €",
+        value: item.total_price,
+        oninput: e => { item.total_price = e.target.value; updateConceptSubtotal(item) }
+    })
+]),
+
+
+    m(ButtonComponent, {
+        bclass: "btn-outline-danger",
+        actions: () => generatePDF(DATA[0])
+    }, ["Descargar PDF ", m("i.fa-solid.fa-file-pdf", { style: { color: "red" } })]
+    )
+ */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
 
 function FormBudgetComponent() {
     const today = new Date().toISOString().split("T")[0];
@@ -430,4 +1068,4 @@ function FormBudgetComponent() {
             ])
         }
     }
-}
+} */

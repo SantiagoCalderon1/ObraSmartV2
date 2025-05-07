@@ -23,6 +23,7 @@ class EstimateLabor extends Model
         'labor_type_id',
         'hours',
         'cost_per_hour',
+        'discount',
         'total_cost',
     ];
 

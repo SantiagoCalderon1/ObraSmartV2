@@ -20,13 +20,15 @@ class EstimateLaborFactory extends Factory
     {
         $hours = fake()->numberBetween(1, 20);
         $costPerHour = fake()->randomFloat(2, 10, 60);
+        $discount = fake()->randomFloat(2, 100, 5000);
 
         return [
             'estimate_id' => Estimate::inRandomOrder()->value('estimate_id'),
             'labor_type_id' => LaborType::inRandomOrder()->value('labor_type_id'),
             'hours' => $hours,
             'cost_per_hour' => $costPerHour,
-            'total_cost' => $hours * $costPerHour,
+            'discount' => $discount,
+            'total_cost' => (($hours * $costPerHour) - $discount),
         ];
     }
 }

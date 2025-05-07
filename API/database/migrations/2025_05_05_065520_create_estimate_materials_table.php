@@ -17,10 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('material_id')->nullable();
             $table->integer('quantity');
             $table->decimal('unit_price', 10, 2);
+            $table->decimal('discount', 10, 2)->nullable();
             $table->decimal('total_price', 10, 2);
-
             $table->timestamps();
-
             $table->foreign('estimate_id')->references('estimate_id')->on('estimates')->onDelete('set null');
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('set null');
         });
