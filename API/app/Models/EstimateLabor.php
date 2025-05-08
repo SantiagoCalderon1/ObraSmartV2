@@ -25,6 +25,7 @@ class EstimateLabor extends Model
         'cost_per_hour',
         'discount',
         'total_cost',
+        'description',
     ];
 
     public function estimate()

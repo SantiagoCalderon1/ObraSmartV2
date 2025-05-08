@@ -29,6 +29,7 @@ class EstimateLaborFactory extends Factory
             'cost_per_hour' => $costPerHour,
             'discount' => $discount,
             'total_cost' => (($hours * $costPerHour) - $discount),
+            'description' => fake()->paragraph(2),
         ];
     }
 }

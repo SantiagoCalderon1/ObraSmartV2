@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('cost_per_hour', 10, 2);
             $table->decimal('discount', 10, 2)->nullable();
             $table->decimal('total_cost', 10, 2);
+            $table->text('description')->nullable();
+
 
             $table->timestamps();
 

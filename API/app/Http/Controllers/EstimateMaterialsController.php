@@ -28,7 +28,13 @@ class EstimateMaterialsController
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'unit' => 'required|in:kg,m2,lt,unidades',
+            'price_per_unit' => 'requiered|numeric|min:0',
+            'stock_quantity' => 'nullable|numeric|min:0',
+            'min_stock_alert' => 'nullable|min:0',
+        ]);
     }
 
     /**

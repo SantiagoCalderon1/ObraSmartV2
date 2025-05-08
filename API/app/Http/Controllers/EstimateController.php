@@ -59,9 +59,9 @@ class EstimateController
             DB::beginTransaction();
 
             $data = $request->all();
-            $EstimateData = $data['EstimateData'] ?? [];
-            $estimateMaterials = $data['estimate_materials'] ?? [];
-            $estimateLabors = $data['estimate_labors'] ?? [];
+            $EstimateData = $data['estimateData'] ?? [];
+            $estimateMaterials = $data['estimateMaterials'] ?? [];
+            $estimateLabors = $data['estimateLabors'] ?? [];
 
             // Validaciones
             $EstimateDataValidator = Validator::make($EstimateData, $this->estimateRules());
@@ -76,7 +76,7 @@ class EstimateController
             // Crear Estimate
             $estimate = Estimate::create([
                 'user_id'        => Auth::id(),
-                'estimate_number' => $EstimateData['estimate_number'],
+                'estimate_number' => 'EST-' . date('ymdHis'),
                 'project_id'     => $EstimateData['project_id'],
                 'client_id'      => $EstimateData['client_id'],
                 'issue_date'     => $EstimateData['issue_date'],
@@ -84,7 +84,7 @@ class EstimateController
                 'status'         => $EstimateData['status'],
                 'iva'            => $EstimateData['iva'],
                 'total_cost'     => $EstimateData['total_cost'],
-                'conditions'     => $EstimateData['conditions'] ?? $EstimateData['conditions'] ?? null,
+                'conditions'     => $EstimateData['conditions'] ??  null,
             ]);
 
             // Insertar materiales
@@ -124,6 +124,7 @@ class EstimateController
                     'cost_per_hour'  => $item['cost_per_hour'],
                     'discount'    => $item['discount'] ?? null,
                     'total_cost'     => $item['total_cost'],
+                    'conditions'     => $item['conditions'] ??  null,
                 ]);
             }
 
@@ -206,9 +207,8 @@ class EstimateController
             // Actualizar cabecera del presupuesto
             $estimate->update([
                 'user_id'        => Auth::id(),
-                'estimate_number' => $EstimateData['estimate_number'],
-                'project_id'     => $EstimateData['project_id'],
                 'client_id'      => $EstimateData['client_id'],
+                'project_id'     => $EstimateData['project_id'],
                 'issue_date'     => $EstimateData['issue_date'],
                 'due_date'       => $EstimateData['due_date'],
                 'status'         => $EstimateData['status'],
@@ -313,18 +313,20 @@ class EstimateController
     // Funciones Auxiliares
     private function estimateRules(): array
     {
-        return [
-            'estimate_number' => 'required|string|unique:estimates,estimate_number',
-            'client_id'       => 'nullable|exists:projects,project_id',
-            'project_id'      => 'nullable|exists:projects,project_id',
-            'status'          => 'nullable|in:aceptado,pendiente,rechazado',
-            'issue_date'      => 'required|date',
-            'iva'             => 'nullable|numeric|min:0',
-            'total_cost'       => 'required|numeric|min:0',
-            'due_date'        => 'required|date|after_or_equal:issue_date',
-            'conditions'  => 'nullable|string'
+        $rules = [
+            'client_id'     => 'nullable|exists:projects,project_id',
+            'project_id'    => 'nullable|exists:projects,project_id',
+            'status'        => 'nullable|in:aceptado,pendiente,rechazado',
+            'issue_date'    => 'required|date',
+            'iva'           => 'nullable|numeric|min:0',
+            'total_cost'    => 'required|numeric|min:0',
+            'due_date'      => 'required|date|after_or_equal:issue_date',
+            'conditions'    => 'nullable|string',
         ];
+
+        return $rules;
     }
+
 
     private function materialRules(): array
     {
@@ -345,6 +347,7 @@ class EstimateController
             'cost_per_hour' => 'required|numeric|min:0',
             'discount'    => 'nullable|numeric|min:0',
             'total_cost'    => 'nullable|numeric|min:0',
+            'description'    => 'nullable|string',
         ];
     }
 

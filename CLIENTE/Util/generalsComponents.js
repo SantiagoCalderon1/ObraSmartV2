@@ -226,7 +226,7 @@ export function ModalComponent() {
                         m("div.modal-body.d-flex.justify-content-center", slots.body ? slots.body : "Cargando detalles..."),
                         m("div.modal-footer", [
                             slots.footer && slots.footer,
-                            addBtnClose && m("button.btn.btn-outline-secondary", { "data-bs-dismiss": "modal", style: { fontWeight: "bold" } }, "Cerrar"),
+                            addBtnClose && m("button.btn.btn-outline-secondary rounded-pill fw-bold py-2", { "data-bs-dismiss": "modal" }, "Cerrar"),
                         ]),
                     ]),
                 ]),
@@ -241,7 +241,7 @@ export function ModalConfirmation() {
         view: function ({ attrs }) {
             const { idModal, tituloModal, mensaje, actions } = attrs
 
-                
+
             const ContentFooterModal = () =>
                 m("div", { class: "col-12 d-flex justify-content-center" }, [
                     m("div", { class: "col-8 col-md-4 d-flex justify-content-between gap-5" }, [
@@ -276,7 +276,7 @@ export function ButtonComponent() {
             return m("button", {
                 "data-bs-dismiss": closeModal ? "modal" : "",
                 type: type,
-                class: `btn ${bclass}`,
+                class: `btn rounded-pill fw-normal py-2 ${bclass}`,
                 onclick: actions,
                 style: { fontWeight: "bold", ...style }
             }, children)

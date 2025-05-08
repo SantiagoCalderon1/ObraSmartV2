@@ -101,7 +101,7 @@ function FormComponent() {
                             m(ButtonComponent,
                                 {
                                     type: "submit",
-                                    bclass: "btn-primary w-100 py-2 rounded-pill fw-semibold", style: { backgroundColor: "var(--mainPurple)" }
+                                    bclass: "btn-primary w-100 fw-semibold", style: { backgroundColor: "var(--mainPurple)" }
                                 },
                                 ["Iniciar Sesión"]
                             ),
@@ -115,7 +115,7 @@ function FormComponent() {
                         ]),
                         m(ButtonComponent,
                             {
-                                bclass: "btn btn-warning w-100 py-2 rounded-pill fw-normal",
+                                bclass: "btn btn-warning w-100",
                                 type: "submit",
                                 actions: () => m.route.set("/register")
                             },
