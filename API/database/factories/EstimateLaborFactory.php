@@ -18,9 +18,9 @@ class EstimateLaborFactory extends Factory
      */
     public function definition(): array
     {
-        $hours = fake()->numberBetween(1, 20);
-        $costPerHour = fake()->randomFloat(2, 10, 60);
-        $discount = fake()->randomFloat(2, 100, 5000);
+        $hours = fake()->numberBetween(1, 30);
+        $costPerHour = fake()->randomFloat(2, 10, 100);
+        $discount = fake()->randomFloat(2, 1, 50);
 
         return [
             'estimate_id' => Estimate::inRandomOrder()->value('estimate_id'),

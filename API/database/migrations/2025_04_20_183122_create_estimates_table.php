@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('client_id')->nullable();
             $table->date('issue_date');
             $table->date('due_date');
-            $table->enum('status', ['aceptado', 'pendiente', 'rechazado'])->default('pendiente');
+            $table->enum('status', ['Aceptado', 'Pendiente', 'Rechazado'])->default('Pendiente');
 
 
             $table->decimal('discount', 10, 2)->nullable();

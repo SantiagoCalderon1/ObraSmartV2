@@ -26,14 +26,14 @@ class DatabaseSeeder extends Seeder
     ]);
 
     // Crear usuarios
-    User::factory(10)->create();
+    User::factory(5)->create();
 
     // Crear materiales y tipos de mano de obra primero
-    Material::factory(10)->create();
-    LaborType::factory(5)->create();
+    Material::factory(30)->create();
+    LaborType::factory(10)->create();
 
     // Crear clientes
-    Client::factory(5)->create()->each(function ($client) {
+    Client::factory(10)->create()->each(function ($client) {
         // Cada cliente con 1-3 proyectos
         Project::factory(rand(1, 3))
             ->for($client)
@@ -56,22 +56,22 @@ class DatabaseSeeder extends Seeder
                             ->create();
 
                         // Materiales y mano de obra
-                        EstimateMaterial::factory(rand(2, 5))
+                        EstimateMaterial::factory(rand(2, 10))
                             ->for($estimate)
                             ->create();
 
-                        EstimateLabor::factory(rand(1, 3))
+                        EstimateLabor::factory(rand(1, 10))
                             ->for($estimate)
                             ->create();
                     });
 
                 // Logs de proyecto
-                ProjectLog::factory(rand(1, 4))
+                ProjectLog::factory(rand(1, 10))
                     ->for($project)
                     ->create();
 
                 // Movimiento de stock
-                StockMovement::factory(rand(1, 3))
+                StockMovement::factory(rand(1, 5))
                     ->for($project)
                     ->for(Material::inRandomOrder()->first())
                     ->for(User::inRandomOrder()->first())

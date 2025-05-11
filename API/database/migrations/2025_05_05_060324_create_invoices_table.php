@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id("invoice_id");
             $table->string('invoice_number')->unique();
-
+ 
             $table->unsignedBigInteger('estimate_id')->nullable();
 
 
@@ -28,6 +28,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('estimate_id')->references('estimate_id')->on('estimates')->onDelete('set null');
+ 
         });
     }
 

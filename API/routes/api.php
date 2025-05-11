@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\EstimateController;
+use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\LaborTypesController;
 use App\Http\Controllers\MaterialsController;
 use App\Http\Controllers\ProjectController;
@@ -67,7 +68,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::delete('/materials/{materials}', 'destroy');
     });
 
-    //Rutas de ProjectController
+    //Rutas de LaborTypesController
     Route::controller(LaborTypesController::class)->group(function () {
         Route::get('/labor-types', 'index');
         Route::get('/labor-types/{laborType}', 'show');
@@ -76,6 +77,17 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::patch('/labor-types/{laborType}', 'update');
         Route::delete('/labor-types/{laborType}', 'destroy');
     });
+
+    //Rutas de InvoicesController
+    Route::controller(InvoicesController::class)->group(function () {
+        Route::get('/invoices', 'index');
+        Route::post('/invoices', 'store');
+        Route::get('/invoices/{invoice}', 'show');
+        //Route::put('/invoices/{invoice}', 'update');  Esta preparado para funcionar si se requiere
+        Route::patch('/invoices/{invoice}', 'update');
+        Route::delete('/invoices/{invoice}', 'destroy');
+    });
+
 
     /*  // Aqui van las rutas que pueden acceder bien sea Admin o User
 

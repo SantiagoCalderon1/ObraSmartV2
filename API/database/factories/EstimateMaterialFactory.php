@@ -24,8 +24,8 @@ class EstimateMaterialFactory extends Factory
     {
 
         $quantity = fake()->numberBetween(1, 50);
-        $unitPrice = fake()->randomFloat(2, 1, 100);
-        $discount = fake()->randomFloat(2, 100, 5000);
+        $unitPrice = fake()->randomFloat(2, 1, 250);
+        $discount = fake()->randomFloat(2, 1, 50);
 
         return [
             'estimate_id' => Estimate::inRandomOrder()->value('estimate_id'),

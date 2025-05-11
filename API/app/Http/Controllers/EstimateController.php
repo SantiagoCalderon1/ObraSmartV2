@@ -59,12 +59,12 @@ class EstimateController
             DB::beginTransaction();
 
             $data = $request->all();
-            $EstimateData = $data['estimateData'] ?? [];
-            $estimateMaterials = $data['estimateMaterials'] ?? [];
-            $estimateLabors = $data['estimateLabors'] ?? [];
+            $estimate = $data['estimate'] ?? [];
+            $estimateMaterials = $data['materials'] ?? [];
+            $estimateLabors = $data['labors'] ?? [];
 
             // Validaciones
-            $EstimateDataValidator = Validator::make($EstimateData, $this->estimateRules());
+            $EstimateDataValidator = Validator::make($estimate, $this->estimateRules());
 
             if ($EstimateDataValidator->fails()) {
                 return response()->json([
@@ -77,14 +77,14 @@ class EstimateController
             $estimate = Estimate::create([
                 'user_id'        => Auth::id(),
                 'estimate_number' => 'EST-' . date('ymdHis'),
-                'project_id'     => $EstimateData['project_id'],
-                'client_id'      => $EstimateData['client_id'],
-                'issue_date'     => $EstimateData['issue_date'],
-                'due_date'       => $EstimateData['due_date'],
-                'status'         => $EstimateData['status'],
-                'iva'            => $EstimateData['iva'],
-                'total_cost'     => $EstimateData['total_cost'],
-                'conditions'     => $EstimateData['conditions'] ??  null,
+                'project_id'     => $estimate['project_id'],
+                'client_id'      => $estimate['client_id'],
+                'issue_date'     => $estimate['issue_date'],
+                'due_date'       => $estimate['due_date'],
+                'status'         => $estimate['status'],
+                'iva'            => $estimate['iva'],
+                'total_cost'     => $estimate['total_cost'],
+                'conditions'     => $estimate['conditions'] ??  null,
             ]);
 
             // Insertar materiales
@@ -179,12 +179,12 @@ class EstimateController
 
             $data = $request->all();
 
-            $EstimateData = $data['EstimateData'] ?? [];
-            $estimateMaterials = $data['estimateMaterialData'] ?? [];
-            $estimateLabors = $data['estimateLaborsData'] ?? [];
+            $estimateData = $data['estimate'] ?? [];
+            $estimateMaterials = $data['materials'] ?? [];
+            $estimateLabors = $data['labors'] ?? [];
 
             // Validaciones
-            $EstimateDataValidator = Validator::make($EstimateData, $this->estimateRules());
+            $EstimateDataValidator = Validator::make($estimateData, $this->estimateRules());
 
             if ($EstimateDataValidator->fails()) {
                 return response()->json([
@@ -207,14 +207,14 @@ class EstimateController
             // Actualizar cabecera del presupuesto
             $estimate->update([
                 'user_id'        => Auth::id(),
-                'client_id'      => $EstimateData['client_id'],
-                'project_id'     => $EstimateData['project_id'],
-                'issue_date'     => $EstimateData['issue_date'],
-                'due_date'       => $EstimateData['due_date'],
-                'status'         => $EstimateData['status'],
-                'iva'            => $EstimateData['iva'],
-                'total_cost'     => $EstimateData['total_cost'],
-                'conditions'     => $EstimateData['conditions'] ?? $EstimateData['conditions'] ?? null,
+                'client_id'      => $estimateData['client_id'],
+                'project_id'     => $estimateData['project_id'],
+                'issue_date'     => $estimateData['issue_date'],
+                'due_date'       => $estimateData['due_date'],
+                'status'         => $estimateData['status'],
+                'iva'            => $estimateData['iva'],
+                'total_cost'     => $estimateData['total_cost'],
+                'conditions'     => $estimateData['conditions'] ?? null,
             ]);
 
             // Actualizar o crear materiales
@@ -314,9 +314,9 @@ class EstimateController
     private function estimateRules(): array
     {
         $rules = [
-            'client_id'     => 'nullable|exists:projects,project_id',
+            'client_id'     => 'nullable|exists:clients,client_id',
             'project_id'    => 'nullable|exists:projects,project_id',
-            'status'        => 'nullable|in:aceptado,pendiente,rechazado',
+            'status'        => 'nullable|in:Aceptado,Pendiente,Rechazado',
             'issue_date'    => 'required|date',
             'iva'           => 'nullable|numeric|min:0',
             'total_cost'    => 'required|numeric|min:0',

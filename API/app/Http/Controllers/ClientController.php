@@ -66,7 +66,7 @@ class ClientController
     public function show(Client $client)
     {
         // Así cargamos las relaciones directamente si tener que hacer mas consultas
-        $client->load(['estimates', 'project']);
+        $client->load(['estimates', 'projects']);
 
         return response()->json([
             'message' => 'Cliente obtenido correctamente',
