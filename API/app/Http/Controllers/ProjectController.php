@@ -40,13 +40,13 @@ class ProjectController
         //
     }
 
-    /**
+    /**  
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'client_id'     => 'required|string|max:255|unique:clients,client_id',
+            'client_id'     => 'required|string|max:255',
             'name'          => 'required|string|max:255',
             'description'   => 'required|string',
             'status'        => 'required|in:en proceso,completado,cancelado',
@@ -91,7 +91,7 @@ class ProjectController
     public function update(Request $request, Project $project)
     {
         $validated = $request->validate([
-            'client_id'     => 'required|string|max:255|unique:clients,client_id',
+            'client_id'     => 'required',
             'name'          => 'required|string|max:255',
             'description'   => 'required|string',
             'status'        => 'required|in:en proceso,completado,cancelado',

@@ -1,63 +1,64 @@
 import { ModalComponent, ModalConfirmation, ButtonComponent } from "../../Util/generalsComponents.js";
 
 // IMPORTADOR DE FUNCIONES
-import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
+import { fetchInvoices, deleteInvoice } from "../../Services/services.js";
 
-export function EstimatesListPage() {
-    let estimates = [];
-    let selectedEstimate = null;
-    
-    async function loadEstimates() {
-        estimates = (await fetchEstimates()).data;
-        console.log(estimates);
+export function InvoicesListPage() {
+    let invoices = [];
+    let selectedInvoice = null;
+    2
+    async function loadInvoices() {
+        invoices = (await fetchInvoices()).data;
+        console.log(invoices);
         m.redraw();
     }
 
     return {
-        oncreate: loadEstimates,
+        oncreate: loadInvoices,
         view: function () {
-            const onSelect = (estimate) => {
-                selectedEstimate = estimate;
-                new bootstrap.Modal(document.getElementById("ModalDetailsEstimatesList")).show();
+            const onSelect = (invoice) => {
+                selectedInvoice = invoice;
+                new bootstrap.Modal(document.getElementById("ModalDetailsInvoicesList")).show();
                 m.redraw();
             };
 
             const onDelete = async () => {
-                if (selectedEstimate) {
-                    await deleteEstimate(selectedEstimate.estimate_id);
-                    selectedEstimate = null;
-                    await loadEstimates();
+                if (selectedInvoice) {
+                    await deleteInvoice(selectedInvoice.invoice_id);
+                    selectedInvoice = null;
+                    await loadInvoices();
                 }
             };
 
             const columns = [
                 { title: "#", field: "index" },
-                { title: "Núm Presupuesto", field: "estimate_number", style: () => ({ textWrap: "nowrap" }) },
+                { title: "Núm Factura", field: "invoice_number", style: () => ({ textWrap: "nowrap" }) },
                 {
                     title: "Estado", field: "status", style: (item) => ({
                         fontWeight: "bold",
                         textTransform: "uppercase",
-                        color: item.status === "Aceptado" ? "green" : item.status === "Rechazado" ? "red" : "black"
+                        color: item.status === "pagado" ? "green" : item.status === "rechazado" ? "red" : "black"
                     })
                 },
+                { title: "Núm Presupuesto", field: "estimatate.estimate_number", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Cliente", field: "client.name" },
                 { title: "Proyecto", field: "project.name" },
-                { title: "Total", field: "total_cost", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
+                { title: "Total", field: "total_amount", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-
             ];
 
             // Normaliza los datos para la tabla (añade índice y campos planos)            
-            const normalizedEstimates = (estimates || []).map((e, i) => ({
+            const normalizedInvoices = (invoices || []).map((e, i) => ({
                 ...e,
                 index: i + 1,
-                "client.name": e.client?.name || "N/A",
-                "project.name": e.project?.name || "N/A",
+                "estimatate.estimate_number": e.estimate?.estimate_number || "N/A",
+                "client.name": e.estimate?.client?.name || "N/A",
+                "project.name": e.estimate?.project?.name || "N/A",
                 "user.name": e.user?.name || "N/A",
             }));
 
-            if (estimates.length === 0) {
+            if (invoices.length === 0) {
                 return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
                     m("div.spinner-border.text-primary", { role: "status" }, [
                         m("span.visually-hidden", "Cargando...")
@@ -66,26 +67,21 @@ export function EstimatesListPage() {
             }
 
             return [
-                m("h1.py-5.text-uppercase", "Presupuestos"),
+                m("h1.py-5.text-uppercase", "Facturas"),
                 m(TableListComponent, {
                     columns: columns,
-                    data: normalizedEstimates,
+                    data: normalizedInvoices,
                     onRowClick: onSelect
-                }, [m(ButtonComponent,
-                    {
-                        type: "submit",
-                        bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                        actions: () => m.route.set("/estimates/create")
-                    },
-                    ["Crear Presupuesto"]
-                ),]),
+                },
+                    //[m(ButtonComponent, { type: "submit", bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" }, actions: () => m.route.set("/invoices/create") }, ["Crear Factura"] ),]
+                ),
                 m(ModalDetailsComponent, {
-                    estimate: selectedEstimate,
+                    invoice: selectedInvoice,
                 }),
                 m(ModalConfirmation, {
-                    idModal: "ModalDeleteEstimate",
+                    idModal: "ModalDeleteInvoice",
                     tituloModal: "Confirmación de eliminación",
-                    mensaje: `¿Está seguro de eliminar el presupuesto con #${selectedEstimate?.estimate_number}?`,
+                    mensaje: `¿Está seguro de eliminar el factura con #${selectedInvoice?.invoice_number}?`,
                     actions: onDelete
                 })
             ];
@@ -156,7 +152,7 @@ function TableListComponent() {
                     boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
                 }
             }, [
-                m("div", { class: "d-flex flex-column flex-md-row justify-content-between mb-3 gap-3" }, [
+                m("div", { class: `d-flex flex-column flex-md-row  mb-3 gap-3 ${children && children.length ? "justify-content-between" : "justify-content-end"}` }, [
                     children,
                     m("div.input-group", { style: { maxWidth: "400px" } }, [
                         m("input", {
@@ -209,29 +205,37 @@ function TableListComponent() {
 function ModalDetailsComponent() {
     return {
         view: function ({ attrs }) {
-            const { estimate = [] } = attrs;
-
+            const { invoice = [] } = attrs;
+ 
             // Cálculo de subtotales
-            const subtotalMaterials = (estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0);
-            const subtotalLabors = (estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
+            const subtotalMaterials = (invoice?.estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0);
+            const subtotalLabors = (invoice?.estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
             const subtotal = subtotalMaterials + subtotalLabors;
 
 
             // Columnas para tablas
-            const columnsEstimate = [
+            const columnsInvoice = [
                 {
                     title: "Estado", field: "status", style: (item) => ({
                         fontWeight: "bold",
                         textTransform: "uppercase",
-                        color: item?.status === "Aceptado" ? "green" : item?.status === "Rechazado" ? "red" : "black"
+                        color: item?.status === "pagado" ? "green" : item?.status === "rechazado" ? "red" : "black"
                     })
                 },
-                { title: "Cliente", field: "client.name" },
-                { title: "Proyecto", field: "project.name" },
-                { title: "Usuario", field: "user.name" },
+                { title: "Núm Presupuesto", field: "estimatate.estimate_number", style: () => ({ textWrap: "nowrap" }) },
 
+                //{ title: "Cliente", field: "client.name" },
+                { title: "Proyecto", field: "project.name" },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
+            ];
+
+            const columnsClient = [
+                { title: "Nombre", field: "name" },
+                { title: "NIF", field: "nif" },
+                { title: "Telefono", field: "phone" },
+                { title: "Email", field: "email" },
+                { title: "Dirección", field: "address" },
             ];
 
             const columnsMaterials = [
@@ -254,7 +258,7 @@ function ModalDetailsComponent() {
             ];
 
             // Normalización de datos
-            const normalizedMaterials = (estimate?.materials || []).map((m, i) => ({
+            const normalizedMaterials = (invoice?.estimate?.materials || []).map((m, i) => ({
                 ...m,
                 index: i + 1,
                 "material.name": m?.material?.name || "N/A",
@@ -264,7 +268,7 @@ function ModalDetailsComponent() {
                 "total_price": m.total_price || "N/A",
             }))
 
-            const normalizedLabors = (estimate?.labors || []).map((l, i) => ({
+            const normalizedLabors = (invoice?.estimate?.labors || []).map((l, i) => ({
                 ...l,
                 index: i + 1,
                 "labor_type.name": l.labor_type?.name || "N/A",
@@ -312,8 +316,8 @@ function ModalDetailsComponent() {
             const TableFooter = () =>
                 m("div.text-end.mt-5.me-2", [
                     m("h6", `SubTotal: ${(subtotal || 0).toFixed(2)} €`),
-                    m("h6", `IVA: ${Number(estimate?.iva || 0)}%`),
-                    m("h5.fw-bold", `Total: ${Number(estimate?.total_cost || 0).toFixed(2)} €`)
+                    m("h6", `IVA: ${Number(invoice?.estimate?.iva || 0)}%`),
+                    m("h5.fw-bold", `Total: ${Number(invoice?.total_amount || 0).toFixed(2)} €`)
                 ]);
 
             // Header con botones
@@ -322,19 +326,21 @@ function ModalDetailsComponent() {
                     closeModal: true,
                     bclass: "btn-danger",
                     actions: () =>
-                        new bootstrap.Modal(document.getElementById("ModalDeleteEstimate")).show()
+                        new bootstrap.Modal(document.getElementById("ModalDeleteInvoice")).show()
                 }, [
                     m("i.fa-solid.fa-trash-can.text-white"),
-                    " Eliminar Presupuesto"
+                    " Eliminar Factura"
                 ]),
+                /* 
+                    No se puede editar la factura es casi ilegal, pero lo dejo por si algunas vez se requiere
                 m(ButtonComponent, {
                     closeModal: true,
                     bclass: "btn-warning",
-                    actions: () => m.route.set(`/estimates/update/${estimate.estimate_number}`)
+                    actions: () => m.route.set(`/invoices/update/${invoice.invoice_number}`)
                 }, [
                     m("i.fa-solid.fa-pen-to-square"),
-                    " Editar Presupuesto"
-                ])
+                    " Editar Factura"
+                ]) */
             ];
 
             // Body con las dos tablas
@@ -347,7 +353,9 @@ function ModalDetailsComponent() {
                     }
                 }, [
                     m("h5.mt-1", "Detalles"),
-                    Table({ columns: columnsEstimate, data: [estimate] }),
+                    Table({ columns: columnsInvoice, data: [invoice] }),
+                    m("h5.mt-3", "Detalles del cliente"),
+                    Table({ columns: columnsClient, data: [invoice?.estimate?.client] }),
                     m("hr"),
                     m("h5.mt-3", "Conceptos"),
                     m("hr"),
@@ -355,33 +363,23 @@ function ModalDetailsComponent() {
                     Table({ columns: columnsMaterials, data: normalizedMaterials }),
                     m("h5.mt-3", "Mano de Obra"),
                     Table({ columns: columnsLabors, data: normalizedLabors }),
-                    m("div.mt-3", [m("span.fw-bold", "Condiciones: "), (estimate?.conditions || "N/A")]),
                     TableFooter()
                 ]);
 
             // Footer con botón de PDF
-            const ContentFooterModal = () => [
+            const ContentFooterModal = () =>
                 m(ButtonComponent, {
-                    //actions: () => GeneratePDF(estimate),
+                    //actions: () => GeneratePDF(invoice),
                     bclass: "btn-outline-danger"
                 }, [
                     "Descargar PDF ",
                     m("i.fa-solid.fa-file-pdf.text-danger")
-                ]),
-                estimate?.status === "Aceptado" ? m(ButtonComponent, {
-                    bclass: "btn text-white fc-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                    actions: () => m.route.set(`/invoices/create/${estimate?.estimate_number}`),
-                    closeModal: true
-                }, [
-                    "Generar Factura ",
-                    m("i.fa-solid.fa-file-invoice-dollar", { style: { color: "white" } })
-                ]) : null,
-            ]
+                ]);
 
             // Render del modal
             return m(ModalComponent, {
-                idModal: "ModalDetailsEstimatesList",
-                title: `Presupuesto #${estimate?.estimate_number}`,
+                idModal: "ModalDetailsInvoicesList",
+                title: `Factura #${invoice?.invoice_number}`,
                 addBtnClose: true,
                 slots: {
                     header: ContentHeaderModal(),

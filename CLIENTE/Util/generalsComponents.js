@@ -16,6 +16,7 @@ export function HeaderComponent() {
     const MENU_ITEM = [
         { label: "Presupuestos", route: "/estimates", icon: "fa-file-signature" },
         { label: "Facturas", route: "/invoices", icon: "fa-file-invoice-dollar" },
+        { label: "Clientes", route: "/clients", icon: "fa-users" },
         { label: "Materiales", route: "/materials", icon: "fa-shapes" },
         { label: "Proyectos", route: "/projects", icon: "fa-hammer" },
         { label: "Mi Cuenta", route: "/myAccount", icon: "fa-circle-user" },
@@ -224,7 +225,7 @@ export function ModalComponent() {
                         ]),
                         slots.header && m("div.modal-header.d-flex.justify-content-center.gap-5", slots.header),
                         m("div.modal-body.d-flex.justify-content-center", slots.body ? slots.body : "Cargando detalles..."),
-                        m("div.modal-footer", [
+                        m("div.modal-footer.d-flex", { class: slots.footer ? "justify-content-between" : "justify-content-end" }, [
                             slots.footer && slots.footer,
                             addBtnClose && m("button.btn.btn-outline-secondary rounded-pill fw-bold py-2", { "data-bs-dismiss": "modal" }, "Cerrar"),
                         ]),
@@ -240,7 +241,6 @@ export function ModalConfirmation() {
     return {
         view: function ({ attrs }) {
             const { idModal, tituloModal, mensaje, actions } = attrs
-
 
             const ContentFooterModal = () =>
                 m("div", { class: "col-12 d-flex justify-content-center" }, [

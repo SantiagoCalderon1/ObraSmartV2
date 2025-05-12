@@ -14,7 +14,7 @@ class MaterialsController
     {
         $materials = Material::with([
             'estimateMaterials',
-            'stockMovements',
+            'stockMovements.project',
         ])->get();
 
         if ($materials->isEmpty()) {
@@ -46,7 +46,7 @@ class MaterialsController
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'unit' => 'required|in:kg,m2,lt,unidades',
-            'price_per_unit' => 'requiered|numeric|min:0',
+            'price_per_unit' => 'required|numeric|min:0',
             'stock_quantity' => 'nullable|numeric|min:0',
             'min_stock_alert' => 'nullable|min:0',
         ]);

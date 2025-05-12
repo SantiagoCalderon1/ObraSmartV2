@@ -20,7 +20,7 @@ return new class extends Migration
             $table->date('start_date');
             $table->date('end_date');
             $table->timestamps();
-            $table->foreign('client_id')->references('client_id')->on('clients')->onDelete('cascade');
+            $table->foreign('client_id')->references('client_id')->on('clients')->onDelete('set null');
         });
     }
 

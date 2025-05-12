@@ -9,6 +9,11 @@ import { HeaderComponent } from "./Util/generalsComponents.js"
 import { HomePage } from "./Pages/home.js"
 import { LoginPage } from "./Pages/login.js"
 import { EstimatesPage } from "./Pages/Estimates/estimates.js";
+import { InvoicesPage } from "./Pages/Invoices/invoices.js";
+import { ClientsPage } from "./Pages/Clients/clients.js";
+import { ProjectsPage } from "./Pages/Projects/projects.js";
+import { MaterialsPage } from "./Pages/Materials/materials.js";
+
 
 /*
 import { RegisterPage } from "./pages/register.js" 
@@ -70,9 +75,28 @@ const routes = {
     // Rutas protegidas (Solo accesibles si se está autenticado)
     '/logout': { view: () => { Logout(); m(LoginPage) } },
     '/home': { view: () => m(authGuard, m(HomePage)) },
+
+    // Routes Estimates
     '/estimates': { view: () => m(authGuard, m(EstimatesPage, { option: "show" })) },
     '/estimates/create': { view: () => m(authGuard, m(EstimatesPage, { option: "create" })) },
     '/estimates/update/:id': { view: ({ attrs }) => m(authGuard, m(EstimatesPage, { option: "update", id: attrs.id })) },
+
+    // Routes Invoices
+    '/invoices': { view: () => m(authGuard, m(InvoicesPage, { option: "show" })) },
+    '/invoices/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
+
+    // Routes Clients
+    '/clients': { view: () => m(authGuard, m(ClientsPage, { option: "show" })) },
+    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(ClientsPage, { option: "create", id: attrs.id })) },
+
+    // Routes Projects
+    '/projects': { view: () => m(authGuard, m(ProjectsPage, { option: "show" })) },
+    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
+
+     // Routes Materials
+    '/materials': { view: () => m(authGuard, m(MaterialsPage, { option: "show" })) },
+    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
+
 
 }
 

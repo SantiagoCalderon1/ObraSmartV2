@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Client;
 use App\Models\Estimate;
 use App\Models\Invoice;
+use App\Models\Project;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
@@ -39,7 +40,7 @@ class RouteServiceProvider extends ServiceProvider
 
          // Bind personalizado: buscar Project por ID o name
         Route::bind('project', function ($value) {
-            return Client::where('project_id', $value)
+            return Project::where('project_id', $value)
                 ->orWhere('name', $value)
                 ->firstOrFail();
         });

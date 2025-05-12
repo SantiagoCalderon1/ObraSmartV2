@@ -1,138 +1,84 @@
-[
-    {
-        "estimate_id": 1,
-        "estimate_number": "EST-40974",
-        "project_id": 1,
-        "user_id": 6,
-        "client_id": 1,
-        "iva": 21,
-        "total_cost": "4703.99",
-        "status": "rechazado",
-        "issue_date": "2020-03-18",
-        "due_date": "2025-05-22",
-        "conditions": "Est assumenda sed eum vero molestiae non. Consequuntur enim nisi praesentium qui ipsam deleniti.",
-        "created_at": "2025-05-05T19:50:17.000000Z",
-        "updated_at": "2025-05-05T19:50:17.000000Z",
-        "materials": [
-            {
-                "estimate_material_id": 1,
-                "estimate_id": 1,
-                "material_id": 10,
-                "quantity": 14,
-                "unit_price": "4.62",
-                "total_price": "64.68",
-                "created_at": "2025-05-05T19:50:17.000000Z",
-                "updated_at": "2025-05-05T19:50:17.000000Z",
-                "material": {
-                    "material_id": 10,
-                    "name": "perferendis",
-                    "unit": "unidades",
-                    "price_per_unit": "55.98",
-                    "stock_quantity": 134,
-                    "min_stock_alert": 50,
-                    "created_at": "2025-05-05T19:50:17.000000Z",
-                    "updated_at": "2025-05-05T19:50:17.000000Z"
-                }
-            },
-            {
-                "estimate_material_id": 2,
-                "estimate_id": 1,
-                "material_id": 6,
-                "quantity": 21,
-                "unit_price": "29.75",
-                "total_price": "624.75",
-                "created_at": "2025-05-05T19:50:17.000000Z",
-                "updated_at": "2025-05-05T19:50:17.000000Z",
-                "material": {
-                    "material_id": 6,
-                    "name": "cum",
-                    "unit": "lt",
-                    "price_per_unit": "60.32",
-                    "stock_quantity": 283,
-                    "min_stock_alert": 28,
-                    "created_at": "2025-05-05T19:50:17.000000Z",
-                    "updated_at": "2025-05-05T19:50:17.000000Z"
-                }
-            }
-        ],
-        "labors": [
-            {
-                "estimate_labor_id": 1,
-                "estimate_id": 1,
-                "labor_type_id": 4,
-                "hours": 5,
-                "cost_per_hour": "19.09",
-                "total_cost": "95.45",
-                "created_at": "2025-05-05T19:50:17.000000Z",
-                "updated_at": "2025-05-05T19:50:17.000000Z",
-                "labor_type": {
-                    "labor_type_id": 4,
-                    "name": "Podiatrist",
-                    "cost_per_hour": "26.20",
-                    "created_at": "2025-05-05T19:50:17.000000Z",
-                    "updated_at": "2025-05-05T19:50:17.000000Z"
-                }
-            },
-            {
-                "estimate_labor_id": 2,
-                "estimate_id": 1,
-                "labor_type_id": 2,
-                "hours": 18,
-                "cost_per_hour": "26.09",
-                "total_cost": "469.62",
-                "created_at": "2025-05-05T19:50:17.000000Z",
-                "updated_at": "2025-05-05T19:50:17.000000Z",
-                "labor_type": {
-                    "labor_type_id": 2,
-                    "name": "Production Helper",
-                    "cost_per_hour": "25.41",
-                    "created_at": "2025-05-05T19:50:17.000000Z",
-                    "updated_at": "2025-05-05T19:50:17.000000Z"
-                }
-            }
-        ],
-        "client": {
-            "client_id": 1,
-            "name": "Schmidt, Mayert and Pfannerstill",
-            "nif": "85089107A",
-            "phone": "+1-434-348-1869",
-            "email": "mercedes.bernhard@example.com",
-            "address": "32601 Keagan Avenue\nEstefaniaport, UT 60240",
-            "created_at": "2025-05-05T19:50:17.000000Z",
-            "updated_at": "2025-05-05T19:50:17.000000Z"
-        },
-        "project": {
+{
+    "client_id": 1,
+    "name": "Smitham Group",
+    "nif": "31568379A",
+    "phone": "830-478-2883",
+    "email": "kadin.parisian@example.net",
+    "address": "9188 Cleta Valley\nBodeton, MO 85814",
+    "created_at": "2025-05-10T05:39:18.000000Z",
+    "updated_at": "2025-05-10T05:39:18.000000Z",
+    "estimates": [
+        {
+            "estimate_id": 1,
+            "user_id": 1,
+            "estimate_number": "EST-91898",
             "project_id": 1,
             "client_id": 1,
-            "name": "Quas odio minima.",
-            "description": "Saepe aut consequuntur qui magnam voluptates. Necessitatibus ex aut fuga. Nesciunt omnis dolor similique dolore. Non in et temporibus impedit porro ea. Non in quidem sit impedit.",
-            "status": "en proceso",
-            "start_date": "1974-08-16",
-            "end_date": "2025-08-12",
-            "created_at": "2025-05-05T19:50:17.000000Z",
-            "updated_at": "2025-05-05T19:50:17.000000Z"
+            "issue_date": "1972-05-22",
+            "due_date": "2025-05-18",
+            "status": "Aceptado",
+            "discount": null,
+            "iva": 10,
+            "total_cost": "2623.54",
+            "conditions": "Qui velit in id nesciunt recusandae. Modi qui aut veritatis recusandae quidem. Assumenda praesentium esse tempora voluptatem.",
+            "created_at": "2025-05-10T05:39:19.000000Z",
+            "updated_at": "2025-05-11T07:30:22.000000Z"
         },
-        "user": {
-            "user_id": 6,
-            "name": "Mr. Fredy McClure",
-            "email": "koby.kemmer@example.org",
-            "role": "disabled",
-            "email_verified_at": "2025-05-05T19:50:16.000000Z",
-            "phone": "941-978-7570",
-            "created_at": "2025-05-05T19:50:17.000000Z",
-            "updated_at": "2025-05-05T19:50:17.000000Z"
+        {
+            "estimate_id": 2,
+            "user_id": 1,
+            "estimate_number": "EST-33981",
+            "project_id": 1,
+            "client_id": 1,
+            "issue_date": "1998-08-02",
+            "due_date": "2025-05-11",
+            "status": "Aceptado",
+            "discount": null,
+            "iva": 21,
+            "total_cost": "3636.40",
+            "conditions": "Ab reprehenderit laborum quasi officiis ab. Aut consequatur eveniet eos voluptatem eaque.",
+            "created_at": "2025-05-10T05:39:19.000000Z",
+            "updated_at": "2025-05-11T07:28:46.000000Z"
         },
-        "invoice": {
-            "invoice_id": 1,
-            "invoice_number": "INV-21738",
-            "estimate_id": 1,
-            "issue_date": "2002-05-21",
-            "due_date": "2025-05-06",
-            "total_amount": "2872.30",
-            "status": "pendiente",
-            "pdf_url": "https://brekke.net/itaque-aliquam-nemo-odit-voluptatem.html",
-            "created_at": "2025-05-05T19:50:17.000000Z",
-            "updated_at": "2025-05-05T19:50:17.000000Z"
+        {
+            "estimate_id": 3,
+            "user_id": 4,
+            "estimate_number": "EST-38644",
+            "project_id": 2,
+            "client_id": 1,
+            "issue_date": "2023-01-21",
+            "due_date": "2025-05-11",
+            "status": "Pendiente",
+            "discount": null,
+            "iva": 21,
+            "total_cost": "3682.49",
+            "conditions": "Labore voluptatum aut excepturi a. Maxime recusandae voluptas et repudiandae dolore voluptatum et. Odio in voluptatem optio error eos molestiae laudantium.",
+            "created_at": "2025-05-10T05:39:19.000000Z",
+            "updated_at": "2025-05-10T05:39:19.000000Z"
         }
-    }
-]
+    ],
+    "projects": [
+        {
+            "project_id": 1,
+            "client_id": 1,
+            "name": "Cum quasi occaecati.",
+            "description": "Non non expedita architecto consequatur consequuntur fugiat. Dolores id alias fugiat unde. Illo illo omnis quia rerum. Ut iure optio culpa id eos occaecati dolorem.",
+            "status": "en proceso",
+            "start_date": "1993-10-22",
+            "end_date": "2026-03-17",
+            "created_at": "2025-05-10T05:39:19.000000Z",
+            "updated_at": "2025-05-10T05:39:19.000000Z"
+        },
+        {
+            "project_id": 2,
+            "client_id": 1,
+            "name": "Laboriosam vitae voluptate.",
+            "description": "Numquam voluptate odit ea error. Explicabo illum tempora id et qui. Sed molestias modi perspiciatis itaque. Labore natus totam ipsum dolore omnis sed ipsam. Tempore nemo qui aut rerum et.",
+            "status": "en proceso",
+            "start_date": "2001-04-17",
+            "end_date": "2025-08-09",
+            "created_at": "2025-05-10T05:39:19.000000Z",
+            "updated_at": "2025-05-10T05:39:19.000000Z"
+        }
+    ]
+}

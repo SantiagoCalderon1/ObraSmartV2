@@ -101,7 +101,7 @@ function FormComponent() {
                             m(ButtonComponent,
                                 {
                                     type: "submit",
-                                    bclass: "btn-primary w-100 fw-semibold", style: { backgroundColor: "var(--mainPurple)" }
+                                    bclass: "btn text-white w-100 fw-semibold", style: { backgroundColor: "var(--mainPurple)" }
                                 },
                                 ["Iniciar Sesión"]
                             ),

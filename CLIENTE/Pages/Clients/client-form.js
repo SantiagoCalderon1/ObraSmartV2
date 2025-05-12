@@ -2,9 +2,9 @@ import { ButtonComponent, ModalConfirmation } from "../../Util/generalsComponent
 
 // IMPORTADOR DE FUNCIONES
 import {
-    fetchEstimate,
-    createEstimate,
-    updateEstimate,
+    fetchClient,
+    createClient,
+    updateClient,
     fetchClients,
     fetchProjects,
     fetchMaterials,
@@ -12,7 +12,7 @@ import {
 } from "../../Services/services.js"
 
 
-export function EstimateFormPage() {
+export function ClientFormPage() {
     return {
         view: function ({ attrs }) {
             const { type, estimate_number } = attrs
@@ -21,7 +21,7 @@ export function EstimateFormPage() {
 
             return [
                 m("h1.text-center.fw-semibold.text-uppercase", { style: { padding: "2rem 1rem", textTransform: "uppercase" } }, title),
-                m(EstimateFormComponent, {
+                m(ClientFormComponent, {
                     type: type,
                     estimate_number: estimate_number // puede ser `undefined` en creación
                 }),
@@ -41,7 +41,7 @@ export function EstimateFormPage() {
     }
 }
 
-function EstimateFormComponent() {
+function ClientFormComponent() {
     let style = {
         _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
         _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
@@ -55,7 +55,7 @@ function EstimateFormComponent() {
     // testigo para el formulario 
     let badForm = false
 
-    const EstimateData = ({
+    const ClientData = ({
         estimate_number = "",
         project_id = "",
         client_id = "",
@@ -143,14 +143,14 @@ function EstimateFormComponent() {
     })
 
     const state = {
-        estimateData: EstimateData(),
+        estimateData: ClientData(),
         estimateMaterialData: [estimateMaterialData()],
         estimateLaborsData: [estimateLaborsData()],
         clients: [],
         projects: [],
         materials: [],
         laborTypes: [],
-        selectedEstimate: null,
+        selectedClient: null,
         filterClients: "",
         filterProjects: "",
         filterMaterials: "",
@@ -188,17 +188,17 @@ function EstimateFormComponent() {
 
     try {
             state.isLoading = true
-            const isUpdate = !!state.selectedEstimate
+            const isUpdate = !!state.selectedClient
             const data = isUpdate
-                ? await updateEstimate(dataToSend, state.selectedEstimate.estimate_number)
-                : await createEstimate(dataToSend)
+                ? await updateClient(dataToSend, state.selectedClient.estimate_number)
+                : await createClient(dataToSend)
             console.log("isUpdate: ", isUpdate);
 
             console.log("Response form: ", data)
 
             // Resetear solo si se creó nuevo
             if (!isUpdate) {
-                state.estimateData = EstimateData()
+                state.estimateData = ClientData()
                 state.estimateMaterialData = [estimateMaterialData()]
                 state.estimateLaborsData = [estimateLaborsData()]
             }
@@ -272,7 +272,7 @@ function EstimateFormComponent() {
         return Number(subtotal * (1 + iva)).toFixed(2)
     }
 
-    async function loadEstimate(estimate_number = null) {
+    async function loadClient(estimate_number = null) {
         try {
             state.clients = (await fetchClients()).data
             state.projects = (await fetchProjects()).data
@@ -286,12 +286,12 @@ function EstimateFormComponent() {
 
             // Solo si es modo edición (update)
             if (estimate_number) {
-                const selected = (await fetchEstimate(estimate_number)).data;
-                state.selectedEstimate = selected
-                console.log("selectedEstimate:", state.selectedEstimate)
+                const selected = (await fetchClient(estimate_number)).data;
+                state.selectedClient = selected
+                console.log("selectedClient:", state.selectedClient)
 
-                // Estimate
-                state.estimateData = EstimateData({
+                // Client
+                state.estimateData = ClientData({
                     estimate_number: selected.estimate_number,
                     project_id: selected.project_id,
                     client_id: selected.client_id,
@@ -302,7 +302,7 @@ function EstimateFormComponent() {
                     total_cost: selected.total_cost,
                     conditions: selected.conditions
                 })
-                console.log("EstimateData:", state.estimateData)
+                console.log("ClientData:", state.estimateData)
 
                 // materials
                 state.estimateMaterialData = selected.materials?.map((item) =>
@@ -342,7 +342,7 @@ function EstimateFormComponent() {
 
     return {
         oncreate: ({ attrs }) => {
-            loadEstimate(attrs.estimate_number)
+            loadClient(attrs.estimate_number)
         },
         view: ({ attrs }) => {
             const { type } = attrs
@@ -491,7 +491,6 @@ function EstimateFormComponent() {
                             ])
                         ]),
                     ]),
-                    // Fechas
                     m("div", { class: "col-md-6 col-lg-3" }, [
                         // Fecha de creación
                         m("div.col-12.py-2", [
@@ -525,7 +524,7 @@ function EstimateFormComponent() {
                     m("hr.mt-4")
                 ])]
             // Conceptos materiales
-            const renderEstimateMaterialData = (item, index) => {
+            const renderClientMaterialData = (item, index) => {
                 return m("div", { class: "row   p-0  m-0 my-2 d-flex justify-content-between" }, [
                     m("input", { type: "hidden", value: item.material_id }),
                     m("div", { class: "row" }, [
@@ -628,7 +627,7 @@ function EstimateFormComponent() {
                 ])
             }
             // Conceptos Servicios
-            const renderEstimateLaborsData = (item, index) => {
+            const renderClientLaborsData = (item, index) => {
                 return m("div", { class: "row col-12 p-0 m-0 my-2" }, [
                     m("input", { type: "hidden", value: item.labor_type_id }),
                     m("div", { class: "col-lg-12 row" }, [
@@ -762,7 +761,7 @@ function EstimateFormComponent() {
                     ]),
                 ]),
                 // Conceptos de materiales
-                ...state.estimateMaterialData?.map(renderEstimateMaterialData),
+                ...state.estimateMaterialData?.map(renderClientMaterialData),
                 btnsAction({
                     key: "estimateMaterialData",
                     createConcept: estimateMaterialData
@@ -791,7 +790,7 @@ function EstimateFormComponent() {
                     ]),
                 ]),
                 // Conceptos de mano de obra
-                ...state.estimateLaborsData?.map(renderEstimateLaborsData),
+                ...state.estimateLaborsData?.map(renderClientLaborsData),
                 btnsAction({
                     key: "estimateLaborsData",
                     createConcept: estimateLaborsData
