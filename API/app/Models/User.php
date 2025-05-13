@@ -26,6 +26,7 @@ class User extends Authenticatable  implements JWTSubject
         'password',
         'role',
         'phone',
+        'profile_picture',
         'google_id',
     ];
 
@@ -78,7 +79,7 @@ class User extends Authenticatable  implements JWTSubject
     }
 
     public function stockMovements()
-{
-    return $this->hasMany(StockMovement::class, 'user_id', 'user_id');
-}
+    {
+        return $this->hasMany(StockMovement::class, 'user_id', 'user_id');
+    }
 }

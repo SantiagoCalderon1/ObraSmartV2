@@ -13,6 +13,7 @@ import { InvoicesPage } from "./Pages/Invoices/invoices.js";
 import { ClientsPage } from "./Pages/Clients/clients.js";
 import { ProjectsPage } from "./Pages/Projects/projects.js";
 import { MaterialsPage } from "./Pages/Materials/materials.js";
+import { MyAccountPage } from "./Pages/MyAccount/myAccount.js";
 
 
 /*
@@ -50,10 +51,7 @@ function authGuard() {
             }
         },
         view: function ({ children }) {
-            if (this.loading) {
-                return m("div", "Cargando...") // Mostrar algo mientras estamos verificando la autenticación
-            }
-
+       
             return m("div", {
                 id: "container-app",
                 style: { display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", width: "100%", height: "100%" }
@@ -95,6 +93,10 @@ const routes = {
 
      // Routes Materials
     '/materials': { view: () => m(authGuard, m(MaterialsPage, { option: "show" })) },
+    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
+
+        // Routes MyAccount
+    '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
     //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
 
 

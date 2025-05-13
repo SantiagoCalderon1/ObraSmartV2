@@ -6,7 +6,9 @@ import {
     URL_MATERIALS,
     URL_LABOR_TYPES,
     URL_INVOICES,
-    URL_PAYMENTS
+    URL_PAYMENTS,
+    URL_AUTH,
+    URL_USER
 } from "../Util/constantes.js"
 
 // IMPORTADOR DE FUNCIONES
@@ -42,6 +44,13 @@ export async function fetchPayments() { // index
     return await request("GET", URL_PAYMENTS);
 }
 
+export async function fetchUser() { // index
+    return await request("GET", URL_AUTH);
+}
+
+
+
+
 
 // PETICIONES GET - SHOW    ********************************************************************************
 export async function fetchEstimate(id) { // show
@@ -71,6 +80,8 @@ export async function fetchInvoice(id) { // show
 export async function fetchPayment(id) { // show
     return await request("GET", `${URL_PAYMENTS}/${id}`);
 }
+
+
 
 
 
@@ -110,10 +121,6 @@ export async function createPayments(body) { // create
 
 
 
-
-
-
-
 //PETICIONES PUT - PATCH    ********************************************************************************
 export async function updateEstimate(body, id) { // update
     return await request("PATCH", `${URL_ESTIMATES}/${id}`, body);
@@ -143,8 +150,9 @@ export async function updatePayment(body, id) { // update
     return await request("PATCH", `${URL_PAYMENTS}/${id}`, body);
 }
 
-
-
+export async function updateUser(body, id) { // update
+    return await request("PATCH", `${URL_USER}/${id}`, body);
+}
 
 
 
@@ -178,4 +186,8 @@ export async function deleteInvoice(id) { // destroy
 
 export async function deletePayment(id) { // destroy
     return await request("DELETE", `${URL_PAYMENTS}/${id}`);
+}
+
+export async function deleteUser(id) { // destroy
+    return await request("DELETE", `${URL_USER}/${id}`);
 }

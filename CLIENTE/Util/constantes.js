@@ -3,8 +3,15 @@
 // BreakPoints API
 
 // Generales
+export const URL_LOGIN = "http://127.0.0.1:8000/api/login"
 export const URL_LOGOUT = "http://127.0.0.1:8000/api/logout"
+export const URL_REGISTER = "http://127.0.0.1:8000/api/register"
+
+
+// Usuario
 export const URL_AUTH = "http://127.0.0.1:8000/api/me"
+export const URL_USER = "http://127.0.0.1:8000/api/user"
+
 
 // Presupuestos
 export const URL_ESTIMATES = "http://127.0.0.1:8000/api/estimates"

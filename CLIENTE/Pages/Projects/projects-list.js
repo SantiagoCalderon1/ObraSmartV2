@@ -428,6 +428,13 @@ function ModalFormComponent() {
                     }).showToast()
                     attrs.onProjectSaved?.(); // Llama al callback si existe
 
+                    const modalElement = document.getElementById("ModalFormProject");
+                    if (modalElement) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement)
+                            || new bootstrap.Modal(modalElement);
+                        modalInstance.hide();
+                    }
+
                 } catch (error) {
                     console.error("Error al enviar el formulario:", error)
                     Toastify({
@@ -572,11 +579,18 @@ function ModalFormComponent() {
                             m("div.col-md-8.d-flex.justify-content-between.gap-4", [
                                 m(ButtonComponent, {
                                     closeModal: true,
-                                    bclass: "btn-danger ",
-                                }, [m("i.fa.fa-arrow-left.me-2.ms-2"), "Cancelar",]),
+                                    bclass: "btn-danger",
+                                }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
                                 m(ButtonComponent, {
                                     type: "submit",
-                                    closeModal: true,
+                                    actions: async (e) => {
+                                        e.preventDefault()
+                                        if (!formElement.checkValidity()) {
+                                            formElement.reportValidity();
+                                            return;
+                                        }
+                                        await handleFormSubmit();
+                                    },
                                     style: { backgroundColor: "var(--mainPurple)" }
                                 }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
                             ])

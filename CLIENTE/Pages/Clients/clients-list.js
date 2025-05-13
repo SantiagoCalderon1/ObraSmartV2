@@ -404,6 +404,13 @@ function ModalFormComponent() {
                     }
                     console.log("Response form: ", response)
 
+                    const modalElement = document.getElementById("ModalFormClient");
+                    if (modalElement) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement)
+                            || new bootstrap.Modal(modalElement);
+                        modalInstance.hide();
+                    }
+
                     Toastify({
                         text: "¡Operación exitosa!",
                         className: "toastify-success",
@@ -503,11 +510,18 @@ function ModalFormComponent() {
                             m("div.col-md-8.d-flex.justify-content-between.gap-4", [
                                 m(ButtonComponent, {
                                     closeModal: true,
-                                    bclass: "btn-danger ",
-                                }, [m("i.fa.fa-arrow-left.me-2.ms-2"), "Cancelar",]),
+                                    bclass: "btn-danger",
+                                }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
                                 m(ButtonComponent, {
                                     type: "submit",
-                                    closeModal: true,
+                                    actions: async (e) => {
+                                        e.preventDefault()
+                                        if (!formElement.checkValidity()) {
+                                            formElement.reportValidity();
+                                            return;
+                                        }
+                                        await handleFormSubmit();
+                                    },
                                     style: { backgroundColor: "var(--mainPurple)" }
                                 }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
                             ])

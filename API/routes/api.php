@@ -10,7 +10,7 @@ use App\Http\Controllers\ProjectController;
 
 use App\Http\Middleware\IsAdminAuth;
 use App\Http\Middleware\IsUserAuth;
-
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +26,16 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('logout', 'logout');
         Route::get('me', 'getUser');
+    });
+
+    //Rutas de EstimateController
+    Route::controller(User::class)->group(function () {
+        Route::get('/user', 'index');
+        Route::post('/user', 'store');
+        Route::get('/user/{user}', 'show');
+        Route::put('/user/{user}', 'update');
+        Route::patch('/user/{user}', 'update');
+        Route::delete('/user/{user}', 'destroy');
     });
 
     //Rutas de EstimateController

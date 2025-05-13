@@ -19,7 +19,7 @@ export function HeaderComponent() {
         { label: "Clientes", route: "/clients", icon: "fa-users" },
         { label: "Materiales", route: "/materials", icon: "fa-shapes" },
         { label: "Proyectos", route: "/projects", icon: "fa-hammer" },
-        { label: "Mi Cuenta", route: "/myAccount", icon: "fa-circle-user" },
+        { label: "Mi Cuenta", route: "/my-account", icon: "fa-circle-user" },
         { label: "Cerrar Sesión", route: "/logout", icon: "fa-arrow-right-from-bracket", },
     ]
     return {
