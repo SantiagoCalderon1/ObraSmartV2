@@ -10,6 +10,7 @@ use App\Http\Controllers\ProjectController;
 
 use App\Http\Middleware\IsAdminAuth;
 use App\Http\Middleware\IsUserAuth;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -28,7 +29,12 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('me', 'getUser');
     });
 
-    //Rutas de EstimateController
+    //Rutas de CompanyController
+    Route::controller(Company::class)->group(function () {
+        Route::get('/company/{id}', 'show');
+    });
+
+    //Rutas de UserController
     Route::controller(User::class)->group(function () {
         Route::get('/user', 'index');
         Route::post('/user', 'store');
@@ -98,22 +104,17 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::delete('/invoices/{invoice}', 'destroy');
     });
 
-
-    /*  // Aqui van las rutas que pueden acceder bien sea Admin o User
-
-    Route::get('/budgets', [BudgetController::class, 'getBudgets']);
-
     // A estas rutas solo podrá acceder el Administrador
     Route::middleware([IsAdminAuth::class])->group(function () {
 
-        //Rutas del AuthController
-        Route::controller(BudgetController::class)->group(function () {
-            //Rutas aqui de los que pueda hacer solo el Admin
-            Route::post('budgets', 'addBudget');
-            Route::get('/budget/{id}', 'getBudgetById');
-            Route::patch('/budgets/{id}', 'updateBudgetById');
-            Route::post('/budgets/{id}', 'deleteBudgetById');
+        //Rutas de CompanyController
+        Route::controller(Company::class)->group(function () {
+            Route::get('/company', 'index');
+            Route::post('/company', 'store');
+            Route::get('/company/{id}', 'show');
+            Route::put('/company/{id}', 'update');
+            Route::patch('/company/{id}', 'update');
+            Route::delete('/company/{id}', 'destroy');
         });
-    }); 
-    */
+    });
 });
