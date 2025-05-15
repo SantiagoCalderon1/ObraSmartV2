@@ -1,0 +1,15 @@
+{
+  "name": "obrasmartv2",
+  "version": "2.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build --cache-dir=.turbo"
+  },
+  "devDependencies": {
+    "turbo": "2.5.3"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
