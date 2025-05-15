@@ -1,6 +1,4 @@
-import "dotenv/config";
-
-const URL_LOGIN = `${process.env.API_URL}/api/login`
+const URL_LOGIN = `${import.meta.env.VITE_API_URL}/api/login`
 
 export async function loginUser(body) {
     try {
