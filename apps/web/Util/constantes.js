@@ -1,45 +1,45 @@
+import "dotenv/config";
+
 /* Sección de Constantes Globales */
 
 // BreakPoints API
 
 // Generales
-export const URL_LOGIN = "http://127.0.0.1:8000/api/login"
-export const URL_LOGOUT = "http://127.0.0.1:8000/api/logout"
-export const URL_REGISTER = "http://127.0.0.1:8000/api/register"
-
+export const URL_LOGIN = `${process.env.API_URL}/api/login`
+export const URL_LOGOUT = `${process.env.API_URL}/api/logout`
+export const URL_REGISTER = `${process.env.API_URL}/api/register`
 
 // Usuario
-export const URL_AUTH = "http://127.0.0.1:8000/api/me"
-export const URL_USER = "http://127.0.0.1:8000/api/user"
-
+export const URL_AUTH = `${process.env.API_URL}/api/me`;
+export const URL_USER = `${process.env.API_URL}/api/user`;
 
 // Presupuestos
-export const URL_ESTIMATES = "http://127.0.0.1:8000/api/estimates"
+export const URL_ESTIMATES = `${process.env.API_URL}/api/estimates`;
 
 // Cliente
-export const URL_CLIENTS = "http://127.0.0.1:8000/api/clients"
+export const URL_CLIENTS = `${process.env.API_URL}/api/clients`;
 
 // Usuarios
-const URL_USERS = "http://127.0.0.1:8000/api/users"
+const URL_USERS = `${process.env.API_URL}/api/users`;
 
 // Proyectos
-export const URL_PROJECTS = "http://127.0.0.1:8000/api/projects"
-const URL_PROJECT_LOGS = "http://127.0.0.1:8000/api/project-logs"
+export const URL_PROJECTS = `${process.env.API_URL}/api/projects`;
+const URL_PROJECT_LOGS = `${process.env.API_URL}/api/project-logs`;
 
 // Movieminetos de stock
-const URL_STOCK_MOVEMENTS = "http://127.0.0.1:8000/api/stock-movements"
+const URL_STOCK_MOVEMENTS = `${process.env.API_URL}/api/stock-movements`;
 
 // Materiales
-export const URL_MATERIALS = "http://127.0.0.1:8000/api/materials"
-const URL_ESTIMATE_MATERIALS = "http://127.0.0.1:8000/api/estimate-materials"
+export const URL_MATERIALS = `${process.env.API_URL}/api/materials`;
+const URL_ESTIMATE_MATERIALS = `${process.env.API_URL}/api/estimate-materials`
 
 // Servicios
-export const URL_LABOR_TYPES = "http://127.0.0.1:8000/api/labor-types"
-const URL_ESTIMATE_LABOR = "http://127.0.0.1:8000/api/estimate-labor"
+export const URL_LABOR_TYPES = `${process.env.API_URL}/api/labor-types`;
+const URL_ESTIMATE_LABOR = `${process.env.API_URL}/api/estimate-labor`
 
 // Facturas
-export const URL_INVOICES = "http://127.0.0.1:8000/api/invoices"
-export const URL_PAYMENTS = "http://127.0.0.1:8000/api/payments"
+export const URL_INVOICES = `${process.env.API_URL}/api/invoices`
+export const URL_PAYMENTS = `${process.env.API_URL}/api/payments`
 
 
 

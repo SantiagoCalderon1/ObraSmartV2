@@ -1,4 +1,6 @@
-const URL_LOGIN = "http://127.0.0.1:8000/api/login";
+import "dotenv/config";
+
+const URL_LOGIN = `${process.env.API_URL}/api/login`
 
 export async function loginUser(body) {
     try {
