@@ -38,7 +38,7 @@ function GeneratePDF(budget, budgetDetails) {
                         m("div.col-md-12.d-flex.justify-content-between.align-items-center", [
                             m("div.text-center", [
                                 m("img", {
-                                    src: "../public/logosObraSmart/logo-1.png",
+                                    src: "/logosObraSmart/logo-1.png",
                                     alt: "Logo",
                                     style: "width: 100px; height: 100px;"
                                 }),
@@ -210,7 +210,7 @@ function GeneratePDF(budget, budgetDetails) {
           <div class="row mb-4">
             <div class="col-md-12 d-flex justify-content-between align-items-center">
               <div class="text-center">
-                <img src="../public/logosObraSmart/logo-1.png" alt="Logo" style="width: 100px; height: 100px;">
+                <img src="/logosObraSmart/logo-1.png" alt="Logo" style="width: 100px; height: 100px;">
                 <p class="mb-0">${company.title}</p>
               </div>
               <h1>Presupuesto</h1>

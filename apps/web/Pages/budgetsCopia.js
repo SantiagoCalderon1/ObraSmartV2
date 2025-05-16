@@ -541,7 +541,7 @@ function FormBudgetComponent() {
         const startSummaryX = 15
 
         // Cargar el logo de la empresa (por ejemplo, imagen base64)
-        const logo = "../public/logosObraSmart/logo-1.png"; // Cambia esto por tu imagen en base64
+        const logo = "/logosObraSmart/logo-1.png"; // Cambia esto por tu imagen en base64
 
         doc.setDrawColor(0); // Color negro
         doc.setLineWidth(0.5); // Grosor de la línea
