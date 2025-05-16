@@ -1,4 +1,4 @@
-const URL_LOGIN = "http://127.0.0.1:8000/api/login";
+const URL_LOGIN = `${import.meta.env.VITE_API_URL}/api/login`
 
 export async function loginUser(body) {
     try {
