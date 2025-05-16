@@ -119,7 +119,7 @@ function ProfileOriginal() {
             const YourPhoto = () => [
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Mi foto de perfil"),
-                    m("img", { src: user.profile_picture || "./Assets/profile.jpg", style: { width: "300px", height: "300px", objectFit: "cover", borderRadius: "50%", border: "1px solid black" } }),
+                    m("img", { src: user.profile_picture || "./public/profile.jpg", style: { width: "300px", height: "300px", objectFit: "cover", borderRadius: "50%", border: "1px solid black" } }),
                     // Foto de perfil
                     m("div.pt-2.text-center", [
                         m("label.form-label.ps-1", "Selecciona una foto..."),
@@ -437,7 +437,7 @@ function Profile() {
             const YourPhoto = () => [
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Mi foto de perfil"),
-                    m("img", { src: user.profile_picture || "./Assets/profile.jpg", style: { width: "300px", height: "300px", objectFit: "cover", borderRadius: "50%", border: "1px solid black" } }),
+                    m("img", { src: user.profile_picture || "./public/profile.jpg", style: { width: "300px", height: "300px", objectFit: "cover", borderRadius: "50%", border: "1px solid black" } }),
                     // Foto de perfil
                     m("div.pt-2.text-center", [
                         m("label.form-label.ps-1", "Selecciona una foto..."),

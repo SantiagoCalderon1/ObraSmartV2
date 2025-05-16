@@ -47,7 +47,7 @@ function FormComponent() {
                 m("div", { class: "col-md-7 d-flex flex-column justify-content-center align-items-center p-5 gap-5" }, [
                     // Logo y título
                     m("div.text-center", { style: {} }, [
-                        m("img", { src: "./assets/logosObraSmart/logo-2.png", style: { width: "150px", height: "150px" } }),
+                        m("img", { src: "./public/logosObraSmart/logo-2.png", style: { width: "150px", height: "150px" } }),
                         m("h1", { class: " mt-3 text-nowrap" }, "¡Bienvenido de nuevo!"),
                     ]),
                     m("div", { class: "w-100", style: { maxWidth: "400px" } }, [
@@ -127,7 +127,7 @@ function FormComponent() {
                 m("div.d-none.d-md-block", {
                     class: "col-md-5 p-0",
                     style: {
-                        backgroundImage: "url('./assets/background-login.webp')",
+                        backgroundImage: "url('./public/background-login.webp')",
                         backgroundSize: "cover",
                         backgroundPosition: "center",
                         backgroundRepeat: "no-repeat"

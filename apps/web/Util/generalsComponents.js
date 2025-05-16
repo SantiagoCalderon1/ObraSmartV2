@@ -31,7 +31,7 @@ export function HeaderComponent() {
                     //.d-none.d-md-block
                     m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
                         m('img', {
-                            src: './assets/logosObraSmart/logo-1.webp', style: { width: "75px", height: "6vh", cursor: "pointer" },
+                            src: './public/logosObraSmart/logo-1.webp', style: { width: "75px", height: "6vh", cursor: "pointer" },
                             onclick: () => m.route.set("/home")
                         }
                         ),
