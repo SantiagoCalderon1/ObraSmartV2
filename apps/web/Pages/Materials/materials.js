@@ -1,4 +1,4 @@
-import { MaterialsListPage } from "./Materials-list.js";
+import { MaterialsListPage } from "./materials-list.js";
 //import { MaterialFormPage } from "./Material-form.js";
 
 
