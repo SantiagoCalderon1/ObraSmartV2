@@ -25,6 +25,7 @@ class UserFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'lastname' => fake()->lastName(),
             'email' => fake()->unique()->safeEmail(),
             'password' =>  Hash::make('password'), // asi la contraseña de todos es password
             //    'password' => Hash::make(Str::random(10)), // contraseña aleatoria cifrada

@@ -12,6 +12,8 @@ export const URL_REGISTER = "http://127.0.0.1:8000/api/register"
 export const URL_AUTH = "http://127.0.0.1:8000/api/me"
 export const URL_USER = "http://127.0.0.1:8000/api/user"
 
+// Company
+export const URL_COMPANY = "http://127.0.0.1:8000/api/company"
 
 // Presupuestos
 export const URL_ESTIMATES = "http://127.0.0.1:8000/api/estimates"

@@ -7,7 +7,7 @@ use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\LaborTypesController;
 use App\Http\Controllers\MaterialsController;
 use App\Http\Controllers\ProjectController;
-
+use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdminAuth;
 use App\Http\Middleware\IsUserAuth;
 use App\Models\Company;
@@ -27,6 +27,16 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::controller(AuthController::class)->group(function () {
         Route::post('logout', 'logout');
         Route::get('me', 'getUser');
+    }); //Rutas de UserController
+    Route::controller(UserController::class)->group(function () {
+        Route::get('/user', 'index');
+        Route::post('/user', 'store');
+        Route::get('/user/{user}', 'show');
+        Route::put('/user/{user}', 'update');
+        Route::patch('/user/{user}', 'update');
+        Route::delete('/user/{user}', 'destroy');
+        Route::post('/user/reset-password', 'resetPassword'); // Nueva ruta
+        Route::get('/company/carrusel', 'carrusel'); // Solo para admin
     });
 
     //Rutas de CompanyController
@@ -34,15 +44,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('/company/{id}', 'show');
     });
 
-    //Rutas de UserController
-    Route::controller(User::class)->group(function () {
-        Route::get('/user', 'index');
-        Route::post('/user', 'store');
-        Route::get('/user/{user}', 'show');
-        Route::put('/user/{user}', 'update');
-        Route::patch('/user/{user}', 'update');
-        Route::delete('/user/{user}', 'destroy');
-    });
+
 
     //Rutas de EstimateController
     Route::controller(EstimateController::class)->group(function () {
@@ -106,7 +108,6 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     // A estas rutas solo podrá acceder el Administrador
     Route::middleware([IsAdminAuth::class])->group(function () {
-
         //Rutas de CompanyController
         Route::controller(Company::class)->group(function () {
             Route::get('/company', 'index');
