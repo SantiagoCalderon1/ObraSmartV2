@@ -1,4 +1,5 @@
  import {  ModalComponent, ModalConfirmation } from "../../components/modal.js"
+ import {  Table } from "../../components/table.js"
 
 import { Button } from "../components/button.js";
 
@@ -56,7 +57,7 @@ export function ClientsListPage() {
 
             return [
                 m("h1.py-5.text-uppercase", "Clientes"),
-                m(TableListComponent, {
+                m(Table, {
                     columns: columns,
                     data: normalizedClients,
                     onRowClick: onSelect
@@ -91,120 +92,6 @@ export function ClientsListPage() {
         }
     };
 }
-
-function TableListComponent() {
-    let localData = [];
-    let filteredData = [];
-    let searchValue = "";
-    let sortState = { campo: null, tipo: "asc" };
-
-    function sortData() {
-        if (!sortState.campo) return;
-        filteredData = [...filteredData].sort((a, b) => {
-            const valA = a[sortState.campo];
-            const valB = b[sortState.campo];
-            if (typeof valA === "string") {
-                return sortState.tipo === "asc"
-                    ? valA.localeCompare(valB)
-                    : valB.localeCompare(valA);
-            } else {
-                return sortState.tipo === "asc" ? valA - valB : valB - valA;
-            }
-        });
-    }
-
-    function orderData(campo) {
-        if (sortState.campo === campo) {
-            sortState.tipo = sortState.tipo === "asc" ? "desc" : "asc";
-        } else {
-            sortState.campo = campo;
-            sortState.tipo = "asc";
-        }
-        sortData();
-        m.redraw();
-    }
-
-    function filterData(value) {
-        searchValue = value;
-        filteredData = localData.filter(item =>
-            Object.values(item).some(val =>
-                String(val).toLowerCase().includes(value.toLowerCase())
-            )
-        );
-        sortData();
-        m.redraw();
-    }
-
-    return {
-        oninit: ({ attrs }) => {
-            localData = [...attrs.data];
-            filteredData = [...localData];
-        },
-        onupdate: ({ attrs }) => {
-            if (attrs.data !== localData) {
-                localData = [...attrs.data];
-                filterData(searchValue);
-            }
-        },
-        view: function ({ attrs, children }) {
-            const { columns = [], onRowClick = null } = attrs;
-
-            return m("div", {
-                class: "col-11 col-md-10 p-3 rounded",
-                style: {
-                    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
-                }
-            }, [
-                m("div", { class: "d-flex flex-column flex-md-row justify-content-between mb-3 gap-3" }, [
-                    children,
-                    m("div.input-group", { style: { maxWidth: "400px" } }, [
-                        m("input", {
-                            class: "form-control px-3 py-2 me-2 rounded-pill",
-                            style: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
-                            placeholder: "Buscar...",
-                            value: searchValue,
-                            oninput: e => filterData(e.target.value)
-                        }),
-                        m("button", {
-                            class: "btn btn-outline-secondary rounded-pill fw-normal",
-                            style: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" }
-                        }, m("i.fa.fa-search"))
-                    ])
-                ]),
-                m("div.table-responsive", [
-                    m("table", { class: "table table-hover table-striped" }, [
-                        m("thead", { class: "py-5 bg-light sticky-top" }, [
-                            m("tr", columns.map(col =>
-                                m("th.text-nowrap.px-4.py-3", {
-                                    style: { cursor: "pointer" },
-                                    onclick: () => orderData(col.field)
-                                }, [
-                                    col.title,
-                                    m("i.fa.fa-sort.ms-2")
-                                ])
-                            ))
-                        ]),
-                        m("tbody", filteredData.map(item =>
-                            m("tr", {
-                                onclick: () => onRowClick && onRowClick(item),
-                                style: { cursor: "pointer" }
-                            }, columns.map(col =>
-                                m("td.px-4", {
-                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                }, [
-                                    item[col.field] || "N/A",
-                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                ])
-                            ))
-                        ))
-                    ])
-                ])
-            ]);
-        }
-    };
-}
-
-
 
 function ModalDetailsComponent() {
     return {

@@ -1,4 +1,5 @@
-import {  ModalConfirmation } from "../../Util/generalsComponents.js"
+import {  ModalConfirmation } from "../../components/modal.js"
+
 import { Button } from "../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
