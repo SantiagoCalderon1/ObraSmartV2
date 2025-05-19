@@ -1,4 +1,5 @@
-import { ButtonComponent, ModalConfirmation } from "../../Util/generalsComponents.js"
+import { ModalConfirmation } from "../../components/modal.js"
+import { Button } from "../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import {
@@ -186,7 +187,7 @@ function EstimateFormComponent() {
             return
         } */
 
-    try {
+        try {
             state.isLoading = true
             const isUpdate = !!state.selectedEstimate
             const data = isUpdate
@@ -228,7 +229,7 @@ function EstimateFormComponent() {
 
         } finally {
             state.isLoading = false
-        } 
+        }
     }
 
     // funcion para filtar las listas con los datos del input de filtrado
@@ -352,13 +353,13 @@ function EstimateFormComponent() {
                 return m("div", { class: "col-12 mt-4 d-flex justify-content-center" }, [
                     m("div", { class: "col-md-8 d-flex flex-column flex-md-row justify-content-between gap-4" }, [
                         // Botón Eliminar
-                        m(ButtonComponent, {
+                        m(Button, {
                             bclass: "btn btn-danger text-nowrap",
                             disabled: isEmpty,
                             actions: () => state[key]?.pop(),
                         }, ["Eliminar concepto", m("i.fa.fa-trash-can.me-2.ms-2", { style: { color: "white" } })]),
                         // Botón Añadir
-                        m(ButtonComponent, {
+                        m(Button, {
                             bclass: "btn-warning text-nowrap",
                             actions: () => state[key]?.push(createConcept()),
                         }, ["Añadir concepto", m("i.fa.fa-plus.me-2.ms-2")])
@@ -843,12 +844,12 @@ function EstimateFormComponent() {
                 // Botones
                 m("div.col-12.d-flex.justify-content-center.my-5", [
                     m("div.col-md-8.d-flex.justify-content-between.gap-4", [
-                        m(ButtonComponent, {
+                        m(Button, {
                             bclass: "btn-warning ",
                             actions: () => new bootstrap.Modal(document.getElementById("ModalCancelation")).show()
                             ,
                         }, [m("i.fa.fa-arrow-left.me-2.ms-2"), "Volver",]),
-                        m(ButtonComponent, {
+                        m(Button, {
                             type: "submit",
                             style: { backgroundColor: "var(--mainPurple)" }
                         }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),

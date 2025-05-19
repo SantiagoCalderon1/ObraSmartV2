@@ -1,4 +1,6 @@
-import { ModalComponent, ModalConfirmation, ButtonComponent } from "../../Util/generalsComponents.js";
+ import {  ModalComponent, ModalConfirmation } from "../../components/modal.js"
+
+import { Button } from "../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchClients, updateClient, createClient, deleteClient } from "../../Services/services.js";
@@ -58,7 +60,7 @@ export function ClientsListPage() {
                     columns: columns,
                     data: normalizedClients,
                     onRowClick: onSelect
-                }, [m(ButtonComponent,
+                }, [m(Button,
                     {
                         type: "submit",
                         bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
@@ -280,7 +282,7 @@ function ModalDetailsComponent() {
 
             // Header con botones
             const ContentHeaderModal = () => [
-                m(ButtonComponent, {
+                m(Button, {
                     closeModal: true,
                     bclass: "btn-danger",
                     actions: () =>
@@ -289,7 +291,7 @@ function ModalDetailsComponent() {
                     m("i.fa-solid.fa-trash-can.text-white"),
                     " Eliminar Cliente"
                 ]),
-                m(ButtonComponent, {
+                m(Button, {
                     closeModal: true,
                     bclass: "btn-warning",
                     actions: () => {
@@ -322,7 +324,7 @@ function ModalDetailsComponent() {
 
             // Footer con botón de PDF
             const ContentFooterModal = () => [
-                m(ButtonComponent, {
+                m(Button, {
                     //actions: () => GeneratePDF(estimate),
                     bclass: "btn-outline-danger"
                 }, [
@@ -508,11 +510,11 @@ function ModalFormComponent() {
                         // Botones
                         m("div.col-12.d-flex.justify-content-center.my-5", [
                             m("div.col-md-8.d-flex.justify-content-between.gap-4", [
-                                m(ButtonComponent, {
+                                m(Button, {
                                     closeModal: true,
                                     bclass: "btn-danger",
                                 }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
-                                m(ButtonComponent, {
+                                m(Button, {
                                     type: "submit",
                                     actions: async (e) => {
                                         e.preventDefault()

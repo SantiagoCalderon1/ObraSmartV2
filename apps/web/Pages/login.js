@@ -1,4 +1,4 @@
-import { ButtonComponent } from "../Util/generalsComponents.js";
+import { Button } from "../components/button.js";
 import { login } from "../lib/auth.js";
 
 
@@ -74,7 +74,7 @@ function FormComponent() {
                                         placeholder: "Contraseña",
                                         autocomplete: "current-password"
                                     }),
-                                    m(ButtonComponent,
+                                    m(Button,
                                         {
                                             bclass: "btn btn-outline-secondary rounded-pill fw-normal",
                                             type: "button",
@@ -98,7 +98,7 @@ function FormComponent() {
                                 m("label", { for: "rememberMe", class: "ms-3" }, "Recuerdame")
                             ]),
                             // Botón de iniciar sesión
-                            m(ButtonComponent,
+                            m(Button,
                                 {
                                     type: "submit",
                                     bclass: "btn text-white w-100 fw-semibold", style: { backgroundColor: "var(--mainPurple)" }
@@ -113,7 +113,7 @@ function FormComponent() {
                             m(m.route.Link, { class: "small", href: "/forgot-password" }, "¿Olvidaste tu contraseña?"),
                             m("p.py-3", "¿No tienes una cuenta?"),
                         ]),
-                        m(ButtonComponent,
+                        m(Button,
                             {
                                 bclass: "btn btn-warning w-100",
                                 type: "submit",

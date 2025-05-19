@@ -1,4 +1,5 @@
-import { ButtonComponent, ModalConfirmation } from "../../Util/generalsComponents.js"
+import {  ModalConfirmation } from "../../Util/generalsComponents.js"
+import { Button } from "../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import {
@@ -531,12 +532,12 @@ function EstimateFormComponent() {
                 // Botones
                 m("div.col-12.d-flex.justify-content-center.my-5", [
                     m("div.col-md-8.d-flex.justify-content-between.gap-4", [
-                        m(ButtonComponent, {
+                        m(Button, {
                             bclass: "btn-warning ",
                             actions: () => new bootstrap.Modal(document.getElementById("ModalCancelation")).show()
                             ,
                         }, [m("i.fa.fa-arrow-left.me-2.ms-2"), "Volver",]),
-                        m(ButtonComponent, {
+                        m(Button, {
                             bclass: "btn text-white fc-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
                             type: "submit",
                         }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2.text-white")]),

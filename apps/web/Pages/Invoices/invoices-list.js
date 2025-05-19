@@ -1,4 +1,6 @@
-import { ModalComponent, ModalConfirmation, ButtonComponent } from "../../Util/generalsComponents.js";
+  import {  ModalComponent, ModalConfirmation } from "../../components/modal.js"
+
+import { Button } from "../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchInvoices, deleteInvoice } from "../../Services/services.js";
@@ -73,7 +75,7 @@ export function InvoicesListPage() {
                     data: normalizedInvoices,
                     onRowClick: onSelect
                 },
-                    //[m(ButtonComponent, { type: "submit", bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" }, actions: () => m.route.set("/invoices/create") }, ["Crear Factura"] ),]
+                    //[m(Button, { type: "submit", bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" }, actions: () => m.route.set("/invoices/create") }, ["Crear Factura"] ),]
                 ),
                 m(ModalDetailsComponent, {
                     invoice: selectedInvoice,
@@ -322,7 +324,7 @@ function ModalDetailsComponent() {
 
             // Header con botones
             const ContentHeaderModal = () => [
-                m(ButtonComponent, {
+                m(Button, {
                     closeModal: true,
                     bclass: "btn-danger",
                     actions: () =>
@@ -333,7 +335,7 @@ function ModalDetailsComponent() {
                 ]),
                 /* 
                     No se puede editar la factura es casi ilegal, pero lo dejo por si algunas vez se requiere
-                m(ButtonComponent, {
+                m(Button, {
                     closeModal: true,
                     bclass: "btn-warning",
                     actions: () => m.route.set(`/invoices/update/${invoice.invoice_number}`)
@@ -368,7 +370,7 @@ function ModalDetailsComponent() {
 
             // Footer con botón de PDF
             const ContentFooterModal = () =>
-                m(ButtonComponent, {
+                m(Button, {
                     //actions: () => GeneratePDF(invoice),
                     bclass: "btn-outline-danger"
                 }, [

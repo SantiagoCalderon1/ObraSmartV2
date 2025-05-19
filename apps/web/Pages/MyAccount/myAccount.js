@@ -1,8 +1,9 @@
-import { ModalComponent, ModalConfirmation, ButtonComponent } from "../../Util/generalsComponents.js";
+import { ModalComponent, ModalConfirmation } from "../../Util/generalsComponents.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchUser, updateUser } from "../../Services/services.js";
 
+import { Button } from "../components/button.js";
 
 export function MyAccountPage() {
     return {
@@ -261,11 +262,11 @@ function ProfileOriginal() {
                 // Botones
                 m("div.col-12.d-flex.justify-content-center.my-5", [
                     m("div.col-md-8.d-flex.justify-content-between.gap-4", [
-                        m(ButtonComponent, {
+                        m(Button, {
                             closeModal: true,
                             bclass: "btn-danger",
                         }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
-                        m(ButtonComponent, {
+                        m(Button, {
                             type: "submit",
                             style: { backgroundColor: "var(--mainPurple)" }
                         }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
@@ -649,11 +650,11 @@ function Profile() {
                 // Botones
                 m("div.col-12.d-flex.justify-content-center.my-5", [
                     m("div.col-md-8.d-flex.justify-content-evenly", [
-                        m(ButtonComponent, {
+                        m(Button, {
                             closeModal: true,
                             bclass: "btn-danger",
                         }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
-                        m(ButtonComponent, {
+                        m(Button, {
                             type: "submit",
                             style: { backgroundColor: "var(--mainPurple)" }
                         }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),

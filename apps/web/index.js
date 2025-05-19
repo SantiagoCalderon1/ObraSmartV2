@@ -5,7 +5,7 @@ import { URL_LOGOUT, URL_AUTH } from "./Util/constantes.js"
 import { request } from "./Util/util.js";
 
 // IMPORTADOR DE PÁGINAS
-import { HeaderComponent } from "./Util/generalsComponents.js"
+import { Header } from "./components/header.js"
 import { HomePage } from "./pages/home.js"
 import { LoginPage } from "./pages/login.js"
 import { EstimatesPage } from "./pages/estimates/estimates.js";
@@ -56,7 +56,7 @@ function authGuard() {
                 id: "container-app",
                 style: { display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", width: "100%", height: "100%" }
             }, [
-                this.isAuthenticated ? m("header", { id: "header" }, m(HeaderComponent)) : null,
+                this.isAuthenticated ? m("header", { id: "header" }, m(Header)) : null,
                 m("main", { id: "app", style: { paddingTop: this.isAuthenticated ? "7.5vh" : "" } }, children),
             ]);
         }

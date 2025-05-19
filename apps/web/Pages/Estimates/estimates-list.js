@@ -1,4 +1,6 @@
-import { ModalComponent, ModalConfirmation, ButtonComponent } from "../../Util/generalsComponents.js";
+  import {  ModalComponent, ModalConfirmation } from "../../components/modal.js"
+
+import { Button } from "../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
@@ -71,7 +73,7 @@ export function EstimatesListPage() {
                     columns: columns,
                     data: normalizedEstimates,
                     onRowClick: onSelect
-                }, [m(ButtonComponent,
+                }, [m(Button,
                     {
                         type: "submit",
                         bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
@@ -318,7 +320,7 @@ function ModalDetailsComponent() {
 
             // Header con botones
             const ContentHeaderModal = () => [
-                m(ButtonComponent, {
+                m(Button, {
                     closeModal: true,
                     bclass: "btn-danger",
                     actions: () =>
@@ -327,7 +329,7 @@ function ModalDetailsComponent() {
                     m("i.fa-solid.fa-trash-can.text-white"),
                     " Eliminar Presupuesto"
                 ]),
-                m(ButtonComponent, {
+                m(Button, {
                     closeModal: true,
                     bclass: "btn-warning",
                     actions: () => m.route.set(`/estimates/update/${estimate.estimate_number}`)
@@ -361,14 +363,14 @@ function ModalDetailsComponent() {
 
             // Footer con botón de PDF
             const ContentFooterModal = () => [
-                m(ButtonComponent, {
+                m(Button, {
                     //actions: () => GeneratePDF(estimate),
                     bclass: "btn-outline-danger"
                 }, [
                     "Descargar PDF ",
                     m("i.fa-solid.fa-file-pdf.text-danger")
                 ]),
-                estimate?.status === "Aceptado" ? m(ButtonComponent, {
+                estimate?.status === "Aceptado" ? m(Button, {
                     bclass: "btn text-white fc-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
                     actions: () => m.route.set(`/invoices/create/${estimate?.estimate_number}`),
                     closeModal: true
