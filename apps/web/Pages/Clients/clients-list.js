@@ -1,7 +1,7 @@
- import {  ModalComponent, ModalConfirmation } from "../../components/modal.js"
+ import {  Modal, ModalConfirmation } from "../../components/modal.js"
  import {  Table } from "../../components/table.js"
 
-import { Button } from "../components/button.js";
+import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchClients, updateClient, createClient, deleteClient } from "../../Services/services.js";
@@ -221,7 +221,7 @@ function ModalDetailsComponent() {
             ]
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalDetailsClientsList",
                 title: `Cliente con NIF ${selectedClient?.nif}`,
                 addBtnClose: true,
@@ -419,7 +419,7 @@ function ModalFormComponent() {
                     ])]])
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalFormClient",
                 title: state.selectedClient?.nif ? `Actualizando el cliente` : `Creando Nuevo Cliente`,
                 addBtnClose: false,

@@ -126,7 +126,7 @@ export function TableListComponent() {
 
 
 // ==================== Componentes para la estructura Modal ========================================
-export function ModalComponent() {
+export function Modal() {
     return {
         view: function ({ attrs }) {
             const { idModal, title, addBtnClose } = attrs
@@ -171,7 +171,7 @@ export function ModalConfirmation() {
                         }, ["aceptar"])
                     ])
                 ])
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: idModal,
                 title: tituloModal,
                 slots: {

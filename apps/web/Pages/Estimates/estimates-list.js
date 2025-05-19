@@ -1,7 +1,5 @@
-  import {  ModalComponent, ModalConfirmation } from "../../components/modal.js"
- import {  Table } from "../../components/table.js"
-
-import { Button } from "../components/button.js";
+import { Modal, ModalConfirmation } from "../../components/modal.js"
+import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
@@ -9,7 +7,7 @@ import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
 export function EstimatesListPage() {
     let estimates = [];
     let selectedEstimate = null;
-    
+
     async function loadEstimates() {
         estimates = (await fetchEstimates()).data;
         console.log(estimates);
@@ -269,7 +267,7 @@ function ModalDetailsComponent() {
             ]
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalDetailsEstimatesList",
                 title: `Presupuesto #${estimate?.estimate_number}`,
                 addBtnClose: true,

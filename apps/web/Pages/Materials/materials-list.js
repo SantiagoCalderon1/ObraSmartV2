@@ -1,7 +1,7 @@
-import { ModalComponent, ModalConfirmation } from "../../components/modal.js"
+import { Modal, ModalConfirmation } from "../../components/modal.js"
  import {  Table } from "../../components/table.js"
 
-import { Button } from "../components/button.js";
+import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchMaterials, updateMaterial, createMaterial, deleteMaterial } from "../../Services/services.js";
@@ -223,7 +223,7 @@ function ModalDetailsComponent() {
             ]
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalDetailsMaterialsList",
                 title: `Material  ${selectedMaterial?.name}`,
                 addBtnClose: true,
@@ -424,7 +424,7 @@ function ModalFormComponent() {
                     ])]])
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalFormMaterial",
                 title: state.selectedMaterial?.material_id ? `Actualizando El Material ${state.selectedMaterial?.name}` : `Creando Nuevo Material`,
                 addBtnClose: false,

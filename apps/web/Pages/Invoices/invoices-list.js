@@ -1,7 +1,7 @@
-import { ModalComponent, ModalConfirmation } from "../../components/modal.js"
+import { Modal, ModalConfirmation } from "../../components/modal.js"
  import {  Table } from "../../components/table.js"
 
-import { Button } from "../components/button.js";
+import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchInvoices, deleteInvoice } from "../../Services/services.js";
@@ -268,7 +268,7 @@ function ModalDetailsComponent() {
                 ]);
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalDetailsInvoicesList",
                 title: `Factura #${invoice?.invoice_number}`,
                 addBtnClose: true,

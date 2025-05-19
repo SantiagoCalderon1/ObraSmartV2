@@ -1,7 +1,7 @@
-import { ModalComponent, ModalConfirmation } from "../../components/modal.js"
+import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Table } from "../../components/table.js"
 
-import { Button } from "../components/button.js";
+import { Button } from "../../components/button.js";
 
 
 // IMPORTADOR DE FUNCIONES
@@ -229,7 +229,7 @@ function ModalDetailsComponent() {
             ]
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalDetailsProjectsList",
                 title: `Project - ${selectedProject?.name}`,
                 addBtnClose: true,
@@ -491,7 +491,7 @@ function ModalFormComponent() {
                     ])]])
 
             // Render del modal
-            return m(ModalComponent, {
+            return m(Modal, {
                 idModal: "ModalFormProject",
                 title: state.selectedProject?.project_id ? `Actualizando el cliente` : `Creando Nuevo Project`,
                 addBtnClose: false,

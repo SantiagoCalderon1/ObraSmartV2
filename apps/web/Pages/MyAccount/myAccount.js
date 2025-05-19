@@ -1,9 +1,9 @@
-import { ModalComponent, ModalConfirmation } from "../../Util/generalsComponents.js";
+import { Modal, ModalConfirmation } from "../../Util/generalsComponents.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchUser, updateUser } from "../../Services/services.js";
 
-import { Button } from "../components/button.js";
+import { Button } from "../../components/button.js";
 
 export function MyAccountPage() {
     return {
