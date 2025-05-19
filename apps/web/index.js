@@ -71,6 +71,8 @@ const routes = {
     //'/register': { view: () => m(RegisterPage) },
 
     // Rutas protegidas (Solo accesibles si se está autenticado)
+
+
     '/logout': { view: () => { Logout(); m(LoginPage) } },
     '/home': { view: () => m(authGuard, m(HomePage)) },
 
@@ -85,50 +87,18 @@ const routes = {
 
     // Routes Clients
     '/clients': { view: () => m(authGuard, m(ClientsPage, { option: "show" })) },
-    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(ClientsPage, { option: "create", id: attrs.id })) },
-
+ 
     // Routes Projects
     '/projects': { view: () => m(authGuard, m(ProjectsPage, { option: "show" })) },
-    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
-
+ 
     // Routes Materials
     '/materials': { view: () => m(authGuard, m(MaterialsPage, { option: "show" })) },
-    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
-
+ 
     // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
-    //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
-
+ 
 
 }
 
 // Montamos en app y actualizamos el layout
 m.route(document.getElementById("app"), "/login", routes);
-
-
-
-const HelloComponent = {
-    view: function () {
-        return m("h1", "Hola, Mithril!");
-    }
-};
-
-m.mount(document.body, HelloComponent);
-
-
-m("h1", "Hola, Mithril!")
-
-
-m.mount()
-
-
-const Contador = {
-    count: 0,
-    view: function () {
-        return m("button", {
-            onclick: function () { Contador.count++; }
-        }, "Contador: " + Contador.count);
-    }
-};
-
-m.mount(document.body, Contador);
