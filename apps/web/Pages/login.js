@@ -1,5 +1,5 @@
 import { ButtonComponent } from "../Util/generalsComponents.js";
-import { loginUser } from "../Services/auth.js";
+import { login } from "../lib/auth.js";
 
 
 export function LoginPage() {
@@ -23,7 +23,7 @@ function FormComponent() {
             };
             //console.log("Enviando datos: ", JSON.stringify(loginData));
             try {
-                const data = await loginUser(loginData);
+                const data = await login(loginData);
                 if (data.status === 200 && data.response.token) {
                     badCredentials = false;
                     // Guardar el token según la preferencia del usuario

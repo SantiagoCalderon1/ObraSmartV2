@@ -6,14 +6,14 @@ import { request } from "./Util/util.js";
 
 // IMPORTADOR DE PÁGINAS
 import { HeaderComponent } from "./Util/generalsComponents.js"
-import { HomePage } from "./Pages/home.js"
-import { LoginPage } from "./Pages/login.js"
-import { EstimatesPage } from "./Pages/Estimates/estimates.js";
-import { InvoicesPage } from "./Pages/Invoices/invoices.js";
-import { ClientsPage } from "./Pages/Clients/clients.js";
-import { ProjectsPage } from "./Pages/Projects/projects.js";
-import { MaterialsPage } from "./Pages/Materials/materials.js";
-import { MyAccountPage } from "./Pages/MyAccount/myAccount.js";
+import { HomePage } from "./pages/home.js"
+import { LoginPage } from "./pages/login.js"
+import { EstimatesPage } from "./pages/estimates/estimates.js";
+import { InvoicesPage } from "./pages/invoices/invoices.js";
+import { ClientsPage } from "./pages/clients/clients.js";
+import { ProjectsPage } from "./pages/projects/projects.js";
+import { MaterialsPage } from "./pages/materials/materials.js";
+import { MyAccountPage } from "./pages/myAccount/myAccount.js";
 
 
 /*
@@ -51,7 +51,7 @@ function authGuard() {
             }
         },
         view: function ({ children }) {
-       
+
             return m("div", {
                 id: "container-app",
                 style: { display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", width: "100%", height: "100%" }
@@ -91,11 +91,11 @@ const routes = {
     '/projects': { view: () => m(authGuard, m(ProjectsPage, { option: "show" })) },
     //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
 
-     // Routes Materials
+    // Routes Materials
     '/materials': { view: () => m(authGuard, m(MaterialsPage, { option: "show" })) },
     //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
 
-        // Routes MyAccount
+    // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
     //'/clients/create/:id': { view: ({ attrs }) => m(authGuard, m(InvoicesPage, { option: "create", id: attrs.id })) },
 
@@ -107,3 +107,28 @@ m.route(document.getElementById("app"), "/login", routes);
 
 
 
+const HelloComponent = {
+    view: function () {
+        return m("h1", "Hola, Mithril!");
+    }
+};
+
+m.mount(document.body, HelloComponent);
+
+
+m("h1", "Hola, Mithril!")
+
+
+m.mount()
+
+
+const Contador = {
+    count: 0,
+    view: function () {
+        return m("button", {
+            onclick: function () { Contador.count++; }
+        }, "Contador: " + Contador.count);
+    }
+};
+
+m.mount(document.body, Contador);

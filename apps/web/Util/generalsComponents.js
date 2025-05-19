@@ -210,6 +210,12 @@ export function TableListComponent() {
     }
 }
 
+
+
+
+
+
+
 // ==================== Componentes para la estructura Modal ========================================
 export function ModalComponent() {
     return {
