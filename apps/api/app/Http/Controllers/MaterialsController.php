@@ -108,23 +108,10 @@ class MaterialsController
     /**
      * Remove the specified resource from storage.
      */
-
     public function destroy(Material $material)
     {
-        try {
-            $material->delete();
-            return response()->json(['message' => 'Material eliminado con éxito.']);
-        } catch (\Throwable $e) {
-            Log::error('Error al eliminar material', [
-                'material_id' => $material->id,
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
+        $material->delete();
 
-            return response()->json([
-                'message' => 'No se pudo eliminar el material.',
-                'error' => $e->getMessage()
-            ], 500);
-        }
+        return response()->json(['message' => 'Material eliminado con éxito.']);
     }
 }

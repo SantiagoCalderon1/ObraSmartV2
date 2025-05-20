@@ -79,11 +79,11 @@ Route::middleware([IsUserAuth::class])->group(function () {
     //Rutas de MaterialController
     Route::controller(MaterialsController::class)->group(function () {
         Route::get('/materials', 'index'); 
-        Route::get('/materials/{materials}', 'show');
+        Route::get('/materials/{material}', 'show');
         Route::post('/materials', 'store');
-        Route::put('/materials/{materials}', 'update');
-        Route::patch('/materials/{materials}', 'update');
-        Route::delete('/materials/{materials}', 'destroy');
+        Route::put('/materials/{material}', 'update');
+        Route::patch('/materials/{material}', 'update');
+        Route::delete('/materials/{material}', 'destroy');
     });
 
     //Rutas de LaborTypesController
