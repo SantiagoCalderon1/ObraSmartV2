@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
 
 class MaterialsController
 {
@@ -106,19 +108,21 @@ class MaterialsController
     /**
      * Remove the specified resource from storage.
      */
+
     public function destroy(Material $material)
     {
         try {
-            $deleted = $material->delete();
+            $material->delete();
+            return response()->json(['message' => 'Material eliminado con éxito.']);
+        } catch (\Throwable $e) {
+            Log::error('Error al eliminar material', [
+                'material_id' => $material->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
 
-            if ($deleted) {
-                return response()->json(['message' => 'Material eliminado con éxito.'], 200);
-            } else {
-                return response()->json(['message' => 'No se pudo eliminar el material.'], 500);
-            }
-        } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Error eliminando el material.',
+                'message' => 'No se pudo eliminar el material.',
                 'error' => $e->getMessage()
             ], 500);
         }
