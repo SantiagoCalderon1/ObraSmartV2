@@ -78,7 +78,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     //Rutas de MaterialController
     Route::controller(MaterialsController::class)->group(function () {
-        Route::get('/materials', 'index');
+        Route::get('/materials', 'index'); 
         Route::get('/materials/{materials}', 'show');
         Route::post('/materials', 'store');
         Route::put('/materials/{materials}', 'update');

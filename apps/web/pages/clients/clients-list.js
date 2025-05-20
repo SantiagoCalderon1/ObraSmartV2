@@ -1,6 +1,5 @@
- import {  Modal, ModalConfirmation } from "../../components/modal.js"
- import {  Table } from "../../components/table.js"
-
+import { Modal, ModalConfirmation } from "../../components/modal.js"
+import { Table } from "../../components/table.js"
 import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
@@ -281,7 +280,7 @@ function ModalFormComponent() {
             const handleFormSubmit = async (e) => {
                 e.preventDefault()
                 const dataToSend = state.ClientData
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 //console.log("Se envió");
 
                 try {
@@ -291,7 +290,7 @@ function ModalFormComponent() {
                     } else {
                         response = await createClient(dataToSend);
                     }
-                    console.log("Response form: ", response)
+                    //console.log("Response form: ", response)
 
                     const modalElement = document.getElementById("ModalFormClient");
                     if (modalElement) {
@@ -311,7 +310,7 @@ function ModalFormComponent() {
                     attrs.onClientSaved?.(); // Llama al callback si existe
 
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error)
+                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",

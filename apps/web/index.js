@@ -28,7 +28,7 @@ async function Logout() {
     try {
         await request("POST", URL_LOGOUT)
     } catch (error) {
-        console.error("Error cerrando sesión: ", error)
+        //console.error("Error cerrando sesión: ", error)
     } finally {
         localStorage.clear()
         sessionStorage.clear()

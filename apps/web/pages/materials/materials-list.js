@@ -1,5 +1,5 @@
 import { Modal, ModalConfirmation } from "../../components/modal.js"
- import {  Table } from "../../components/table.js"
+import { Table } from "../../components/table.js"
 
 import { Button } from "../../components/button.js";
 
@@ -12,7 +12,7 @@ export function MaterialsListPage() {
 
     async function loadMaterials() {
         materials = (await fetchMaterials()).data;
-        console.log(materials);
+        //console.log(materials);
         m.redraw();
     }
 
@@ -28,7 +28,9 @@ export function MaterialsListPage() {
 
             const onDelete = async () => {
                 if (selectedMaterial) {
-                    await deleteMaterial(selectedMaterial.material_id);
+                    let response = await deleteMaterial(selectedMaterial.material_id);
+                    console.log(response);
+
                     selectedMaterial = null;
                     await loadMaterials();
                 }
@@ -89,7 +91,7 @@ export function MaterialsListPage() {
                 m(ModalConfirmation, {
                     idModal: "ModalDeleteMaterial",
                     tituloModal: "Confirmación de eliminación",
-                    mensaje: `¿Está seguro de eliminar el material con nombre ${selectedMaterial?.namer}?`,
+                    mensaje: `¿Está seguro de eliminar el material con nombre ${selectedMaterial?.name}?`,
                     actions: onDelete
                 })
             ];
@@ -175,7 +177,7 @@ function ModalDetailsComponent() {
                     closeModal: true,
                     bclass: "btn-danger",
                     actions: () =>
-                        new bootstrap.Modal(document.getElementById("ModalDeleteClient")).show()
+                        new bootstrap.Modal(document.getElementById("ModalDeleteMaterial")).show()
                 }, [
                     m("i.fa-solid.fa-trash-can.text-white"),
                     " Eliminar Material"
@@ -186,7 +188,7 @@ function ModalDetailsComponent() {
                     actions: () => {
                         //m.route.set(`/materials/update/${selectedMaterial.material_id}`)
                         //m.route.set("/materials/create")
-                        new bootstrap.Modal(document.getElementById("ModalFormClient")).show();
+                        new bootstrap.Modal(document.getElementById("ModalFormMaterial")).show();
                         m.redraw();
                     }
                 }, [
@@ -284,7 +286,7 @@ function ModalFormComponent() {
             const handleFormSubmit = async () => {
 
                 const dataToSend = state.MaterialData
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 //console.log("Se envió");
                 try {
                     let response;
@@ -301,7 +303,7 @@ function ModalFormComponent() {
                         modalInstance.hide();
                     }
 
-                    console.log("Response form: ", response)
+                    //console.log("Response form: ", response)
                     Toastify({
                         text: "¡Operación exitosa!",
                         className: "toastify-success",
@@ -312,7 +314,7 @@ function ModalFormComponent() {
                     }).showToast()
                     attrs.onClientSaved?.(); // Llama al callback si existe
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error)
+                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",

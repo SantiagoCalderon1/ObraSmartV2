@@ -54,11 +54,11 @@ export function Table() {
             return m("div.col-11.col-md-10", { style: style.containerStyle }, [
                 m("div.col-12", [
                     m("div.row", [
-                        m("div.col-12.col-md-6.offset-md-6", {
+                        m("div.col-12", {
                             style: { display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", gap: "10px", padding: "10px 20px", }
                         }, [
                             m("div.input-group.flex-nowrap", [children ? children : null,]),
-                            m("div.input-group.flex-nowrap", [
+                            m("div.input-group.flex-nowrap.offset-md-6", [
                                 m("input.form-control", {
                                     type: "text",
                                     placeholder: "Buscar...",

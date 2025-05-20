@@ -170,8 +170,8 @@ function ClientFormComponent() {
     const handleFormSubmit = async (e) => {
         e.preventDefault()
         const dataToSend = collectFormData()
-        console.log("dataToSend: ", dataToSend);
-        console.log("Se envió");
+        //console.log("dataToSend: ", dataToSend);
+        //console.log("Se envió");
 
 
         /* // Validación básica
@@ -193,9 +193,9 @@ function ClientFormComponent() {
             const data = isUpdate
                 ? await updateClient(dataToSend, state.selectedClient.estimate_number)
                 : await createClient(dataToSend)
-            console.log("isUpdate: ", isUpdate);
+            //console.log("isUpdate: ", isUpdate);
 
-            console.log("Response form: ", data)
+            //console.log("Response form: ", data)
 
             // Resetear solo si se creó nuevo
             if (!isUpdate) {
@@ -215,7 +215,7 @@ function ClientFormComponent() {
 
             m.route.set("/estimates")
         } catch (error) {
-            console.error("Error al enviar el formulario:", error)
+            //console.error("Error al enviar el formulario:", error)
             Toastify({
                 text: "¡Algo salió mal!",
                 className: "toastify-error",
@@ -224,7 +224,7 @@ function ClientFormComponent() {
                 gravity: "top",
                 position: "right"
             }).showToast()
-            console.log(error);
+            //console.log(error);
 
 
         } finally {
@@ -259,9 +259,9 @@ function ClientFormComponent() {
             (acc, item) => acc + parseFloat(item.total_cost || 0), 0
         );
 
-        console.log("materialSubtotal: ", materialSubtotal);
-        console.log("laborSubtotal: ", laborSubtotal);
-        console.log("subtotal: ", Number(materialSubtotal + laborSubtotal).toFixed(2));
+        //console.log("materialSubtotal: ", materialSubtotal);
+        //console.log("laborSubtotal: ", laborSubtotal);
+        //console.log("subtotal: ", Number(materialSubtotal + laborSubtotal).toFixed(2));
 
         return Number(materialSubtotal + laborSubtotal).toFixed(2);
     };
@@ -280,16 +280,16 @@ function ClientFormComponent() {
             state.materials = (await fetchMaterials()).data
             state.laborTypes = (await fetchLaborTypes()).data
 
-            console.log("Clientes: ", state.clients)
-            console.log("Proyectos: ", state.projects)
-            console.log("Materiales: ", state.materials)
-            console.log("Servicios: ", state.laborTypes)
+            //console.log("Clientes: ", state.clients)
+            //console.log("Proyectos: ", state.projects)
+            //console.log("Materiales: ", state.materials)
+            //console.log("Servicios: ", state.laborTypes)
 
             // Solo si es modo edición (update)
             if (estimate_number) {
                 const selected = (await fetchClient(estimate_number)).data;
                 state.selectedClient = selected
-                console.log("selectedClient:", state.selectedClient)
+                //console.log("selectedClient:", state.selectedClient)
 
                 // Client
                 state.estimateData = ClientData({
@@ -303,7 +303,7 @@ function ClientFormComponent() {
                     total_cost: selected.total_cost,
                     conditions: selected.conditions
                 })
-                console.log("ClientData:", state.estimateData)
+                //console.log("ClientData:", state.estimateData)
 
                 // materials
                 state.estimateMaterialData = selected.materials?.map((item) =>
@@ -317,7 +317,7 @@ function ClientFormComponent() {
                         unit: item.material?.unit || "",  //opcional para mostrar en UI
                     })
                 ) || []
-                console.log("Items materials actualizables:", state.estimateMaterialData)
+                //console.log("Items materials actualizables:", state.estimateMaterialData)
 
                 //labors
                 state.estimateLaborsData = selected.labors?.map((item) =>
@@ -333,11 +333,11 @@ function ClientFormComponent() {
                     })
                 ) || [];
 
-                console.log("Items labors actualizables:", state.estimateLaborsData)
+                //console.log("Items labors actualizables:", state.estimateLaborsData)
             }
             m.redraw()
         } catch (error) {
-            console.error("Error cargando datos del formulario:", error)
+            //console.error("Error cargando datos del formulario:", error)
         }
     }
 
@@ -401,7 +401,7 @@ function ClientFormComponent() {
                                 value: state.estimateData?.client_id,
                                 onchange: e => {
                                     state.estimateData.client_id = e.target.value
-                                    console.log("input select: ", state.estimateData?.client_id)
+                                    //console.log("input select: ", state.estimateData?.client_id)
                                     m.redraw()
                                 },
                             }, [
@@ -643,7 +643,7 @@ function ClientFormComponent() {
                                     item.labor_type_id = parseInt(e.target.value)
                                     const selected = state.laborTypes.find(l => l.labor_type_id == item.labor_type_id)
                                     if (selected) {
-                                        console.log("Selected estimate labor", selected);
+                                        //console.log("Selected estimate labor", selected);
 
                                         item.cost_per_hour = parseFloat(selected.cost_per_hour) || 0
                                         item.hours = 1

@@ -1,5 +1,5 @@
 import { Modal, ModalConfirmation } from "../../components/modal.js"
- import {  Table } from "../../components/table.js"
+import { Table } from "../../components/table.js"
 
 import { Button } from "../../components/button.js";
 
@@ -12,7 +12,7 @@ export function InvoicesListPage() {
     2
     async function loadInvoices() {
         invoices = (await fetchInvoices()).data;
-        console.log(invoices);
+        //console.log(invoices);
         m.redraw();
     }
 

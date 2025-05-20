@@ -14,7 +14,7 @@ export function ProjectsListPage() {
 
     async function loadProjects() {
         projects = (await fetchProjects()).data;
-        console.log(projects);
+        //console.log(projects);
         m.redraw();
     }
 
@@ -288,7 +288,7 @@ function ModalFormComponent() {
             if (attrs.selectedProject !== state.selectedProject) {
                 state.selectedProject = attrs.selectedProject;
                 state.ProjectData = ProjectData(state.selectedProject || {});
-                console.log("state.selectedProject: ", state.selectedProject);
+                //console.log("state.selectedProject: ", state.selectedProject);
             }
         },
 
@@ -298,7 +298,7 @@ function ModalFormComponent() {
             const handleFormSubmit = async (e) => {
                 e.preventDefault()
                 const dataToSend = state.ProjectData
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 //console.log("Se envió");
 
                 try {
@@ -308,7 +308,7 @@ function ModalFormComponent() {
                     } else {
                         response = await createProject(dataToSend);
                     }
-                    console.log("Response form: ", response)
+                    //console.log("Response form: ", response)
 
                     Toastify({
                         text: "¡Operación exitosa!",
@@ -328,7 +328,7 @@ function ModalFormComponent() {
                     }
 
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error)
+                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -442,7 +442,7 @@ function ModalFormComponent() {
                                     value: state.ProjectData?.client_id,
                                     onchange: e => {
                                         state.ProjectData.client_id = e.target.value
-                                        console.log("input select: ", state.ProjectData?.client_id)
+                                        //console.log("input select: ", state.ProjectData?.client_id)
                                         m.redraw()
                                     },
                                 }, [

@@ -108,8 +108,19 @@ class MaterialsController
      */
     public function destroy(Material $material)
     {
-        $material->delete();
+        try {
+            $deleted = $material->delete();
 
-        return response()->json(['message' => 'Material eliminado con éxito.']);
+            if ($deleted) {
+                return response()->json(['message' => 'Material eliminado con éxito.'], 200);
+            } else {
+                return response()->json(['message' => 'No se pudo eliminar el material.'], 500);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error eliminando el material.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

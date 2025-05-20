@@ -6,7 +6,7 @@ export async function login(body) {
   try {
     const response = await m.request({
       method: "POST",
-      url: `${import.meta.env.API_URL}/api/login`,
+      url: `${import.meta.env.VITE_API_URL}/api/login`,
       body,
       headers: {
         "Content-Type": "application/json"
@@ -18,7 +18,7 @@ export async function login(body) {
     });
     return response;
   } catch (error) {
-    console.error("Error iniciando sesión:", error);
+    //console.error("Error iniciando sesión:", error);
     throw error;
   }
 }

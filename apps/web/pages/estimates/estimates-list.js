@@ -1,5 +1,7 @@
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Button } from "../../components/button.js";
+import { Table } from "../../components/table.js"
+
 
 // IMPORTADOR DE FUNCIONES
 import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
@@ -10,7 +12,7 @@ export function EstimatesListPage() {
 
     async function loadEstimates() {
         estimates = (await fetchEstimates()).data;
-        console.log(estimates);
+        //console.log(estimates);
         m.redraw();
     }
 

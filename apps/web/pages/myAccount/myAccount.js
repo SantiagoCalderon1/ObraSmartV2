@@ -40,7 +40,7 @@ function ProfileOriginal() {
 
     async function loadUser() {
         user = (await fetchUser()).user;
-        console.log(user);
+        //console.log(user);
         m.redraw();
     }
 
@@ -52,13 +52,13 @@ function ProfileOriginal() {
             const handleFormSubmit = async (e) => {
                 e.preventDefault()
                 const dataToSend = user
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 //console.log("Se envió");
                 try {
                     let response;
                     response = await updateUser(dataToSend, state.selectedMaterial.material_id);
 
-                    console.log("Response form: ", response)
+                    //console.log("Response form: ", response)
                     Toastify({
                         text: "¡Operación exitosa!",
                         className: "toastify-success",
@@ -69,7 +69,7 @@ function ProfileOriginal() {
                     }).showToast()
                     attrs.onClientSaved?.(); // Llama al callback si existe
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error)
+                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -86,13 +86,13 @@ function ProfileOriginal() {
             const handleFormResetPassword = async (e) => {
                 e.preventDefault()
                 const dataToSend = user
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 //console.log("Se envió");
                 try {
                     let response;
                     response = await updateUser(dataToSend, state.selectedMaterial.material_id);
 
-                    console.log("Response form: ", response)
+                    //console.log("Response form: ", response)
                     Toastify({
                         text: "¡Operación exitosa!",
                         className: "toastify-success",
@@ -103,7 +103,7 @@ function ProfileOriginal() {
                     }).showToast()
                     attrs.onClientSaved?.(); // Llama al callback si existe
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error)
+                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -322,7 +322,7 @@ function Profile() {
 
     async function loadUser() {
         user = (await fetchUser()).user;
-        console.log(user);
+        //console.log(user);
         m.redraw();
     }
 
@@ -334,12 +334,12 @@ function Profile() {
             const handleFormSubmit = async (e) => {
                 e.preventDefault();
                 const dataToSend = user;
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 try {
                     let response;
                     response = await updateUser(dataToSend);
 
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
                     Toastify({
                         text: "¡Operación exitosa!",
                         className: "toastify-success",
@@ -349,7 +349,7 @@ function Profile() {
                         position: "right"
                     }).showToast();
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error);
+                    //console.error("Error al enviar el formulario:", error);
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -367,12 +367,12 @@ function Profile() {
             const handleCompanyFormSubmit = async (e) => {
                 e.preventDefault();
                 const dataToSend = company; // Usamos `company` para actualizar la información de la compañía
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 try {
                     let response;
                     response = await updateCompany(dataToSend);
 
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
                     Toastify({
                         text: "¡Operación exitosa!",
                         className: "toastify-success",
@@ -383,7 +383,7 @@ function Profile() {
                     }).showToast();
                     attrs.onClientSaved?.();
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error);
+                    //console.error("Error al enviar el formulario:", error);
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -408,7 +408,7 @@ function Profile() {
 
                 try {
                     let response = await updatePassword(dataToSend); // Llamada para actualizar la contraseña
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
 
                     Toastify({
                         text: "¡Contraseña actualizada exitosamente!",
@@ -421,7 +421,7 @@ function Profile() {
 
                     attrs.onClientSaved?.(); // Llama al callback si existe
                 } catch (error) {
-                    console.error("Error al enviar el formulario de cambio de contraseña:", error);
+                    //console.error("Error al enviar el formulario de cambio de contraseña:", error);
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",

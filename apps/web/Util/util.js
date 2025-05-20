@@ -3,7 +3,7 @@
 export async function request(method, url, body = null, routeSet = true) {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token")
     if (!token) {
-        console.log("No hay token, redirigiendo a /login")
+        //console.log("No hay token, redirigiendo a /login")
         m.route.set("/login")
         return
     }
@@ -19,7 +19,7 @@ export async function request(method, url, body = null, routeSet = true) {
         })
         return data
     } catch (error) {
-        console.error("Error en la petición:", error)
+        //console.error("Error en la petición:", error)
         routeSet ? m.route.set("/login") : null
         throw error
     }

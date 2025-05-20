@@ -36,7 +36,7 @@ function FormComponent() {
                     sessionStorage.clear();
                 }
             } catch (error) {
-                console.error("Error en login:", error);
+                //console.error("Error en login:", error);
                 badCredentials = true;
             }
             m.redraw();
