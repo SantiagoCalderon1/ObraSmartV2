@@ -267,7 +267,7 @@ class EstimateController
                 ->whereNotIn('labor_type_id', $laborIdsInRequest)
                 ->delete();
 
-            $estimate->refresh();
+            $estimate = $estimate->fresh()->load('materials.material');
 
             if (!$wasAccepted && strtolower($estimate->status) === 'aceptado') {
                 $this->aplicarMovimientosStock($estimate, 'uso');
