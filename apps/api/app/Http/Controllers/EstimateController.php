@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Estimate;
 use App\Models\EstimateLabor;
 use App\Models\EstimateMaterial;
+use App\Models\StockMovement;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -128,6 +129,11 @@ class EstimateController
                 ]);
             }
 
+            // Solo si el estado es aceptado
+            if ($estimate->status === 'aceptado') {
+                $this->aplicarMovimientosStock($estimate, 'uso');
+            }
+
             DB::commit();
 
             return response()->json([
@@ -176,12 +182,14 @@ class EstimateController
     {
         try {
             DB::beginTransaction();
+            $wasAccepted = $estimate->status === 'aceptado';
 
             $data = $request->all();
 
             $estimateData = $data['estimate'] ?? [];
             $estimateMaterials = $data['materials'] ?? [];
             $estimateLabors = $data['labors'] ?? [];
+
 
             // Validaciones
             $EstimateDataValidator = Validator::make($estimateData, $this->estimateRules());
@@ -259,6 +267,17 @@ class EstimateController
                 ->whereNotIn('labor_type_id', $laborIdsInRequest)
                 ->delete();
 
+
+
+
+            if (!$wasAccepted && $estimate->status === 'aceptado') {
+                $this->aplicarMovimientosStock($estimate, 'uso');
+            }
+
+            if ($wasAccepted && $estimate->status !== 'aceptado') {
+                $this->aplicarMovimientosStock($estimate, 'compra'); // o 'ajuste'
+            }
+
             DB::commit();
 
             return response()->json([
@@ -311,6 +330,42 @@ class EstimateController
     }
 
     // Funciones Auxiliares
+    private function aplicarMovimientosStock(Estimate $estimate, string $tipo = 'uso')
+    {
+        foreach ($estimate->materials as $item) {
+            $material = $item->material;
+
+            if (!$material) continue;
+
+            if ($tipo === 'uso') {
+                // Verifica si hay stock suficiente
+                if ($material->stock_quantity < $item->quantity) {
+                    throw new \Exception("Stock insuficiente para el material: {$material->name}");
+                }
+
+                // Resta del stock
+                $material->stock_quantity -= $item->quantity;
+            } else {
+                // Devuelve stock
+                $material->stock_quantity += $item->quantity;
+            }
+
+            $material->save();
+
+            // Registra movimiento
+            StockMovement::create([
+                'material_id' => $material->material_id,
+                'project_id'  => $estimate->project_id,
+                'user_id'     => Auth::id(),
+                'quantity'    => $item->quantity,
+                'reason'      => $tipo
+            ]);
+        }
+    }
+
+
+
+
     private function estimateRules(): array
     {
         $rules = [
