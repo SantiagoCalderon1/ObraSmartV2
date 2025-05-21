@@ -43,9 +43,9 @@ class StockMovementsController
 
             // Ajustar stock del material
             if ($validated['reason'] === 'compra') {
-                $material->stock += $validated['quantity'];
+                $material->stock_quantity += $validated['quantity'];
             } elseif ($validated['reason'] === 'uso') {
-                if ($material->stock < $validated['quantity']) {
+                if ($material->stock_quantity < $validated['quantity']) {
                     return response()->json(['message' => 'Stock insuficiente para registrar el uso.'], 400);
                 }
                 $material->stock -= $validated['quantity'];
