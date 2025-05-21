@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\StockMovement;
 use App\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class StockMovementsController
@@ -33,7 +34,6 @@ class StockMovementsController
         $validated = $request->validate([
             'material_id' => 'required|exists:materials,material_id',
             'project_id' => 'nullable|exists:projects,project_id',
-            'user_id' => 'nullable|exists:users,user_id',
             'quantity' => 'required|integer|min:1',
             'reason' => 'required|in:compra,uso,ajuste'
         ]);
@@ -57,7 +57,7 @@ class StockMovementsController
             $movement = StockMovement::create([
                 'material_id' => $validated['material_id'],
                 'project_id' => $validated['project_id'],
-                'user_id' => $validated['user_id'],
+                'user_id'        => Auth::id(),
                 'quantity' => $validated['quantity'],
                 'reason' => $validated['reason']
             ]);
