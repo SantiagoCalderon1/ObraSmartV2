@@ -182,7 +182,6 @@ class EstimateController
     {
         try {
             DB::beginTransaction();
-            $wasAccepted = strtolower($estimate->status) === 'aceptado';
 
             $data = $request->all();
 
@@ -269,13 +268,12 @@ class EstimateController
 
             $estimate = $estimate->fresh()->load('materials.material');
 
-            if (!$wasAccepted && strtolower($estimate->status) === 'aceptado') {
+            if (strtolower($estimate->status) === 'rechazado' ) {
+                $this->aplicarMovimientosStock($estimate, 'ajuste'); // Restaura el stock
+            } else {
                 $this->aplicarMovimientosStock($estimate, 'uso');
             }
 
-            if ($wasAccepted && strtolower($estimate->status) !== 'aceptado') {
-                $this->aplicarMovimientosStock($estimate, 'compra'); // o 'ajuste'
-            }
 
             DB::commit();
 
