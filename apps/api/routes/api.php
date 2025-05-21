@@ -7,6 +7,7 @@ use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\LaborTypesController;
 use App\Http\Controllers\MaterialsController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\StockMovementsController;
 use App\Http\Controllers\UserController;
 use App\Http\Middleware\IsAdminAuth;
 use App\Http\Middleware\IsUserAuth;
@@ -78,13 +79,24 @@ Route::middleware([IsUserAuth::class])->group(function () {
 
     //Rutas de MaterialController
     Route::controller(MaterialsController::class)->group(function () {
-        Route::get('/materials', 'index'); 
+        Route::get('/materials', 'index');
         Route::get('/materials/{material}', 'show');
         Route::post('/materials', 'store');
         Route::put('/materials/{material}', 'update');
         Route::patch('/materials/{material}', 'update');
         Route::delete('/materials/{material}', 'destroy');
     });
+
+    // Rutas de StockMovementsController
+    Route::controller(StockMovementsController::class)->group(function () {
+        Route::get('/stock-movements', 'index');
+        Route::get('/stock-movements/{stockMovement}', 'show');
+        Route::post('/stock-movements', 'store');
+        Route::put('/stock-movements/{stockMovement}', 'update');
+        Route::patch('/stock-movements/{stockMovement}', 'update');
+        Route::delete('/stock-movements/{stockMovement}', 'destroy');
+    });
+
 
     //Rutas de LaborTypesController
     Route::controller(LaborTypesController::class)->group(function () {
