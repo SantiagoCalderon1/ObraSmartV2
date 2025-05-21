@@ -48,7 +48,7 @@ class StockMovementsController
                 if ($material->stock_quantity < $validated['quantity']) {
                     return response()->json(['message' => 'Stock insuficiente para registrar el uso.'], 400);
                 }
-                $material->stock -= $validated['quantity'];
+                $material->stock_quantity -= $validated['quantity'];
             }
 
             $material->save();
