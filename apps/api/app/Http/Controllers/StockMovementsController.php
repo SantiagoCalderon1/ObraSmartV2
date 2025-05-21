@@ -33,7 +33,7 @@ class StockMovementsController
     {
         $validated = $request->validate([
             'material_id' => 'required|exists:materials,material_id',
-            'project_id' => 'nullable|exists:projects,project_id',
+            'project_id' => 'required|exists:projects,project_id',
             'quantity' => 'required|integer|min:1',
             'reason' => 'required|in:compra,uso,ajuste'
         ]);
@@ -68,7 +68,10 @@ class StockMovementsController
             ], 201);
         } catch (\Exception $e) {
             Log::error('Error al registrar movimiento de stock: ' . $e->getMessage());
-            return response()->json(['message' => 'Error al registrar movimiento.'], 500);
+            return response()->json([
+                'message' => 'Error al registrar movimiento.',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
