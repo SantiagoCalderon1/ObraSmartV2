@@ -130,7 +130,7 @@ class EstimateController
             }
 
             // Solo si el estado es aceptado
-            if ($estimate->status === 'aceptado') {
+            if (strtolower($estimate->status) === 'aceptado') {
                 $this->aplicarMovimientosStock($estimate, 'uso');
             }
 
