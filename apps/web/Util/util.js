@@ -26,6 +26,6 @@ export async function request(method, url, body = null, routeSet = true) {
 }
 
 // funcion para filtar las listas con los datos del input de filtrado
-export const filterList = (list, keyword) => list.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(keyword.toLowerCase())))
+export const filterList = (list, keyword) => list.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(keyword?.toLowerCase())))
 
 

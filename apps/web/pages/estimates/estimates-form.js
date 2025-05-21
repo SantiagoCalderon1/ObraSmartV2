@@ -1,3 +1,7 @@
+import Choices from 'choices.js';
+
+
+
 import { ModalConfirmation } from "../../components/modal.js"
 import { Button } from "../../components/button.js";
 
@@ -110,38 +114,6 @@ function EstimateFormComponent() {
         description
     })
 
-    //terminar y creo que no lo uso y usaré
-    const materialData = ({
-        material_id = "",
-        name = 0,
-        unit = 0,
-        price_per_unit = 0,
-        stock_quantity = 0,
-        min_stock_alert = 0
-    } = {}) => ({
-        material_id,
-        name,
-        unit,
-        price_per_unit,
-        stock_quantity,
-        min_stock_alert,
-    })
-    //terminar y creo que no lo uso y usaré
-    const laborsData = ({
-        labor_type_id = "",
-        description = "",
-        hours = 0,
-        cost_per_hour = 0,
-        discount = 0,
-        total_cost = 0
-    } = {}) => ({
-        labor_type_id,
-        description,
-        hours,
-        cost_per_hour,
-        discount,
-        total_cost,
-    })
 
     const state = {
         estimateData: EstimateData(),
@@ -170,22 +142,8 @@ function EstimateFormComponent() {
     const handleFormSubmit = async (e) => {
         e.preventDefault()
         const dataToSend = collectFormData()
-        //console.log("dataToSend: ", dataToSend);
-        //console.log("Se envió");
-
-
-        /* // Validación básica
-        if (!dataToSend.header.inputClient || !dataToSend.header.inputProject) {
-            Toastify({
-                text: "¡Por favor, selecciona cliente y proyecto.!",
-                className: "toastify-error",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right"
-            }).showToast()
-            return
-        } */
+        console.log(dataToSend);
+        
 
         try {
             state.isLoading = true
@@ -193,9 +151,6 @@ function EstimateFormComponent() {
             const data = isUpdate
                 ? await updateEstimate(dataToSend, state.selectedEstimate.estimate_number)
                 : await createEstimate(dataToSend)
-            //console.log("isUpdate: ", isUpdate);
-
-            //console.log("Response form: ", data)
 
             // Resetear solo si se creó nuevo
             if (!isUpdate) {
@@ -215,7 +170,6 @@ function EstimateFormComponent() {
 
             m.route.set("/estimates")
         } catch (error) {
-            //console.error("Error al enviar el formulario:", error)
             Toastify({
                 text: "¡Algo salió mal!",
                 className: "toastify-error",
@@ -224,9 +178,6 @@ function EstimateFormComponent() {
                 gravity: "top",
                 position: "right"
             }).showToast()
-            //console.log(error);
-
-
         } finally {
             state.isLoading = false
         }
@@ -258,11 +209,6 @@ function EstimateFormComponent() {
         const laborSubtotal = state.estimateLaborsData.reduce(
             (acc, item) => acc + parseFloat(item.total_cost || 0), 0
         );
-
-        //console.log("materialSubtotal: ", materialSubtotal);
-        //console.log("laborSubtotal: ", laborSubtotal);
-        //console.log("subtotal: ", Number(materialSubtotal + laborSubtotal).toFixed(2));
-
         return Number(materialSubtotal + laborSubtotal).toFixed(2);
     };
 
@@ -279,17 +225,10 @@ function EstimateFormComponent() {
             state.projects = (await fetchProjects()).data
             state.materials = (await fetchMaterials()).data
             state.laborTypes = (await fetchLaborTypes()).data
-
-            //console.log("Clientes: ", state.clients)
-            //console.log("Proyectos: ", state.projects)
-            //console.log("Materiales: ", state.materials)
-            //console.log("Servicios: ", state.laborTypes)
-
             // Solo si es modo edición (update)
             if (estimate_number) {
                 const selected = (await fetchEstimate(estimate_number)).data;
                 state.selectedEstimate = selected
-                //console.log("selectedEstimate:", state.selectedEstimate)
 
                 // Estimate
                 state.estimateData = EstimateData({
@@ -303,7 +242,6 @@ function EstimateFormComponent() {
                     total_cost: selected.total_cost,
                     conditions: selected.conditions
                 })
-                //console.log("EstimateData:", state.estimateData)
 
                 // materials
                 state.estimateMaterialData = selected.materials?.map((item) =>
@@ -317,7 +255,6 @@ function EstimateFormComponent() {
                         unit: item.material?.unit || "",  //opcional para mostrar en UI
                     })
                 ) || []
-                //console.log("Items materials actualizables:", state.estimateMaterialData)
 
                 //labors
                 state.estimateLaborsData = selected.labors?.map((item) =>
@@ -333,13 +270,50 @@ function EstimateFormComponent() {
                     })
                 ) || [];
 
-                //console.log("Items labors actualizables:", state.estimateLaborsData)
             }
             m.redraw()
         } catch (error) {
             //console.error("Error cargando datos del formulario:", error)
         }
     }
+
+    function validarStockMaterial(item) {
+        const selected = state.materials.find(mat => mat.material_id == item.material_id);
+        if (!selected) return;
+
+        const cantidad = Number(item.quantity) || 0;
+        const restante = selected.stock_quantity - cantidad;
+
+        if (restante <= 0) {
+            Toastify({
+                text: `❌ Stock insuficiente para "${selected.name}". (${selected.stock_quantity} disponibles)`,
+                className: "toastify-error",
+                duration: 4000,
+                close: true,
+                gravity: "top",
+                position: "right"
+            }).showToast();
+
+            // Resetear selección
+            item.quantity = 1;
+
+            updateConceptSubtotal(item);
+            m.redraw();
+            return;
+        }
+
+        if (restante <= selected.min_stock_alert) {
+            Toastify({
+                text: `⚠️ Pocas unidades de "${selected.name}". Quedan ${restante}.`,
+                className: "toastify-warning",
+                duration: 4000,
+                close: true,
+                gravity: "top",
+                position: "right"
+            }).showToast();
+        }
+    }
+
 
     return {
         oncreate: ({ attrs }) => {
@@ -371,86 +345,116 @@ function EstimateFormComponent() {
                 m("span", { class: "fw-semibold text-uppercase fs-5 py-3" }, "Cabecera del documento"),
                 m("div", { class: "row col-12 p-0 m-0" }, [
                     m("div", { class: "col-md-6 col-lg-3" }, [
-                        // Cliente filter
-                        m("div", { class: "col-12 d-flex flex-column align-items-start py-2" }, [
-                            m("label.form-label.ps-1", "Flitrar cliente *"),
-                            m("div.input-group.flex-nowrap", [
-                                m("input.form-control", {
-                                    style: { ...style._input_main },
-                                    value: state.filterClients || "",
-                                    placeholder: "Clientes...",
-                                    oninput: e => {
-                                        state.filterClients = e.target.value
-                                        m.redraw()
-                                    }
-                                }),
-                                m("span.input-group-text", {
-                                    style: { ...style._input_main },
-                                    onclick: e => e.target.closest(".input-group").querySelector("input").focus()
-                                }, m("i.fa", { class: "fa-magnifying-glass" }))
-                            ])
-                        ]),
                         // Cliente input
-                        m("div", { class: "col-12   py-1" }, [
+                        m("div", { class: "col-12 py-1" }, [
                             m("label.form-label.ps-1", "Cliente *"),
-                            m("select.form-select", {
-                                class: (badForm ? " is-invalid" : ""),
+                            m("select.form-select my-choices", {
+                                class: badForm ? "is-invalid" : "",
                                 required: true,
                                 style: { ...style._input_secondary },
                                 id: "client_id",
-                                value: state.estimateData?.client_id,
+                                value: state.estimateData?.client_id || "",
                                 onchange: e => {
-                                    state.estimateData.client_id = e.target.value
-                                    //console.log("input select: ", state.estimateData?.client_id)
-                                    m.redraw()
+                                    state.estimateData.client_id = e.target.value;
+                                    m.redraw();
                                 },
-                            }, [
-                                m("option", { value: "", disabled: true, selected: !state.estimateData?.client_id }, "-- Selecciona Cliente --"),
-                                ...(Array.isArray(state.clients) ? filterList(state.clients, state.filterClients) : []).map(opt =>
-                                    m("option", { value: opt.client_id }, opt.name || opt.content)
-                                )
-                            ])
-                        ]),
-                    ]),
-                    m("div", { class: "col-md-6 col-lg-3" }, [
-                        // Proyecto filter
-                        m("div", { class: "col-12 d-flex flex-column align-items-start py-2" }, [
-                            m("label.form-label.ps-1", "Filtrar proyecto *"),
-                            m("div.input-group.flex-nowrap", [
-                                m("input.form-control", {
-                                    style: { ...style._input_main },
-                                    placeholder: " Proyectos...",
-                                    value: state.filterProjects || "",
-                                    oninput: e => {
-                                        state.filterProjects = e.target.value
-                                        m.redraw()
+                                oncreate: ({ dom }) => {
+                                    if (Array.isArray(state.clients) && state.clients.length > 0) {
+                                        dom.choicesInstance = new Choices(dom, {
+                                            containerOuter: 'choices my-choices-container',
+                                            allowHTML: false,
+                                            shouldSort: false,
+                                            searchPlaceholderValue: "Buscar cliente...",
+                                            itemSelectText: '',
+                                        });
                                     }
-                                }),
-                                m("span.input-group-text", {
-                                    style: { ...style._input_main },
-                                    onclick: e => e.target.closest(".input-group").querySelector("input").focus()
-                                }, m("i.fa", { class: "fa-magnifying-glass" }))
-                            ])
-                        ]),
-                        //projecto input
-                        m("div", { class: "col-12 py-1" }, [
-                            m("label.form-label.ps-1", "Proyecto *"),
-                            m("select.form-select", {
-                                class: (badForm ? " is-invalid" : ""),
-                                required: true,
-                                style: { ...style._input_secondary },
-                                id: "project_id",
-                                value: state.estimateData?.project_id,
-                                onchange: e => {
-                                    state.estimateData.project_id = e.target.value
-                                    m.redraw()
+                                },
+                                onupdate: ({ dom }) => {
+                                    if (!dom.choicesInstance && Array.isArray(state.clients) && state.clients.length > 0) {
+                                        dom.choicesInstance = new Choices(dom, {
+                                            allowHTML: false,
+                                            shouldSort: false,
+                                            searchPlaceholderValue: "Buscar cliente...",
+                                            itemSelectText: '',
+                                        });
+                                    }
+                                },
+                                onremove: ({ dom }) => {
+                                    if (dom.choicesInstance) {
+                                        dom.choicesInstance.destroy();
+                                    }
                                 }
                             }, [
-                                m("option", { value: "", disabled: true, selected: !state.estimateData?.project_id }, "-- Selecciona Proyecto --"),
-                                ...(Array.isArray(state.projects) ? filterList(state.projects, state.filterProjects) : []).map(opt =>
-                                    m("option", { value: opt.project_id }, opt.name || opt.content)
-                                )
+                                m("option", {
+                                    value: "",
+                                    disabled: true,
+                                    selected: !state.estimateData?.client_id
+                                }, "-- Selecciona Cliente --"),
+                                ...(Array.isArray(state.clients) ? state.clients.map(opt =>
+                                    m("option", {
+                                        value: opt.client_id
+                                    }, opt.name || opt.content || "Sin nombre")
+                                ) : [])
                             ])
+                        ]),
+
+                    ]),
+                    m("div", { class: "col-md-6 col-lg-3" }, [
+                        //projecto input
+                        m("div", { class: "col-12 py-1" }, [
+                            m("div", { class: "col-12 py-1" }, [
+                                m("label.form-label.ps-1", "Proyecto *"),
+                                m("select.form-select", {
+                                    class: badForm ? "is-invalid" : "",
+                                    required: true,
+                                    style: { ...style._input_secondary },
+                                    id: "project_id",
+                                    value: state.estimateData?.project_id || "",
+                                    onchange: e => {
+                                        state.estimateData.project_id = e.target.value;
+                                        m.redraw();
+                                    },
+                                    oncreate: ({ dom }) => {
+                                        if (Array.isArray(state.projects) && state.projects.length > 0) {
+                                            dom.choicesInstance = new Choices(dom, {
+                                                allowHTML: false,
+                                                shouldSort: false,
+                                                searchPlaceholderValue: "Buscar proyecto...",
+                                                itemSelectText: '',
+                                            });
+                                        }
+                                    },
+                                    onupdate: ({ dom }) => {
+                                        if (!dom.choicesInstance && Array.isArray(state.projects) && state.projects.length > 0) {
+                                            dom.choicesInstance = new Choices(dom, {
+                                                allowHTML: false,
+                                                shouldSort: false,
+                                                searchPlaceholderValue: "Buscar proyecto...",
+                                                itemSelectText: '',
+                                            });
+                                        }
+                                    },
+                                    onremove: ({ dom }) => {
+                                        if (dom.choicesInstance) {
+                                            dom.choicesInstance.destroy();
+                                        }
+                                    }
+                                }, [
+                                    m("option", {
+                                        value: "",
+                                        disabled: true,
+                                        selected: !state.estimateData?.project_id
+                                    }, "-- Selecciona Proyecto --"),
+                                    ...(Array.isArray(state.projects)
+                                        ? filterList(state.projects, state.filterProjects).map(opt =>
+                                            m("option", {
+                                                value: opt.project_id
+                                            }, opt.name || opt.content || "Sin nombre")
+                                        )
+                                        : [])
+                                ])
+                            ])
+
                         ]),
                     ]),
                     m("div", { class: "col-md-6 col-lg-3" }, [
@@ -533,32 +537,62 @@ function EstimateFormComponent() {
                         m("div", { class: "col-md-6 col-lg-4 pt-2" }, [
                             m("label.form-label.ps-1", `Material * #${index + 1}`),
                             m("select.form-select", {
-                                class: (badForm ? " is-invalid" : ""),
+                                class: badForm ? "is-invalid" : "",
                                 required: true,
-                                style: { ...style._input_secondary },
                                 id: "name",
-                                value: item.material_id,
+                                value: item.material_id || "",
                                 onchange: e => {
-                                    item.material_id = e.target.value
-                                    const selected = state.materials.find(mat => mat.material_id == item.material_id)
+                                    item.material_id = e.target.value;
+                                    const selected = state.materials.find(mat => mat.material_id == item.material_id);
                                     if (selected) {
-                                        // Guardar datos del material seleccionado
-                                        item.unit = selected.unit || "N/A"
-                                        item.unit_price = parseFloat(selected.price_per_unit) || 0
-                                        item.quantity = 1
-                                        item.discount = 0
-                                        //item.material_data = selected
-                                        updateConceptSubtotal(item)
+                                        item.unit = selected.unit || "N/A";
+                                        item.unit_price = parseFloat(selected.price_per_unit) || 0;
+                                        item.quantity = 1;
+                                        item.discount = 0;
+                                        updateConceptSubtotal(item);
                                     }
-                                    m.redraw()
+                                    m.redraw();
+                                },
+                                oncreate: ({ dom }) => {
+                                    if (Array.isArray(state.materials) && state.materials.length > 0) {
+                                        dom.choicesInstance = new Choices(dom, {
+                                            allowHTML: false,
+                                            shouldSort: false,
+                                            searchPlaceholderValue: "Buscar material...",
+                                            itemSelectText: '',
+                                        });
+                                    }
+                                },
+                                onupdate: ({ dom }) => {
+                                    if (!dom.choicesInstance && Array.isArray(state.materials) && state.materials.length > 0) {
+                                        dom.choicesInstance = new Choices(dom, {
+                                            allowHTML: false,
+                                            shouldSort: false,
+                                            searchPlaceholderValue: "Buscar material...",
+                                            itemSelectText: '',
+                                        });
+                                    }
+                                },
+                                onremove: ({ dom }) => {
+                                    if (dom.choicesInstance) {
+                                        dom.choicesInstance.destroy();
+                                    }
                                 }
                             }, [
-                                m("option", { value: "", disabled: true, selected: !item.material_id }, "-- Selecciona Material --"),
-                                ...(Array.isArray(state.materials) ? filterList(state.materials, state.filterMaterials) : []).map(opt =>
-                                    m("option", { value: opt.material_id }, opt.name || opt.content)
-                                )
+                                m("option", {
+                                    value: "",
+                                    disabled: true,
+                                    selected: !item.material_id
+                                }, "-- Selecciona Material --"),
+                                ...(Array.isArray(state.materials)
+                                    ? state.materials.map(opt =>
+                                        m("option", { value: opt.material_id }, opt.name || opt.content || "Sin nombre")
+                                    )
+                                    : [])
                             ])
-                        ]),
+                        ])
+
+                        ,
                         // Espacio en blanco
                         m("div.col-md-3.col-lg-8.pt-2"),
                         // Cantidad
@@ -573,7 +607,9 @@ function EstimateFormComponent() {
                                 value: item.quantity,
                                 oninput: e => {
                                     item.quantity = +e.target.value
+                                    validarStockMaterial(item);
                                     updateConceptSubtotal(item)
+                                    m.redraw()
                                 }
                             })
                         ]),
@@ -636,32 +672,62 @@ function EstimateFormComponent() {
                         m("div", { class: "col-md-6 col-lg-4 pt-2" }, [
                             m("label.form-label.ps-1", `Servicio * #${index + 1}`),
                             m("select.form-select", {
-                                class: (badForm ? " is-invalid" : ""),
+                                class: badForm ? "is-invalid" : "",
                                 required: true,
                                 style: { ...style._input_secondary },
                                 value: item.labor_type_id || "",
                                 onchange: e => {
-                                    item.labor_type_id = parseInt(e.target.value)
-                                    const selected = state.laborTypes.find(l => l.labor_type_id == item.labor_type_id)
+                                    item.labor_type_id = parseInt(e.target.value);
+                                    const selected = state.laborTypes.find(l => l.labor_type_id == item.labor_type_id);
                                     if (selected) {
-                                        //console.log("Selected estimate labor", selected);
+                                        item.cost_per_hour = parseFloat(selected.cost_per_hour) || 0;
+                                        item.hours = 1;
+                                        item.discount = 0;
+                                        item.description = selected.description || "";
+                                        updateConceptSubtotal(item);
 
-                                        item.cost_per_hour = parseFloat(selected.cost_per_hour) || 0
-                                        item.hours = 1
-                                        item.discount = 0
-                                        item.description = selected.description || ""
-                                        //item.labor_type_data = selected // opcional
-                                        updateConceptSubtotal(item)
                                     }
-                                    m.redraw()
+                                    m.redraw();
+                                },
+                                oncreate: ({ dom }) => {
+                                    if (Array.isArray(state.laborTypes) && state.laborTypes.length > 0) {
+                                        dom.choicesInstance = new Choices(dom, {
+                                            allowHTML: false,
+                                            shouldSort: false,
+                                            searchPlaceholderValue: "Buscar servicio...",
+                                            itemSelectText: '',
+                                        });
+                                    }
+                                },
+                                onupdate: ({ dom }) => {
+                                    if (!dom.choicesInstance && Array.isArray(state.laborTypes) && state.laborTypes.length > 0) {
+                                        dom.choicesInstance = new Choices(dom, {
+                                            allowHTML: false,
+                                            shouldSort: false,
+                                            searchPlaceholderValue: "Buscar servicio...",
+                                            itemSelectText: '',
+                                        });
+                                    }
+                                },
+                                onremove: ({ dom }) => {
+                                    if (dom.choicesInstance) {
+                                        dom.choicesInstance.destroy();
+                                    }
                                 }
                             }, [
-                                m("option", { value: "", disabled: true, selected: !item.labor_type_id }, "-- Selecciona Servicio --"),
-                                ...(Array.isArray(state.laborTypes) ? filterList(state.laborTypes, state.filterLaborsType) : []).map(opt =>
-                                    m("option", { value: opt.labor_type_id }, opt.name || opt.content)
-                                )
+                                m("option", {
+                                    value: "",
+                                    disabled: true,
+                                    selected: !item.labor_type_id
+                                }, "-- Selecciona Servicio --"),
+                                ...(Array.isArray(state.laborTypes)
+                                    ? state.laborTypes.map(opt =>
+                                        m("option", { value: opt.labor_type_id }, opt.name || opt.content || "Sin nombre")
+                                    )
+                                    : [])
                             ])
                         ]),
+
                         // Espacio en blanco
                         m("div.col-md-6.d-lg-6.pt-2"),
                         // Descripción
@@ -741,27 +807,7 @@ function EstimateFormComponent() {
                 m("h5", "Conceptos"),
                 m("hr"),
                 m("h6", "Materiales"),
-                // Filtro Materials
-                m("div", { class: "col-lg-12 row my-3" }, [
-                    m("div", { class: "col-lg-4 d-flex flex-column align-items-start " }, [
-                        m("label.form-label.ps-1", "Flitrar material *"),
-                        m("div.input-group.flex-nowrap", [
-                            m("input.form-control", {
-                                style: { ...style._input_main },
-                                value: state.filterMaterials || "",
-                                placeholder: " Filtrar Material",
-                                oninput: e => {
-                                    state.filterMaterials = e.target.value
-                                    m.redraw()
-                                }
-                            }),
-                            m("span.input-group-text", {
-                                style: { ...style._input_main },
-                                onclick: e => e.target.closest(".input-group").querySelector("input").focus()
-                            }, m("i.fa.fa-magnifying-glass"))
-                        ])
-                    ]),
-                ]),
+
                 // Conceptos de materiales
                 ...state.estimateMaterialData?.map(renderEstimateMaterialData),
                 btnsAction({
@@ -770,27 +816,7 @@ function EstimateFormComponent() {
                 }),
                 m("hr.mt-5"),
                 m("h6", "Servicios"),
-                // Filtro Labor Types
-                m("div", { class: "col-lg-12 row my-3" }, [
-                    m("div", { class: "col-lg-4 d-flex flex-column align-items-start py-2" }, [
-                        m("label.form-label.ps-1", "Flitrar Servicios *"),
-                        m("div.input-group.flex-nowrap", [
-                            m("input.form-control", {
-                                style: { ...style._input_main },
-                                value: state.filterLaborsType || "",
-                                placeholder: " Filtrar Servicio",
-                                oninput: e => {
-                                    state.filterLaborsType = e.target.value
-                                    m.redraw()
-                                }
-                            }),
-                            m("span.input-group-text", {
-                                style: { ...style._input_main },
-                                onclick: e => e.target.closest(".input-group").querySelector("input").focus()
-                            }, m("i.fa.fa-magnifying-glass"))
-                        ])
-                    ]),
-                ]),
+
                 // Conceptos de mano de obra
                 ...state.estimateLaborsData?.map(renderEstimateLaborsData),
                 btnsAction({

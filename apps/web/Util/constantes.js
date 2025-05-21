@@ -27,7 +27,7 @@ export const URL_PROJECTS = `${import.meta.env.VITE_API_URL}/api/projects`;
 const URL_PROJECT_LOGS = `${import.meta.env.VITE_API_URL}/api/project-logs`;
 
 // Movieminetos de stock
-const URL_STOCK_MOVEMENTS = `${import.meta.env.VITE_API_URL}/api/stock-movements`;
+export const URL_STOCK_MOVEMENTS = `${import.meta.env.VITE_API_URL}/api/stock-movements`;
 
 // Materiales
 export const URL_MATERIALS = `${import.meta.env.VITE_API_URL}/api/materials`;

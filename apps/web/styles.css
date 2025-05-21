@@ -78,6 +78,71 @@ p {
   padding: 0;
 }
 
+
+
+/* Contenedor principal Choices */
+.choices {
+  font-size: var(--font-size, 1rem) !important;
+  width: 100%;
+}
+
+/* Caja de entrada principal */
+.choices__inner {
+  color: #000 !important;
+  background-color: var(--mainGray) !important;
+  border: 1px solid var(--mainPurple) !important;
+  border-radius: 0.375rem !important;
+  padding: 0 !important;
+  min-height: 38px !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.choices__list,
+.choices__list--single {
+  padding: 0 !important;
+  color: #000 !important;
+}
+
+/* Al enfocar */
+.choices.is-focused .choices__inner {
+  border-color: var(--mainPurple) !important;
+  box-shadow: 0 0 0 2px rgba(123, 63, 228, 0.15);
+}
+
+/* Dropdown */
+.choices__list--dropdown {
+  background-color: var(--mainGray) !important;
+  border: 1px solid var(--secondaryPurple) !important;
+  border-radius: 0 0 0.375rem 0.375rem !important;
+  max-height: 300px !important;
+  overflow-y: auto ;
+  margin: 0  0 20px 0 !important;
+}
+
+/* Items del dropdown */
+.choices__item--selectable {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* Hover o seleccionado */
+.choices__item--selectable.is-highlighted {
+  background-color: var(--secondaryPurple) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+}
+
+/* Clase para envolver y aplicar  */
+.my-choices-container .choices__inner {
+  background-color: var(--mainGray) !important;
+  border: 1px solid var(--mainPurple) !important;
+}
+
+
+
+
+
 /* Estilos personalizados para Toastify */
 .toastify-success {
   background: #28a745 !important;

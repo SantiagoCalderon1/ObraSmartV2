@@ -9,7 +9,8 @@ import {
     URL_PAYMENTS,
     URL_AUTH,
     URL_USER,
-    URL_COMPANY
+    URL_COMPANY,
+    URL_STOCK_MOVEMENTS
 } from "../Util/constantes.js"
 
 // IMPORTADOR DE FUNCIONES
@@ -125,9 +126,9 @@ export async function createCompany(body) { // create
     return await request("POST", URL_COMPANY, body);
 }
 
-
-
-
+export async function createStockMovement(body) { // create
+    return await request("POST", URL_STOCK_MOVEMENTS, body);
+}
 
 
 

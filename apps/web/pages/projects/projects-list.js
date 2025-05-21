@@ -1,3 +1,6 @@
+import Choices from 'choices.js';
+
+
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Table } from "../../components/table.js"
 
@@ -412,44 +415,58 @@ function ModalFormComponent() {
                         ]),
                         // Cliente
                         m("div", { class: "row col-xl-4 " }, [
-                            // Cliente filter
-                            m("div", { class: "col-12 d-flex flex-column align-items-start py-2" }, [
-                                m("label.form-label.ps-1", "Flitrar cliente *"),
-                                m("div.input-group.flex-nowrap", [
-                                    m("input.form-control", {
-                                        style: { ...style._input_main },
-                                        value: state.filterClients || "",
-                                        placeholder: "Clientes...",
-                                        oninput: e => {
-                                            state.filterClients = e.target.value
-                                            m.redraw()
-                                        }
-                                    }),
-                                    m("span.input-group-text", {
-                                        style: { ...style._input_main },
-                                        onclick: e => e.target.closest(".input-group").querySelector("input").focus()
-                                    }, m("i.fa", { class: "fa-magnifying-glass" }))
-                                ])
-                            ]),
+
                             // Cliente input
-                            m("div", { class: "col-12   py-1" }, [
+                            m("div", { class: "col-12 py-1" }, [
                                 m("label.form-label.ps-1", "Cliente *"),
                                 m("select.form-select", {
-                                    class: (badForm ? " is-invalid" : ""),
+                                    class: badForm ? "is-invalid" : "",
                                     required: true,
                                     style: { ...style._input_secondary },
                                     id: "client_id",
-                                    value: state.ProjectData?.client_id,
+                                    value: state.ProjectData?.client_id || "",
                                     onchange: e => {
-                                        state.ProjectData.client_id = e.target.value
-                                        //console.log("input select: ", state.ProjectData?.client_id)
-                                        m.redraw()
+                                        state.ProjectData.client_id = e.target.value;
+                                        m.redraw();
                                     },
+                                    oncreate: ({ dom }) => {
+                                        if (Array.isArray(state.clients) && state.clients.length > 0) {
+                                            dom.choicesInstance = new Choices(dom, {
+                                                allowHTML: false,
+                                                shouldSort: false,
+                                                searchPlaceholderValue: "Buscar cliente...",
+                                                itemSelectText: '',
+                                            });
+                                        }
+                                    },
+                                    onupdate: ({ dom }) => {
+                                        if (!dom.choicesInstance && Array.isArray(state.clients) && state.clients.length > 0) {
+                                            dom.choicesInstance = new Choices(dom, {
+                                                allowHTML: false,
+                                                shouldSort: false,
+                                                searchPlaceholderValue: "Buscar cliente...",
+                                                itemSelectText: '',
+                                            });
+                                        }
+                                    },
+                                    onremove: ({ dom }) => {
+                                        if (dom.choicesInstance) {
+                                            dom.choicesInstance.destroy();
+                                        }
+                                    }
                                 }, [
-                                    m("option", { value: "", disabled: true, selected: !state.ProjectData?.client_id }, "-- Selecciona Cliente --"),
-                                    ...(Array.isArray(state.clients) ? filterList(state.clients, state.filterClients) : []).map(opt =>
-                                        m("option", { value: opt.client_id }, opt.name || opt.content)
-                                    )
+                                    m("option", {
+                                        value: "",
+                                        disabled: true,
+                                        selected: !state.ProjectData?.client_id
+                                    }, "-- Selecciona Cliente --"),
+                                    ...(Array.isArray(state.clients)
+                                        ? state.clients.map(opt =>
+                                            m("option", {
+                                                value: opt.client_id
+                                            }, opt.name || opt.content || "Sin nombre")
+                                        )
+                                        : [])
                                 ])
                             ]),
                         ]),

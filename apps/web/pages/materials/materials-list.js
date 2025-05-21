@@ -1,10 +1,16 @@
+import Choices from 'choices.js';
+import 'choices.js/public/assets/styles/choices.min.css';
+
+
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Table } from "../../components/table.js"
 
 import { Button } from "../../components/button.js";
+import { filterList } from "../../Util/util.js";
+
 
 // IMPORTADOR DE FUNCIONES
-import { fetchMaterials, updateMaterial, createMaterial, deleteMaterial } from "../../Services/services.js";
+import { fetchMaterials, fetchProjects, updateMaterial, createMaterial, deleteMaterial, createStockMovement } from "../../Services/services.js";
 
 export function MaterialsListPage() {
     let materials = [];
@@ -85,7 +91,12 @@ export function MaterialsListPage() {
                 }),
                 m(ModalFormComponent, {
                     selectedMaterial: selectedMaterial,
-                    onClientSaved: loadMaterials
+                    onMaterialSaved: loadMaterials
+                }
+                ),
+                m(ModalStockFormComponent, {
+                    selectedMaterial: selectedMaterial,
+                    onStockMovementSaved: loadMaterials
                 }
                 ),
                 m(ModalConfirmation, {
@@ -194,7 +205,7 @@ function ModalDetailsComponent() {
                 }, [
                     m("i.fa-solid.fa-pen-to-square"),
                     " Editar Material"
-                ])
+                ]),
             ];
 
             // Body con las dos tablas
@@ -222,6 +233,17 @@ function ModalDetailsComponent() {
                     "Descargar PDF ",
                     m("i.fa-solid.fa-file-pdf.text-danger")
                 ]),
+                m(Button, {
+                    closeModal: true,
+                    bclass: "btn-outline-warning",
+                    actions: () => {
+                        new bootstrap.Modal(document.getElementById("ModalFormStockMovement")).show();
+                        m.redraw();
+                    }
+                }, [
+                    m("i.fa-solid.fa-pen-to-square.text-warning"),
+                    " Generar Movimiento de stock"
+                ])
             ]
 
             // Render del modal
@@ -312,7 +334,7 @@ function ModalFormComponent() {
                         gravity: "top",
                         position: "right"
                     }).showToast()
-                    attrs.onClientSaved?.(); // Llama al callback si existe
+                    attrs.onMaterialSaved?.(); // Llama al callback si existe
                 } catch (error) {
                     //console.error("Error al enviar el formulario:", error)
                     Toastify({
@@ -434,6 +456,194 @@ function ModalFormComponent() {
                     //header: ContentHeaderModal(),
                     body: ContentBodyModal(),
                     //footer: ContentFooterModal()
+                }
+            });
+        }
+    };
+}
+
+function ModalStockFormComponent() {
+
+    let style = {
+        _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
+        _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
+    };
+
+    const motivos = [{ value: "ajuste" }, { value: "compra" }, { value: "uso" }];
+
+    let formElement = null;
+    let badForm = false;
+    let choicesInstance = null;
+
+    const StockMovementData = ({
+        material_id = "",
+        project_id = "",
+        quantity = 0,
+        reason = "",
+    } = {}) => ({
+        material_id,
+        project_id,
+        quantity,
+        reason
+    });
+
+    const state = {
+        StockMovementData: StockMovementData(),
+        projects: [],
+    };
+
+    return {
+        oninit: async ({ attrs }) => {
+            state.projects = (await fetchProjects()).data;
+        },
+
+        onupdate: () => {
+            // Refrescar Choices.js al cambiar la lista de proyectos
+            if (choicesInstance && state.projects.length) {
+                choicesInstance.clearChoices();
+                choicesInstance.setChoices(
+                    state.projects.map(opt => ({
+                        value: opt.project_id,
+                        label: opt.name || opt.content,
+                        selected: opt.project_id === state.StockMovementData.project_id
+                    })),
+                    'value',
+                    'label',
+                    false
+                );
+            }
+        },
+
+        view: function ({ attrs }) {
+            if (!state.StockMovementData.material_id && attrs.selectedMaterial?.material_id) {
+                state.StockMovementData.material_id = attrs.selectedMaterial.material_id;
+            } console.log("state.StockMovementData: ", state.StockMovementData);
+
+            const handleFormSubmit = async () => {
+                try {
+                    console.log("Datos a enviar: ", state.StockMovementData);
+
+                    const response = await createStockMovement(state.StockMovementData);
+
+                    const modalElement = document.getElementById("ModalFormStockMovement");
+                    if (modalElement) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement)
+                            || new bootstrap.Modal(modalElement);
+                        modalInstance.hide();
+                    }
+
+                    Toastify({
+                        text: "¡Movimiento de stock creado!",
+                        className: "toastify-success",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right"
+                    }).showToast();
+
+                    attrs.onStockMovementSaved?.();
+                } catch (error) {
+                    Toastify({
+                        text: "¡Error al crear movimiento!",
+                        className: "toastify-error",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right"
+                    }).showToast();
+                } finally {
+                    m.redraw();
+                }
+            };
+
+            const ContentBodyModal = () =>
+                m("form", {
+                    class: "row col-12",
+                    onsubmit: (e) => {
+                        e.preventDefault();
+                        if (!formElement.checkValidity()) {
+                            formElement.reportValidity();
+                            return;
+                        }
+                        handleFormSubmit();
+                    },
+                    oncreate: (vnode) => {
+                        formElement = vnode.dom;
+
+                        const selectEl = vnode.dom.querySelector("#project_id");
+                        if (selectEl && !choicesInstance) {
+                            choicesInstance = new Choices(selectEl, {
+                                searchEnabled: true,
+                                itemSelectText: "",
+                                shouldSort: false,
+                                searchPlaceholderValue: "Filtrar proyectos...",
+                                placeholder: true,
+                            });
+
+                            // Manejar selección
+                            selectEl.addEventListener("change", (e) => {
+                                state.StockMovementData.project_id = e.target.value;
+                            });
+                        }
+                    }
+                }, [
+                    m("span", { class: "fw-semibold text-uppercase fs-3 py-3" }, "Nuevo Movimiento de Stock"),
+                    m("div", { class: "row py-3 px-0 m-0 d-flex justify-content-between" }, [
+                        m("div", { class: "row" }, [
+                            m("div.col-md-12.col-lg-6.pt-2", [
+                                m("label.form-label.ps-1", "Cantidad *"),
+                                m("input.form-control", {
+                                    style: style._input_main,
+                                    type: "number",
+                                    min: 0,
+                                    required: true,
+                                    value: state.StockMovementData.quantity,
+                                    oninput: (e) => state.StockMovementData.quantity = +e.target.value
+                                })
+                            ]),
+                            m("div.col-md-12.col-lg-6.pt-2", [
+                                m("label.form-label.ps-1", "Motivo *"),
+                                m("select.form-select", {
+                                    style: style._input_main,
+                                    required: true,
+                                    value: state.StockMovementData.reason,
+                                    onchange: (e) => state.StockMovementData.reason = e.target.value
+                                }, [
+                                    m("option", { value: "", disabled: true, selected: !state.StockMovementData.reason }, "Selecciona un motivo"),
+                                    ...motivos.map(o => m("option", { value: o.value }, o.value))
+                                ])
+                            ]),
+                            m("div.col-md-12.col-lg-12.pt-2", [
+                                m("label.form-label.ps-1", "Proyecto *"),
+                                m("select.form-select", {
+                                    class: (badForm ? " is-invalid" : ""),
+                                    id: "project_id",
+                                    style: { ...style._input_secondary },
+                                    required: true
+                                })
+                            ])
+                        ]),
+                        m("div.col-12.d-flex.justify-content-center.my-5", [
+                            m("div.col-md-8.d-flex.justify-content-between.gap-4", [
+                                m(Button, {
+                                    closeModal: true,
+                                    bclass: "btn-danger",
+                                }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar"]),
+                                m(Button, {
+                                    type: "submit",
+                                    style: { backgroundColor: "var(--mainPurple)" }
+                                }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })])
+                            ])
+                        ])
+                    ])
+                ]);
+
+            return m(Modal, {
+                idModal: "ModalFormStockMovement",
+                title: `Generando Movimiento de Stock en el material ${attrs.selectedMaterial?.name}`,
+                addBtnClose: false,
+                slots: {
+                    body: ContentBodyModal()
                 }
             });
         }
