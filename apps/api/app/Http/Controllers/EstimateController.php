@@ -182,7 +182,7 @@ class EstimateController
     {
         try {
             DB::beginTransaction();
-            $wasAccepted = $estimate->status === 'aceptado';
+            $wasAccepted = strtolower($estimate->status) === 'aceptado';
 
             $data = $request->all();
 
@@ -267,14 +267,13 @@ class EstimateController
                 ->whereNotIn('labor_type_id', $laborIdsInRequest)
                 ->delete();
 
+            $estimate->refresh();
 
-
-
-            if (!$wasAccepted && $estimate->status === 'aceptado') {
+            if (!$wasAccepted && strtolower($estimate->status) === 'aceptado') {
                 $this->aplicarMovimientosStock($estimate, 'uso');
             }
 
-            if ($wasAccepted && $estimate->status !== 'aceptado') {
+            if ($wasAccepted && strtolower($estimate->status) !== 'aceptado') {
                 $this->aplicarMovimientosStock($estimate, 'compra'); // o 'ajuste'
             }
 
