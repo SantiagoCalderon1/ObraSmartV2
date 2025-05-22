@@ -4,17 +4,20 @@ import { Table } from "../../components/table.js"
 import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
-import { fetchInvoices, deleteInvoice } from "../../Services/services.js";
+import { fetchInvoices, deleteInvoice, updateInvoice } from "../../Services/services.js";
 
 export function InvoicesListPage() {
     let invoices = [];
     let selectedInvoice = null;
-    2
+
     async function loadInvoices() {
-        invoices = (await fetchInvoices()).data;
-        //console.log(invoices);
+        const response = await fetchInvoices();
+        invoices = response.data ? [...response.data] : [];
+        console.log(invoices);
+        
         m.redraw();
     }
+
 
     return {
         oncreate: loadInvoices,
@@ -25,13 +28,47 @@ export function InvoicesListPage() {
                 m.redraw();
             };
 
-            const onDelete = async () => {
-                if (selectedInvoice) {
-                    await deleteInvoice(selectedInvoice.invoice_id);
+            const handleInvoiceAction = async (action) => {
+                if (!selectedInvoice) return;
+                try {
+                    switch (action) {
+                        case "delete":
+                            await deleteInvoice(selectedInvoice.invoice_id);
+                            break;
+                        case "pay":
+                            await updateInvoice({ status: "pagado" }, selectedInvoice.invoice_id);
+                            break;
+                        case "rejected":
+                            await updateInvoice({ status: "rechazado" }, selectedInvoice.invoice_id);
+                            break;
+                    }
                     selectedInvoice = null;
                     await loadInvoices();
+                    m.redraw()
+
+                    Toastify({
+                        text: "¡Operación exitosa!",
+                        className: "toastify-success",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right"
+                    }).showToast()
+
+                } catch (error) {
+                    //console.error("Error al enviar el formulario:", error)
+                    Toastify({
+                        text: "¡Algo salió mal!",
+                        className: "toastify-error",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right"
+                    }).showToast()
                 }
+
             };
+
 
             const columns = [
                 { title: "#", field: "index" },
@@ -52,7 +89,7 @@ export function InvoicesListPage() {
             ];
 
             // Normaliza los datos para la tabla (añade índice y campos planos)            
-            const normalizedInvoices = (invoices || []).map((e, i) => ({
+            const normalizedInvoices = invoices.map((e, i) => ({
                 ...e,
                 index: i + 1,
                 "estimatate.estimate_number": e.estimate?.estimate_number || "N/A",
@@ -85,8 +122,20 @@ export function InvoicesListPage() {
                     idModal: "ModalDeleteInvoice",
                     tituloModal: "Confirmación de eliminación",
                     mensaje: `¿Está seguro de eliminar el factura con #${selectedInvoice?.invoice_number}?`,
-                    actions: onDelete
-                })
+                    actions: () => handleInvoiceAction("delete")
+                }),
+                m(ModalConfirmation, {
+                    idModal: "ModalUpdatePagadoInvoice",
+                    tituloModal: "Confirmación de actualización",
+                    mensaje: `¿Está seguro de actualizar el estado a PAGADO de la factura con #${selectedInvoice?.invoice_number}?`,
+                    actions: () => handleInvoiceAction("pay")
+                }),
+                m(ModalConfirmation, {
+                    idModal: "ModalUpdateRechazadoInvoice",
+                    tituloModal: "Confirmación de actualización",
+                    mensaje: `¿Está seguro de actualizar el estado a RECHAZADO de la factura con #${selectedInvoice?.invoice_number}?`,
+                    actions: () => handleInvoiceAction("rejected")
+                }),
             ];
         }
     };
@@ -106,6 +155,9 @@ function ModalDetailsComponent() {
 
             // Columnas para tablas
             const columnsInvoice = [
+                { title: "Núm Presupuesto", field: "estimatate.estimate_number", style: () => ({ textWrap: "nowrap" }) },
+                //{ title: "Cliente", field: "client.name" },
+                { title: "Proyecto", field: "project.name" },
                 {
                     title: "Estado", field: "status", style: (item) => ({
                         fontWeight: "bold",
@@ -113,10 +165,6 @@ function ModalDetailsComponent() {
                         color: item?.status === "pagado" ? "green" : item?.status === "rechazado" ? "red" : "black"
                     })
                 },
-                { title: "Núm Presupuesto", field: "estimatate.estimate_number", style: () => ({ textWrap: "nowrap" }) },
-
-                //{ title: "Cliente", field: "client.name" },
-                { title: "Proyecto", field: "project.name" },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
             ];
@@ -222,17 +270,37 @@ function ModalDetailsComponent() {
                     m("i.fa-solid.fa-trash-can.text-white"),
                     " Eliminar Factura"
                 ]),
+            ]
+
+            const ButtonsActions = () => [
                 /* 
-                    No se puede editar la factura es casi ilegal, pero lo dejo por si algunas vez se requiere
-                m(Button, {
-                    closeModal: true,
-                    bclass: "btn-warning",
-                    actions: () => m.route.set(`/invoices/update/${invoice.invoice_number}`)
-                }, [
-                    m("i.fa-solid.fa-pen-to-square"),
-                    " Editar Factura"
-                ]) */
-            ];
+    No se puede editar la factura es casi ilegal, pero lo dejo por si algunas vez se requiere
+    Lo que si se puede cambiar es el estado, de pendiente a aceptado  o rechazado, pero no al reves   
+*/
+                invoice?.status === "pendiente" ? [
+                    m("h5.text-center.pt-3", "Actualizar Estado"),
+                    m("div.d-flex.justify-content-evenly.pb-3", [
+                        m(Button, {
+                            closeModal: true,
+                            bclass: "btn-outline-danger",
+                            actions: () =>
+                                new bootstrap.Modal(document.getElementById("ModalUpdateRechazadoInvoice")).show()
+                        }, [
+                            m("i.fa-solid.fa-pen-to-square.text-danger"),
+                            " RECHAZADO"
+                        ]),
+                        m(Button, {
+                            closeModal: true,
+                            bclass: "btn-outline-success",
+                            actions: () =>
+                                new bootstrap.Modal(document.getElementById("ModalUpdatePagadoInvoice")).show()
+                        }, [
+                            m("i.fa-solid.fa-pen-to-square.text-success"),
+                            " PAGADO"
+                        ])
+                    ])
+                ] : null
+            ]
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
@@ -243,7 +311,9 @@ function ModalDetailsComponent() {
                         padding: "1rem"
                     }
                 }, [
+                    ButtonsActions(),
                     m("h5.mt-1", "Detalles"),
+                    m("hr"),
                     Table({ columns: columnsInvoice, data: [invoice] }),
                     m("h5.mt-3", "Detalles del cliente"),
                     Table({ columns: columnsClient, data: [invoice?.estimate?.client] }),

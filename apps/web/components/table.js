@@ -2,7 +2,7 @@ export function Table() {
     let style = {
         containerStyle: {
             minHeight: "10vh",
-            maxHeight: "75vh",
+            maxHeight: "70vh",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -15,52 +15,9 @@ export function Table() {
         }
     }
 
-    let localData = []
-    let filteredData = []
-    let searchValue = ""
-    let sortState = {
-        campo: null, 
-        tipo: "asc"
-    }
-
     let currentPage = 1
     let rowsPerPage = 20
     let viewAll = false
-
-    function getPagedData() {
-        if (viewAll) return filteredData
-        const start = (currentPage - 1) * rowsPerPage
-        return filteredData.slice(start, start + rowsPerPage)
-    }
-
-    function totalPages() {
-        return Math.ceil(filteredData.length / rowsPerPage)
-    }
-
-    function orderData(campo) {
-        if (sortState.campo === campo) {
-            sortState.tipo = sortState.tipo === "asc" ? "desc" : "asc"
-        } else {
-            sortState.campo = campo
-            sortState.tipo = "asc"
-        }
-
-        filteredData = [...filteredData].sort((a, b) => {
-            const valA = a[campo]
-            const valB = b[campo]
-            if (typeof valA === "string") {
-                return sortState.tipo === "asc"
-                    ? valA.localeCompare(valB)
-                    : valB.localeCompare(valA)
-            } else {
-                return sortState.tipo === "asc"
-                    ? valA - valB
-                    : valB - valA
-            }
-        })
-        currentPage = 1
-        m.redraw()
-    }
 
     function filterData(searchValue) {
         filteredData = localData.filter(item =>
@@ -73,13 +30,51 @@ export function Table() {
     }
 
     return {
-        oninit: function ({ attrs }) {
-            localData = attrs.data
-            filteredData = [...localData]
-        },
         view: function ({ attrs, children }) {
             const { columns = [], onRowClick = null } = attrs
+            let localData = []
+            let filteredData = []
+            let searchValue = ""
+            let sortState = {
+                campo: null,
+                tipo: "asc"
+            }
+            localData = attrs.data
+            filteredData = [...localData]
 
+            function getPagedData() {
+                if (viewAll) return filteredData
+                const start = (currentPage - 1) * rowsPerPage
+                return filteredData.slice(start, start + rowsPerPage)
+            }
+
+            function totalPages() {
+                return Math.ceil(filteredData.length / rowsPerPage)
+            }
+
+            function orderData(campo) {
+                if (sortState.campo === campo) {
+                    sortState.tipo = sortState.tipo === "asc" ? "desc" : "asc"
+                } else {
+                    sortState.campo = campo
+                    sortState.tipo = "asc"
+                }
+                filteredData = [...filteredData].sort((a, b) => {
+                    const valA = a[campo]
+                    const valB = b[campo]
+                    if (typeof valA === "string") {
+                        return sortState.tipo === "asc"
+                            ? valA.localeCompare(valB)
+                            : valB.localeCompare(valA)
+                    } else {
+                        return sortState.tipo === "asc"
+                            ? valA - valB
+                            : valB - valA
+                    }
+                })
+                currentPage = 1
+                m.redraw()
+            }
             return m("div.col-11.col-md-10", { style: style.containerStyle }, [
                 m("div.col-12", [
                     m("div.row", [
@@ -115,7 +110,7 @@ export function Table() {
                             ])
                         ])
                     ]),
-                    m("div.table-responsive", { style: { height: "60vh", overflowY: "auto" } }, [
+                    m("div.table-responsive", { style: { height: "45vh", overflowY: "auto" } }, [
                         m("table.table.table-striped.table-hover", { style: { width: "100%", borderCollapse: "collapse" } }, [
                             m("thead.bg-light.sticky-top", { style: { top: "0", zIndex: "2" } }, [
                                 m("tr.text-start.text-nowrap", { style: { cursor: "pointer" } },
@@ -151,10 +146,8 @@ export function Table() {
                             )),
                         ]),
                     ]),
-
                     // Footer con paginador y "ver todos"
                     m("div.d-flex.flex-column.justify-content-center.align-items-center.mt-3.gap-2", [
-
                         m("div.d-flex.justify-content-center.align-items-center.mt-3.gap-3", [
                             // Botón anterior
                             m("button.btn.btn-outline-secondary", {
@@ -166,15 +159,15 @@ export function Table() {
                                 },
                                 disabled: viewAll || currentPage === 1
                             }, "Anterior"),
-                             // Botón ver todos / ver menos
-                            m("button.btn.btn-outline-primary", {
+                            // Botón ver todos / ver menos
+                            m("button.btn.btn-outline-primary.text-nowrap", {
                                 onclick: () => {
                                     viewAll = !viewAll
                                     currentPage = 1
                                     m.redraw()
                                 }
                             }, viewAll ? "Ver menos" : "Ver todos"),
-                             // Botón siguiente
+                            // Botón siguiente
                             m("button.btn.btn-outline-secondary", {
                                 onclick: () => {
                                     if (currentPage < totalPages()) {
@@ -197,6 +190,3 @@ export function Table() {
         },
     }
 }
-
-
-

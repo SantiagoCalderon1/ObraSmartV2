@@ -154,10 +154,10 @@ export async function updateLaborType(body, id) { // update
     return await request("PATCH", `${URL_LABOR_TYPES}/${id}`, body);
 }
 
-/* export async function updateInvoice(body, id) { // update
+export async function updateInvoice(body, id) { // update
     return await request("PATCH", `${URL_INVOICES}/${id}`, body);
 }
- */
+
 export async function updatePayment(body, id) { // update
     return await request("PATCH", `${URL_PAYMENTS}/${id}`, body);
 }
