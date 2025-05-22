@@ -113,7 +113,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('/invoices', 'index');
         Route::post('/invoices', 'store');
         Route::get('/invoices/{invoice}', 'show');
-        //Route::put('/invoices/{invoice}', 'update');  Esta preparado para funcionar si se requiere
+        Route::put('/invoices/{invoice}', 'update');  
         Route::patch('/invoices/{invoice}', 'update');
         Route::delete('/invoices/{invoice}', 'destroy');
     });
