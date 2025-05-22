@@ -122,54 +122,34 @@ class InvoicesController
      * Esta creado para casos excepcionales
      */
     public function update(Request $request, Invoice $invoice)
-    {
-        try {
-            DB::beginTransaction();
+{
+    try {
+        $validated = $request->validate([
+            'status' => 'required|string|in:pagado,rechazado,pendiente',
+        ]);
 
-            $data = $request->all();
+        $invoice->update([
+            'status' => $validated['status'],
+            'user_id' => Auth::id(),
+        ]);
 
-            $invoice = $data['invoice'] ?? [];
-
-            // Validaciones
-            $InvoiceDataValidator = Validator::make($invoice, $this->invoiceRules());
-
-            if ($InvoiceDataValidator->fails()) {
-                return response()->json([
-                    'message' => 'Error al crear el presupuesto, datos inválidos.',
-                    'errors' => $InvoiceDataValidator->errors(),
-                ], 400);
-            }
-
-            // Actualizar cabecera del presupuesto
-            $invoice->update([
-                'user_id'        => Auth::id(),
-                'client_id'      => $invoice['client_id'],
-                'project_id'     => $invoice['project_id'],
-                'issue_date'     => $invoice['issue_date'],
-                'due_date'       => $invoice['due_date'],
-                'status'         => $invoice['status'],
-                'iva'            => $invoice['iva'],
-                'total_cost'     => $invoice['total_cost'],
-                'conditions'     => $invoice['conditions'] ?? null,
-            ]);
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Presupuesto actualizado correctamente',
-                'data' => $invoice->fresh()->load([
-                    'estimate',
-                    'payments',
-                ]),
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'message' => 'Error al actualizar el presupuesto',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'message' => 'Estado de la factura actualizado correctamente.',
+            'data' => $invoice->fresh(),
+        ], 200);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'message' => 'Datos inválidos.',
+            'errors' => $e->errors(),
+        ], 422);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Error al actualizar el estado de la factura.',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
 
 
     /**
