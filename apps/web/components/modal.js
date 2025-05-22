@@ -1,4 +1,4 @@
-import {Button} from './button.js';
+import { Button } from './button.js';
 
 export function Modal() {
     return {
@@ -13,7 +13,7 @@ export function Modal() {
                             m("button.btn-close", { "data-bs-dismiss": "modal", arialLabel: "close", }),
                         ]),
                         slots.header && m("div.modal-header.d-flex.justify-content-center.gap-5", slots.header),
-                        m("div.modal-body.d-flex.justify-content-center", slots.body ? slots.body : "Cargando detalles..."),
+                        m("div.modal-body.d-flex.justify-content-center", { style: { maxHeight:"50vh" } }, slots.body ? slots.body : "Cargando detalles..."),
                         m("div.modal-footer.d-flex", { class: slots.footer ? "justify-content-between" : "justify-content-end" }, [
                             slots.footer && slots.footer,
                             addBtnClose && m("button.btn.btn-outline-secondary rounded-pill fw-bold py-2", { "data-bs-dismiss": "modal" }, "Cerrar"),
