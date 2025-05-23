@@ -73,6 +73,7 @@ class ProjectController
             'estimates.materials.material', // material dentro de cada estimateMaterial
             'estimates.labors.laborType',   // laborType dentro de cada estimateLabor
             'estimates.user',               // usuario que creó el estimate
+            'estimates.invoice',               // factura de ese estimate  
             'projectLogs',
             'stockMovements',
             'client'

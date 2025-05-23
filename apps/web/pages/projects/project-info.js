@@ -590,7 +590,9 @@ function EstimatesList() {
                 m(Table, {
                     columns: columns,
                     data: normalizedEstimates,
-                    onRowClick: onSelect
+                    onRowClick: onSelect,
+                    maxHeightTable: "20vh",
+                    offset: ""
                 }, [m(Button,
                     {
                         type: "submit",
@@ -633,7 +635,7 @@ function ModalDetailsComponent() {
                         color: item?.status === "Aceptado" ? "green" : item?.status === "Rechazado" ? "red" : "black"
                     })
                 },
- 
+
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
             ];

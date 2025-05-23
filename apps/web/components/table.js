@@ -82,7 +82,7 @@ export function Table() {
             }
         },
         view: function ({ attrs, children }) {
-            const { columns = [], onRowClick = null } = attrs
+            const { columns = [], onRowClick = null, maxHeightTable = "45vh", offset = "offset-md-6" } = attrs
             return m("div.col-11.col-md-10", { style: style.containerStyle }, [
                 m("div.col-12", [
                     m("div.row", [
@@ -97,7 +97,7 @@ export function Table() {
                             }
                         }, [
                             m("div.input-group.flex-nowrap", [children ? children : null]),
-                            m("div.input-group.flex-nowrap.offset-md-6", [
+                            m(`div.input-group.flex-nowrap${offset ? ` ${offset}` : ""}`, [
                                 m("input.form-control", {
                                     type: "text",
                                     placeholder: "Buscar...",
@@ -118,7 +118,7 @@ export function Table() {
                             ])
                         ])
                     ]),
-                    m("div.table-responsive", { style: { height: "45vh", overflowY: "auto" } }, [
+                    m("div.table-responsive", { style: { height: maxHeightTable, overflowY: "auto" } }, [
                         m("table.table.table-striped.table-hover", { style: { width: "100%", borderCollapse: "collapse" } }, [
                             m("thead.bg-light.sticky-top", { style: { top: "0", zIndex: "2" } }, [
                                 m("tr.text-start.text-nowrap", { style: { cursor: "pointer" } },
