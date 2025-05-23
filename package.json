@@ -12,5 +12,10 @@
     "apps/*",
     "packages/*"
   ],
-  "packageManager": "npm@8.5.0"
+  "packageManager": "npm@8.5.0",
+  "dependencies": {
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "tabulator-tables": "^6.3.1"
+  }
 }

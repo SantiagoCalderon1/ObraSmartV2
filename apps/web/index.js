@@ -87,16 +87,17 @@ const routes = {
 
     // Routes Clients
     '/clients': { view: () => m(authGuard, m(ClientsPage, { option: "show" })) },
- 
+
     // Routes Projects
     '/projects': { view: () => m(authGuard, m(ProjectsPage, { option: "show" })) },
- 
+    '/projects/:id': { view: ({ attrs }) => m(authGuard, m(ProjectsPage, { option: "show-info", id: attrs.id })) },
+
     // Routes Materials
     '/materials': { view: () => m(authGuard, m(MaterialsPage, { option: "show" })) },
- 
+
     // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
- 
+
 
 }
 

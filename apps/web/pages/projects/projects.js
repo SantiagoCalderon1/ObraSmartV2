@@ -1,4 +1,5 @@
 import { ProjectsListPage } from "./projects-list.js";
+import { ProjectInfoPage } from "./project-info.js";
 //import { ProjectFormPage } from "./client-form.js";
 
 
@@ -10,9 +11,10 @@ export function ProjectsPage() {
                 case "show":
                     content = m(ProjectsListPage);
                     break;
-                /*   case "create":
-                      content = m(ProjectFormPage, { type: "create" });
-                      break;
+                case "show-info":
+                    content = m(ProjectInfoPage, { id: attrs.id });
+                    break;  
+                /*
                   case "update":
                       content = m(ProjectFormPage, { type: "update", estimate_number: attrs.id });
                       break; */

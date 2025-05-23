@@ -227,7 +227,7 @@ function ModalDetailsComponent() {
                 slots: {
                     header: ContentHeaderModal(),
                     body: ContentBodyModal(),
-                    footer: ContentFooterModal()
+                    //footer: ContentFooterModal()
                 }
             });
         }

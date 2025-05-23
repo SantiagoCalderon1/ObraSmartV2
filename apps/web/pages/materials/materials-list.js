@@ -193,7 +193,7 @@ function ModalDetailsComponent() {
                     m("i.fa-solid.fa-trash-can.text-white"),
                     " Eliminar Material"
                 ]),
-                m(Button, {
+                m(Button, { 
                     closeModal: true,
                     bclass: "btn-warning",
                     actions: () => {

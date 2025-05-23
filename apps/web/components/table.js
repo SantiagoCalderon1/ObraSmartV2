@@ -14,10 +14,51 @@ export function Table() {
             overflow: "hidden"
         }
     }
+    let localData = []
+    let filteredData = []
+    let searchValue = ""
+    let sortState = {
+        campo: null,
+        tipo: "asc"
+    }
 
     let currentPage = 1
     let rowsPerPage = 20
     let viewAll = false
+
+
+    function getPagedData() {
+        if (viewAll) return filteredData
+        const start = (currentPage - 1) * rowsPerPage
+        return filteredData.slice(start, start + rowsPerPage)
+    }
+
+    function totalPages() {
+        return Math.ceil(filteredData.length / rowsPerPage)
+    }
+
+    function orderData(campo) {
+        if (sortState.campo === campo) {
+            sortState.tipo = sortState.tipo === "asc" ? "desc" : "asc"
+        } else {
+            sortState.campo = campo
+            sortState.tipo = "asc"
+        }
+        filteredData = [...filteredData].sort((a, b) => {
+            const valA = a[campo]
+            const valB = b[campo]
+            if (typeof valA === "string") {
+                return sortState.tipo === "asc"
+                    ? valA.localeCompare(valB)
+                    : valB.localeCompare(valA)
+            } else {
+                return sortState.tipo === "asc"
+                    ? valA - valB
+                    : valB - valA
+            }
+        })
+        currentPage = 1
+    }
 
     function filterData(searchValue) {
         filteredData = localData.filter(item =>
@@ -26,55 +67,22 @@ export function Table() {
             )
         )
         currentPage = 1
-        m.redraw()
     }
 
+
     return {
+        oninit: ({ attrs }) => {
+            localData = [...attrs.data];
+            filteredData = [...localData];
+        },
+        onupdate: ({ attrs }) => {
+            if (attrs.data !== localData) {
+                localData = [...attrs.data];
+                filterData(searchValue);
+            }
+        },
         view: function ({ attrs, children }) {
             const { columns = [], onRowClick = null } = attrs
-            let localData = []
-            let filteredData = []
-            let searchValue = ""
-            let sortState = {
-                campo: null,
-                tipo: "asc"
-            }
-            localData = attrs.data
-            filteredData = [...localData]
-
-            function getPagedData() {
-                if (viewAll) return filteredData
-                const start = (currentPage - 1) * rowsPerPage
-                return filteredData.slice(start, start + rowsPerPage)
-            }
-
-            function totalPages() {
-                return Math.ceil(filteredData.length / rowsPerPage)
-            }
-
-            function orderData(campo) {
-                if (sortState.campo === campo) {
-                    sortState.tipo = sortState.tipo === "asc" ? "desc" : "asc"
-                } else {
-                    sortState.campo = campo
-                    sortState.tipo = "asc"
-                }
-                filteredData = [...filteredData].sort((a, b) => {
-                    const valA = a[campo]
-                    const valB = b[campo]
-                    if (typeof valA === "string") {
-                        return sortState.tipo === "asc"
-                            ? valA.localeCompare(valB)
-                            : valB.localeCompare(valA)
-                    } else {
-                        return sortState.tipo === "asc"
-                            ? valA - valB
-                            : valB - valA
-                    }
-                })
-                currentPage = 1
-                m.redraw()
-            }
             return m("div.col-11.col-md-10", { style: style.containerStyle }, [
                 m("div.col-12", [
                     m("div.row", [

@@ -69,7 +69,14 @@ class ProjectController
     public function show(Project $project)
     {
         // Así cargamos las relaciones directamente si tener que hacer mas consultas
-        $project->load(['estimates', 'projectLogs', 'stockMovements', 'client']);
+        $project->load([
+            'estimates.materials.material', // material dentro de cada estimateMaterial
+            'estimates.labors.laborType',   // laborType dentro de cada estimateLabor
+            'estimates.user',               // usuario que creó el estimate
+            'projectLogs',
+            'stockMovements',
+            'client'
+        ]);
 
         return response()->json([
             'message' => 'Proyecto obtenido correctamente',
