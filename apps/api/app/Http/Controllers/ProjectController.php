@@ -68,22 +68,38 @@ class ProjectController
      */
     public function show(Project $project)
     {
-        // Así cargamos las relaciones directamente si tener que hacer mas consultas
+        // Cargamos todas las relaciones necesarias
         $project->load([
-            'estimates.materials.material', // material dentro de cada estimateMaterial
-            'estimates.labors.laborType',   // laborType dentro de cada estimateLabor
-            'estimates.user',               // usuario que creó el estimate
-            'estimates.invoice',               // factura de ese estimate  
+            'estimates.materials.material',
+            'estimates.labors.laborType',
+            'estimates.user',
+            'estimates.invoice',
             'projectLogs',
             'stockMovements',
             'client'
         ]);
 
+        // Extraer todas las facturas únicas de estimates
+        $invoices = $project->estimates
+            ->pluck('invoice')
+            ->filter()
+            ->unique('id')
+            ->values();
+
+        // Agregar las facturas como una propiedad al objeto Project
+        $project->invoices = $invoices;
+
+        // remover invoices de estimates  
+        $project->estimates->each(function ($estimate) {
+            unset($estimate->invoice);
+        });
+
         return response()->json([
             'message' => 'Proyecto obtenido correctamente',
             'data' => $project,
-        ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE); // darle un formato bonito al JSON
+        ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
+
 
     /**
      * Show the form for editing the specified resource.
