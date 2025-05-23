@@ -79,21 +79,6 @@ class ProjectController
             'client'
         ]);
 
-        // Extraer todas las facturas únicas de estimates
-        $invoices = $project->estimates
-            ->pluck('invoice')
-            ->filter()
-            ->unique('id')
-            ->values();
-
-        // Agregar las facturas como una propiedad al objeto Project
-        $project->invoices = $invoices;
-
-        // remover invoices de estimates  
-        $project->estimates->each(function ($estimate) {
-            unset($estimate->invoice);
-        });
-
         return response()->json([
             'message' => 'Proyecto obtenido correctamente',
             'data' => $project,
