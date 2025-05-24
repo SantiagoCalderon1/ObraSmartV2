@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
-    use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Storage;
 
 
 class CompanyController extends Controller
@@ -87,7 +87,7 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
- 
+
 
     public function update(Request $request, Company $company)
     {
@@ -100,18 +100,21 @@ class CompanyController extends Controller
             'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
-        // Si hay nueva imagen
         if ($request->hasFile('image_route')) {
-            // Borra la anterior si existe y está en la carpeta de uploads
+            // Eliminar la imagen anterior si existe
             if ($company->image_route) {
-                $previousPath = str_replace(asset('storage') . '/', '', $company->image_route);
-                Storage::disk('public')->delete($previousPath);
+                $previousFilename = basename($company->image_route);
+                $previousPath = public_path('uploads/' . $previousFilename);
+                if (file_exists($previousPath)) {
+                    unlink($previousPath);
+                }
             }
 
-            // Guarda nueva imagen en storage/app/public/uploads
+            // Subir nueva imagen
             $image = $request->file('image_route');
-            $path = $image->store('uploads', 'public'); // devuelve uploads/logo-xxxx.webp
-            $validated['image_route'] = asset('storage/' . $path); // genera la URL pública accesible
+            $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads'), $filename);
+            $validated['image_route'] = url('uploads/' . $filename); // genera URL completa accesible
         }
 
         $company->update($validated);
@@ -121,6 +124,7 @@ class CompanyController extends Controller
             'data' => $company,
         ], 200);
     }
+
 
 
 
