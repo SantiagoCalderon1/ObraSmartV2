@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EstimateController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\LaborTypesController;
@@ -121,7 +122,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
     // A estas rutas solo podrá acceder el Administrador
     Route::middleware([IsAdminAuth::class])->group(function () {
         //Rutas de CompanyController
-        Route::controller(Company::class)->group(function () {
+        Route::controller(CompanyController::class)->group(function () {
             Route::get('/company', 'index');
             Route::post('/company', 'store');
             Route::get('/company/{id}', 'show');
