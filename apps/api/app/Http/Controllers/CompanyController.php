@@ -50,8 +50,10 @@ class CompanyController extends Controller
         ]);
 
         if ($request->hasFile('image_route')) {
-            $rutaImg = $request->file('image_route')->store('uploads', 'public'); // en storage/app/public/uploads
-            $validated['image_route'] = $rutaImg;
+            $image = $request->file('image_route');
+            $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads'), $filename);
+            $validated['image_route'] = 'uploads/' . $filename;
         }
 
         $company = Company::create($validated);
@@ -94,10 +96,16 @@ class CompanyController extends Controller
             'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
+
+        if ($company->image_route && file_exists(public_path($company->image_route))) {
+            unlink(public_path($company->image_route));
+        }
         // Si hay imagen nueva
         if ($request->hasFile('image_route')) {
-            $rutaImg = $request->file('image_route')->store('uploads', 'public');
-            $validated['image_route'] = $rutaImg;
+            $image = $request->file('image_route');
+            $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads'), $filename);
+            $validated['image_route'] = 'uploads/' . $filename;
         }
 
         $company->update($validated);
