@@ -52,10 +52,8 @@ class CompanyController extends Controller
         ]);
 
         if ($request->hasFile('image_route')) {
-            $image = $request->file('image_route');
-            $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $filename);
-            $validated['image_route'] = 'uploads/' . $filename;
+            $rutaImg = $request->file('image_route')->store('uploads');
+            $validated['image_route'] = $rutaImg;
         }
 
         $company = Company::create($validated);
@@ -100,22 +98,14 @@ class CompanyController extends Controller
 
         if ($request->hasFile('image_route')) {
             // Eliminar la imagen anterior si existe
-            if ($company->image_route) {
-                $previousPath = public_path($company->image_route);
-                if (file_exists($previousPath)) {
-                    unlink($previousPath);
-                }
+            if ($company->image_route && Storage::exists($company->image_route)) {
+                Storage::delete($company->image_route);
             }
 
             // Subir nueva imagen
-            $image = $request->file('image_route');
-            $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $filename);
-            $validated['image_route'] = 'uploads/' . $filename; // ruta relativa, no URL completa
-            var_dump($validated['image_route']);
+            $rutaImg = $request->file('image_route')->store('uploads');
+            $company->image_route = $rutaImg;
         }
-
-
         $company->update($validated);
         $company->refresh();
 
