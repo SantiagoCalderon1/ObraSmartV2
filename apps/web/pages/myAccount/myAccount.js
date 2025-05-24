@@ -35,7 +35,7 @@ function Profile() {
         _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
     }
 
-    let user = {}, company = {}, imageURL = "";
+    let user = {}, company = {} 
 
 
 
@@ -44,11 +44,7 @@ function Profile() {
         company = (await fetchCompany(1)).data;
         console.log(user);
         console.log(company);
-        imageURL = company.image_route
-            ? `https://obrasmartv2-production.up.railway.app/${company.image_route}`
-            : "/default-logo.png";
-
-
+ 
         m.redraw();
     }
 
@@ -196,7 +192,7 @@ function Profile() {
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Logo de la Compañía"),
                     m("img", {
-                        src: company.image_preview || imageURL  ,
+                        src: company.image_preview || company.image_route  ,
                         style: {
                             width: "300px",
                             height: "300px",

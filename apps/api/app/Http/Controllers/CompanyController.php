@@ -101,7 +101,7 @@ class CompanyController extends Controller
         if ($request->hasFile('image_route')) {
             // Eliminar la imagen anterior si existe
             if ($company->image_route) {
-                $previousPath = public_path($company->image_route);   
+                $previousPath = public_path($company->image_route);
                 if (file_exists($previousPath)) {
                     unlink($previousPath);
                 }
@@ -112,15 +112,14 @@ class CompanyController extends Controller
             $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('uploads'), $filename);
             $validated['image_route'] = 'uploads/' . $filename; // ruta relativa, no URL completa
+            var_dump($validated['image_route']);
         }
 
 
         $company->update($validated);
+        $company->refresh();
 
-        return response()->json([
-            'message' => 'Compañía actualizada correctamente.',
-            'data' => $company,
-        ], 200);
+        return response()->json(['message' => 'Compañía actualizada correctamente.', 'data' => $company,], 200);
     }
 
 
