@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Client;
+use App\Models\Company;
 use App\Models\Estimate;
 use App\Models\Invoice;
 use App\Models\Project;
@@ -38,17 +39,23 @@ class RouteServiceProvider extends ServiceProvider
                 ->firstOrFail();
         });
 
-         // Bind personalizado: buscar Project por ID o name
+        // Bind personalizado: buscar Project por ID o name
         Route::bind('project', function ($value) {
             return Project::where('project_id', $value)
                 ->orWhere('name', $value)
                 ->firstOrFail();
         });
 
-         // Bind personalizado: buscar Invoice por ID o invoice_number
+        // Bind personalizado: buscar Invoice por ID o invoice_number
         Route::bind('invoice', function ($value) {
             return Invoice::where('invoice_id', $value)
                 ->orWhere('invoice_number', $value)
+                ->firstOrFail();
+        });
+
+        Route::bind('company', function ($value) {
+            return Company::where('company_id', $value)
+                ->orWhere('nif', $value)
                 ->firstOrFail();
         });
     }
