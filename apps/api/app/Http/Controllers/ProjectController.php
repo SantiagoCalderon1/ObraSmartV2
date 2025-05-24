@@ -75,7 +75,7 @@ class ProjectController
             'estimates.user',
             'estimates.invoice',
             'projectLogs',
-            'stockMovements',
+            'stockMovements.material',
             'client'
         ]);
 
