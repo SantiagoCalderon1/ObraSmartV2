@@ -123,12 +123,12 @@ Route::middleware([IsUserAuth::class])->group(function () {
     Route::middleware([IsAdminAuth::class])->group(function () {
         //Rutas de CompanyController
         Route::controller(CompanyController::class)->group(function () {
-            Route::get('/company', 'index');
-            Route::post('/company', 'store');
-            Route::get('/company/{id}', 'show');
-            Route::put('/company/{id}', 'update');
-            Route::patch('/company/{id}', 'update');
-            Route::delete('/company/{id}', 'destroy');
+            Route::get('/companies', 'index');
+            Route::post('/companies', 'store');
+            Route::get('/companies/{company}', 'show');
+            Route::put('/companies/{company}', 'update');
+            Route::patch('/companies/{company}', 'update');
+            Route::delete('/companies/{company}', 'destroy');
         });
     });
 });
