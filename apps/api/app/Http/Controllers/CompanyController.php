@@ -98,12 +98,13 @@ class CompanyController extends Controller
 
         if ($request->hasFile('image_route')) {
             // Eliminar la imagen anterior si existe
-            if ($company->image_route && Storage::exists($company->image_route)) {
-                Storage::delete($company->image_route);
+            if ($company->image_route && Storage::disk('public')->exists($company->image_route)) {
+                Storage::disk('public')->delete($company->image_route);
             }
 
+
             // Subir nueva imagen
-            $rutaImg = $request->file('image_route')->store('uploads');
+            $rutaImg = $request->file('image_route')->store('uploads', 'public');
             $validated['image_route'] = $rutaImg;
         }
         $company->update($validated);
