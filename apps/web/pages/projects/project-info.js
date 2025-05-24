@@ -1,41 +1,49 @@
 import Choices from 'choices.js';
+import { Chart, registerables } from 'chart.js';
+Chart.register(...registerables);
 
 // IOMPORTADOR DE COMPONENTES REUTILIZABLES
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Table } from "../../components/table.js"
 import { Button } from "../../components/button.js";
+import { TableModal } from "../../components/table-modal.js";
 
 
 
 
 // IMPORTADOR DE FUNCIONES
-import { fetchProject, fetchClients, updateProject, createProject, deleteProject } from "../../Services/services.js";
+import { fetchProject, fetchClients, updateProject, createProject, deleteInvoice, updateInvoice } from "../../Services/services.js";
 
 export function ProjectInfoPage() {
+    let style = {
+        containerStyle: {
+            minHeight: "10vh",
+            maxHeight: "45vh",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: "#fff",
+            padding: "25px",
+            borderRadius: "8px",
+            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+            overflow: "hidden",
+            gap: "1.30rem"
+        }
+    }
     let project = {};
 
     async function loadProject(id = "") {
         project = (await fetchProject(id)).data;
 
-        if (project?.invoices?.length && project?.estimates?.length) {
-            console.log("Project invoices: ", project.invoices);
-            console.log("Project estimates: ", project.estimates);
-            
-            project.invoices = project.invoices.map(invoice => {
-                const relatedEstimate = project.estimates.find(est => est.estimate_id === invoice.estimate_id);
-                return { ...invoice, estimate: relatedEstimate };
-            });
-        }
-
-        if (project?.invoices?.length) {
-            project.invoices = project.invoices.map(invoice => ({
-                ...invoice,
+        if (project?.estimates?.length) {
+            project.invoices = project.estimates.map(estimate => ({
+                ...estimate.invoice,
+                estimate: estimate,
                 client: project.client,  //  Cliente del proyecto
                 proyectName: project.name
             }));
         }
-
-
 
         console.log(project);
         m.redraw();
@@ -48,24 +56,17 @@ export function ProjectInfoPage() {
         //onupdate: loadProject,
         view: function () {
 
-            const columns = [
-                { title: "#", field: "index" },
-                { title: "Nombre", field: "name", style: () => ({ textWrap: "nowrap" }) },
-                {
-                    title: "Estado", field: "status", style: (item) => ({
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        color: item?.status === "completado" ? "green" : item?.status === "cancelado" ? "red" : "black"
-                    })
-                },
-                { title: "Cliente", field: "client.name", style: () => ({ textWrap: "nowrap" }) },
-                //{ title: "Descripción", field: "description" },
-                { title: "Fecha de inicio", field: "start_date", style: () => ({ textWrap: "nowrap" }) },
-                { title: "Fecha de fin", field: "end_date", style: () => ({ textWrap: "nowrap" }) },
-            ];
+            const Card = {
+                view: ({ attrs, children }) => {
+                    return [
+                        m("h2.py-2.text-uppercase", attrs.title),
+                        m("div.col-11.col-md-10.text-start", { style: style.containerStyle }, [
+                            children
+                        ])
 
-
-
+                    ]
+                }
+            };
 
             if (loadProject == {}) {
                 return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
@@ -79,18 +80,18 @@ export function ProjectInfoPage() {
                 m("div.container", [
                     m("div.row", [
                         // Pequeñas (izquierda)
-                        m("div.col-12.col-md-6", [
+                        m("div.col-12.col-lg-6", [
                             m("div.row", [
                                 ...smallBoxes.map((boxContent, i) =>
-                                    m("div.col-6.mb-3", [
-                                        m("div.p-3.bg-primary.text-white.text-center.rounded", boxContent)
+                                    m("div.col-12.mb-3.d-flex.justify-content-center.align-items-center.flex-column", [
+                                        boxContent
                                     ])
                                 )
                             ])
                         ]),
 
                         // Grandes (derecha)
-                        m("div.col-12.col-md-6", [
+                        m("div.col-12.col-lg-6", [
                             m("div.row", [
                                 ...largeBoxes.map((boxContent, i) =>
                                     m("div.col-12.mb-3.d-flex.justify-content-center.align-items-center.flex-column", [
@@ -104,180 +105,263 @@ export function ProjectInfoPage() {
 
 
             return [
-                m("h1.py-5.text-uppercase", `Detalles del presupuesto ${project?.name}`),
+                m("h1.py-5.text-uppercase", `Proyecto ${project?.name}`),
                 PageEsctructure({
                     smallBoxes: [
-                        m("span", "Caja 1"),
-                        m("span", "Caja 2"),
-                        m("span", "Caja 3"),
+                        m(Card, { title: "Detalles" }, [m(ProjectDetails, { project })]),
+                        //m(ProjectCard, { project }),
+                        project.estimates && project.estimates.length ? [
+                            m(Card, { title: "Gráficos" }, [m(ProjectChartBox, { project }),]),
+                            m(Card, [m(EstimateStatusChartBox, { project })]),
+                            m(Card, [m(InvoicestatusChartBox, { project })])
+                        ]
+
+                            :
+                            m(Card, { title: "Gráficos" }, [m("div", "Cargando gráfico...")]),
+
+
                         m("span", "Caja 4"),
                     ],
                     largeBoxes: [
                         // SECCION DE PRESUPUESTOS
                         m(EstimatesList, { estimates: project?.estimates }),
                         m(InvoicesList, { invoices: project?.invoices }),
-
                     ]
                 }),
-
                 m(ModalFormComponent, {
                     selectedProject: project,
                     onProjectSaved: loadProject
                 }),
-
-
             ];
         }
     };
 }
 
-function ModalProjectDetailsComponent() {
+function ProjectDetails() {
     return {
-
-        view: function ({ attrs }) {
-            const { selectedProject = {}, } = attrs;
-            console.log("selectedProject: ", selectedProject);
-
-            // Columnas para tablas
-            const columnsProject = [
-                { title: "Nombre", field: "name", style: () => ({ textWrap: "nowrap" }) },
-                {
-                    title: "Estado", field: "status", style: (item) => ({
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                        textWrap: "nowrap",
-                        color: item?.status === "completado" ? "green" : item?.status === "cancelado" ? "red" : "black"
-                    })
-                },
-                { title: "Cliente", field: "client.name", style: () => ({ textWrap: "nowrap" }) },
-                //{ title: "Descripción", field: "description" },
-                { title: "Fecha de inicio", field: "start_date", style: () => ({ textWrap: "nowrap" }) },
-                { title: "Fecha de fin", field: "end_date", style: () => ({ textWrap: "nowrap" }) },
-            ];
-
-            const columnsClient = [
-                { title: "Nombre", field: "name", style: () => ({ textWrap: "nowrap" }) },
-                { title: "NIF", field: "nif", style: () => ({ textWrap: "nowrap" }) },
-                { title: "Telefono", field: "phone", style: () => ({ textWrap: "nowrap" }) },
-                { title: "Email", field: "email", style: () => ({ textWrap: "nowrap" }) },
-                { title: "Dirección", field: "address", style: () => ({ textWrap: "nowrap" }) },
-            ];
-
-            // Tabla reusable
-            const Table = ({ columns, data }) =>
-                m("div.table-responsive", {
-                    style: {
-                        maxHeight: "50vh",
-                    }
-                },
-                    [
-                        m("table", { class: "table table-hover table-striped" }, [
-                            m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
-                                m("tr", [
-                                    ...columns.map(col =>
-                                        m("th.text-nowrap.px-4.py-3", col.title))
-                                ])
-                            ]),
-                            m("tbody", [
-                                data.length > 0
-                                    ? data.map(item =>
-                                        m("tr", [
-                                            ...columns.map(col =>
-                                                m(`td.px-4`, {
-                                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                                }, [
-                                                    item?.[col.field] || "N/A",
-                                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                                ])
-                                            )
-                                        ])
-                                    )
-                                    : m("tr.text-center", m(`td[colspan=${columns.length + 1}]`, "No hay datos disponibles"))
-                            ])
-                        ])
-                    ]);
-
-
-
-            // Header con botones
-            const ContentHeaderModal = () => [
-                m(Button, {
-                    closeModal: true,
-                    bclass: "btn-danger",
-                    actions: () =>
-                        new bootstrap.Modal(document.getElementById("ModalDeleteProject")).show()
-                }, [
-                    m("i.fa-solid.fa-trash-can.text-white"),
-                    " Eliminar Project"
+        view: ({ attrs }) => {
+            const project = attrs.project || {};
+            return [
+                m("div.text-start.col-12", [
+                    m("label.form-label.ps-1.fw-bold.text-start", "Nombre "),
+                    m("input.form-control[readonly]", {
+                        type: "text",
+                        value: project.name || "Sin nombre",
+                        disabled: true
+                    }),
                 ]),
-                m(Button, {
-                    closeModal: true,
-                    bclass: "btn-warning",
-                    actions: () => {
-                        //m.route.set(`/projects/update/${selectedProject.project_id}`)
-                        //m.route.set("/projects/create")
-                        new bootstrap.Modal(document.getElementById("ModalFormProject")).show();
-                        m.redraw();
-                    }
-                }, [
-                    m("i.fa-solid.fa-pen-to-square"),
-                    " Editar Project"
+                m("div.text-start.col-12", [
+                    m("label.form-label.ps-1.fw-bold", "Estado "),
+                    m("input.form-control[readonly]", {
+                        type: "text",
+                        value: project.status,
+                        disabled: true,
+                        style: {
+                            color: project.status === "completado" ? "green" :
+                                project.status === "cancelado" ? "red" : "black",
+                            textTransform: "uppercase",
+                            fontWeight: "bold"
+                        }
+                    }),
+                ]),
+                m("div.text-start.col-12", [
+                    m("label.form-label.ps-1.fw-bold", "Cliente "),
+                    m("input.form-control[readonly]", {
+                        type: "text",
+                        value: project.client?.name,
+                        disabled: true
+                    }),
+                ]),
+                m("div.text-start.col-12", [
+                    m("label.form-label.ps-1.fw-bold", "Fecha de inicio"),
+                    m("input.form-control[readonly]", {
+                        type: "date",
+                        value: project.start_date,
+                        disabled: true
+                    }),
+                ]),
+                m("div.text-start.col-12", [
+                    m("label.form-label.ps-1.fw-bold", "Fecha de fin "),
+                    m("input.form-control[readonly]", {
+                        type: "date",
+                        value: project.end_date,
+                        disabled: true
+                    }),
                 ])
-            ];
-
-            // Body con las dos tablas
-            const ContentBodyModal = () =>
-                m("div", {
-                    style: {
-                        maxHeight: "60vh",
-                        overflowY: "auto",
-                        padding: "1rem"
-                    }
-                }, [
-                    m("h5.mt-1", "Detalles"),
-                    Table({ columns: columnsProject, data: [selectedProject] }),
-                    m("div.py-3", [
-                        m("h5", "Descripción"),
-                        m("p", selectedProject?.description),
-                    ]),
-                    m("hr"),
-                    m("h5.mt-3", "Cliente propietario"),
-                    Table({ columns: columnsClient, data: [selectedProject?.client] }),
-                ]);
-
-            // Footer con botón de PDF
-            const ContentFooterModal = () => [
-                m(Button, {
-                    //actions: () => GeneratePDF(estimate),
-                    bclass: "btn-outline-danger"
-                }, [
-                    "Descargar PDF ",
-                    m("i.fa-solid.fa-file-pdf.text-danger")
-                ]),
-                m(Button, {
-                    closeModal: true,
-                    actions: () => m.route.set(`/projects/${selectedProject?.name}`),
-                    bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal",
-                    style: { backgroundColor: "var(--mainPurple)" },
-                }, [
-                    "Ver todos los detalles "
-                ]),
             ]
+        }
+    }
+}
 
-            // Render del modal
-            return m(Modal, {
-                idModal: "ModalDetailsProjectsList",
-                title: `Project - ${selectedProject?.name}`,
-                addBtnClose: true,
-                slots: {
-                    header: ContentHeaderModal(),
-                    body: ContentBodyModal(),
-                    footer: ContentFooterModal()
+function ProjectChartBox() {
+    return {
+        oncreate: ({ dom, attrs }) => {
+            const { project } = attrs;
+
+            const ctx = dom.querySelector("canvas").getContext("2d");
+
+            const labels = project?.estimates?.map(e => {
+                const est = e.estimate_number || "Presupuesto";
+                const inv = e.invoice.invoice_number || "Factura";
+                return `${est} - ${inv}`;
+            }) || [];
+            const costs = project?.estimates?.map(e => e.total_cost || 0);
+            const invoices = project?.estimates?.map(e => e.invoice?.total_amount || 0);
+
+            console.log(labels, costs, invoices);
+
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: "Presupuesto (€)",
+                            data: costs,
+                            backgroundColor: "rgba(128, 68, 254, 0.6)"
+                        },
+                        {
+                            label: "Facturación (€)",
+                            data: invoices,
+                            backgroundColor: "rgba(54, 162, 235, 0.6)"
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Presupuestos vs Facturación"
+                        }
+                    }
                 }
             });
-        }
-    };
-}
+        },
+        view: () =>
+            m("div", {
+                style: {
+                    width: "100%",
+                    height: "100%",
+                }
+            }, m("canvas"))
+    }
+
+};
+
+function EstimateStatusChartBox() {
+    return {
+        oncreate: ({ dom, attrs }) => {
+            const { project } = attrs;
+
+            const ctx = dom.querySelector("canvas").getContext("2d");
+
+            const statusCount = (project?.estimates || []).reduce((acc, estimate) => {
+                const status = (estimate.status === "Rechazado" || estimate.status === "Cancelado") ? "Cancelado" : estimate.status || "Desconocido";
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(statusCount);
+            const data = Object.values(statusCount);
+
+            new Chart(ctx, {
+                type: "doughnut", // o "pie"
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: "Cantidad",
+                            data,
+                            backgroundColor: [
+                                "rgba(153, 102, 255, 0.6)",  // Pendiente
+                                "rgba(75, 192, 192, 0.6)",   // Aprobado
+                                "rgba(255, 99, 132, 0.6)",   // Canceladof
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Distribución de Presupuestos por Estado"
+                        },
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            });
+        },
+        view: () =>
+            m("div", {
+                style: {
+                    width: "100%",
+                    height: "100%",
+                }
+            }, m("canvas"))
+    }
+};
+
+function InvoicestatusChartBox() {
+    return {
+        oncreate: ({ dom, attrs }) => {
+            const { project } = attrs;
+
+            const ctx = dom.querySelector("canvas").getContext("2d");
+
+            const statusCount = (project?.invoices || []).reduce((acc, invoice) => {
+                const status = (invoice.status === "Rechazado" || invoice.status === "Cancelado") ? "Cancelado" : invoice.status || "Desconocido";
+                acc[status] = (acc[status] || 0) + 1;
+                return acc;
+            }, {});
+
+            const labels = Object.keys(statusCount);
+            const data = Object.values(statusCount);
+
+            new Chart(ctx, {
+                type: "pie", // o "doughnut"
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: "Cantidad",
+                            data,
+                            backgroundColor: [
+                                "rgba(255, 99, 132, 0.6)",   // Canceladof
+                                "rgba(153, 102, 255, 0.6)",  // Pendiente
+                                "rgba(75, 192, 192, 0.6)",   // Aprobado
+                            ],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: "Distribución de Facturas por Estado"
+                        },
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            });
+        },
+        view: () =>
+            m("div", {
+                style: {
+                    width: "100%",
+                    height: "100%",
+                }
+            }, m("canvas"))
+    }
+};
 
 function ModalFormComponent() {
     let style = {
@@ -585,11 +669,9 @@ function EstimatesList() {
                         color: item.status === "Aceptado" ? "green" : item.status === "Rechazado" ? "red" : "black"
                     })
                 },
-
                 { title: "Total", field: "total_cost", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-
             ];
 
             // Normaliza los datos para la tabla (añade índice y campos planos)            
@@ -607,7 +689,7 @@ function EstimatesList() {
             }
 
             return [
-                m("h1.py-5.text-uppercase", "Presupuestos"),
+                m("h2.py-2.text-uppercase", "Presupuestos"),
                 m(Table, {
                     columns: columns,
                     data: normalizedEstimates,
@@ -636,6 +718,9 @@ function EstimatesList() {
     };
 }
 
+
+
+
 function ModalEstimatesDetailsComponent() {
     return {
         view: function ({ attrs }) {
@@ -646,7 +731,6 @@ function ModalEstimatesDetailsComponent() {
             const subtotalLabors = (estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
             const subtotal = subtotalMaterials + subtotalLabors;
 
-
             // Columnas para tablas
             const columnsEstimate = [
                 {
@@ -656,7 +740,6 @@ function ModalEstimatesDetailsComponent() {
                         color: item?.status === "Aceptado" ? "green" : item?.status === "Rechazado" ? "red" : "black"
                     })
                 },
-
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
             ];
@@ -701,40 +784,6 @@ function ModalEstimatesDetailsComponent() {
                 "total_cost": l.total_cost || "N/A",
             }))
 
-            // Tabla reusable
-            const Table = ({ columns, data }) =>
-                m("div.table-responsive", {
-                    style: {
-                        maxHeight: "50vh",
-                    }
-                },
-                    [
-                        m("table", { class: "table table-hover table-striped" }, [
-                            m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
-                                m("tr", [
-                                    ...columns.map(col =>
-                                        m("th.text-nowrap.px-4.py-3", col.title))
-                                ])
-                            ]),
-                            m("tbody", [
-                                data.length > 0
-                                    ? data.map(item =>
-                                        m("tr", [
-                                            ...columns.map(col =>
-                                                m(`td.px-4${col.field === 'description' ? '' : '.text-nowrap'}`, {
-                                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                                }, [
-                                                    item?.[col.field] || "N/A",
-                                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                                ])
-                                            )
-                                        ])
-                                    )
-                                    : m("tr.text-center", m(`td[colspan=${columns.length + 1}]`, "No hay datos disponibles"))
-                            ])
-                        ])
-                    ]);
-
             // Footer con totales
             const TableFooter = () =>
                 m("div.text-end.mt-5.me-2", [
@@ -774,14 +823,14 @@ function ModalEstimatesDetailsComponent() {
                     }
                 }, [
                     m("h5.mt-1", "Detalles"),
-                    Table({ columns: columnsEstimate, data: [estimate] }),
+                    m(TableModal, { columns: columnsEstimate, data: [estimate] }),
                     m("hr"),
                     m("h5.mt-3", "Conceptos"),
                     m("hr"),
                     m("h5.mt-3", "Materiales"),
-                    Table({ columns: columnsMaterials, data: normalizedMaterials }),
+                    m(TableModal, { columns: columnsMaterials, data: normalizedMaterials }),
                     m("h5.mt-3", "Mano de Obra"),
-                    Table({ columns: columnsLabors, data: normalizedLabors }),
+                    m(TableModal, { columns: columnsLabors, data: normalizedLabors }),
                     m("div.mt-3", [m("span.fw-bold", "Condiciones: "), (estimate?.conditions || "N/A")]),
                     TableFooter()
                 ]);
@@ -824,8 +873,6 @@ function ModalEstimatesDetailsComponent() {
 // SECCION DE FACTURAS
 function InvoicesList() {
     let selectedInvoice = null;
-
-
     return {
         view: function ({ attrs }) {
             const { invoices = [] } = attrs
@@ -887,9 +934,9 @@ function InvoicesList() {
                         color: item.status === "pagado" ? "green" : item.status === "rechazado" ? "red" : "black"
                     })
                 },
-                { title: "Núm Presupuesto", field: "estimatate.estimate_number", style: () => ({ textWrap: "nowrap" }) },
+                { title: "Núm Presupuesto", field: "estimate_number", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Cliente", field: "client.name" },
-                { title: "Proyecto", field: "project.name" },
+                { title: "Proyecto", field: "proyectName" },
                 { title: "Total", field: "total_amount", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
@@ -899,6 +946,8 @@ function InvoicesList() {
             const normalizedInvoices = invoices.map((e, i) => ({
                 ...e,
                 index: i + 1,
+                "estimate_number": e?.estimate?.estimate_number || "N/A",
+                "client.name": e?.client?.name || "N/A",
 
             }));
 
@@ -946,7 +995,6 @@ function InvoicesList() {
         }
     };
 }
-
 
 function ModalInvoicesDetailsComponent() {
     return {
@@ -1029,40 +1077,6 @@ function ModalInvoicesDetailsComponent() {
                 "total_cost": l.total_cost || "N/A",
             }))
 
-            // Tabla reusable
-            const Table = ({ columns, data }) =>
-                m("div.table-responsive", {
-                    style: {
-                        maxHeight: "50vh",
-                    }
-                },
-                    [
-                        m("table", { class: "table table-hover table-striped" }, [
-                            m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
-                                m("tr", [
-                                    ...columns.map(col =>
-                                        m("th.text-nowrap.px-4.py-3", col.title))
-                                ])
-                            ]),
-                            m("tbody", [
-                                data.length > 0
-                                    ? data.map(item =>
-                                        m("tr", [
-                                            ...columns.map(col =>
-                                                m(`td.px-4${col.field === 'description' ? '' : '.text-nowrap'}`, {
-                                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                                }, [
-                                                    item?.[col.field] || "N/A",
-                                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                                ])
-                                            )
-                                        ])
-                                    )
-                                    : m("tr.text-center", m(`td[colspan=${columns.length + 1}]`, "No hay datos disponibles"))
-                            ])
-                        ])
-                    ]);
-
             // Footer con totales
             const TableFooter = () =>
                 m("div.text-end.mt-5.me-2", [
@@ -1126,16 +1140,16 @@ function ModalInvoicesDetailsComponent() {
                     ButtonsActions(),
                     m("h5.mt-1", "Detalles"),
                     m("hr"),
-                    Table({ columns: columnsInvoice, data: [normalizedInvoice] }),
+                    m(TableModal, { columns: columnsInvoice, data: [normalizedInvoice] }),
                     m("h5.mt-3", "Detalles del cliente"),
-                    Table({ columns: columnsClient, data: [invoice?.client] }),
+                    m(TableModal, { columns: columnsClient, data: [invoice?.client] }),
                     m("hr"),
                     m("h5.mt-3", "Conceptos"),
                     m("hr"),
                     m("h5.mt-3", "Materiales"),
-                    Table({ columns: columnsMaterials, data: normalizedMaterials }),
+                    m(TableModal, { columns: columnsMaterials, data: normalizedMaterials }),
                     m("h5.mt-3", "Mano de Obra"),
-                    Table({ columns: columnsLabors, data: normalizedLabors }),
+                    m(TableModal, { columns: columnsLabors, data: normalizedLabors }),
                     TableFooter()
                 ]);
 
@@ -1163,4 +1177,3 @@ function ModalInvoicesDetailsComponent() {
         }
     };
 }
-
