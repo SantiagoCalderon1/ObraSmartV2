@@ -46,11 +46,11 @@ class CompanyController extends Controller
             'phone' => 'required|string|unique:companies,phone',
             'email' => 'required|email|unique:companies,email',
             'address' => 'required|string',
-            'image_route' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
+            'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
         if ($request->hasFile('image_route')) {
-            $rutaImg = $request->file('image_route')->store('myimages', 'public'); // en storage/app/public/myimages
+            $rutaImg = $request->file('image_route')->store('uploads', 'public'); // en storage/app/public/uploads
             $validated['image_route'] = $rutaImg;
         }
 
@@ -91,12 +91,12 @@ class CompanyController extends Controller
             'phone' => 'sometimes|required|string|unique:companies,phone,' . $company->company_id . ',company_id',
             'email' => 'sometimes|required|email|unique:companies,email,' . $company->company_id . ',company_id',
             'address' => 'sometimes|required|string',
-            'image_route' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
+            'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
         // Si hay imagen nueva
         if ($request->hasFile('image_route')) {
-            $rutaImg = $request->file('image_route')->store('myimages', 'public');
+            $rutaImg = $request->file('image_route')->store('uploads', 'public');
             $validated['image_route'] = $rutaImg;
         }
 

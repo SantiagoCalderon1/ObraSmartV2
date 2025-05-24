@@ -27,7 +27,14 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        Company::factory(5)->create(); 
+        Company::factory()->create([
+            'name' => 'ObraSmart S.A',
+            'nif' => 'A12345678',
+            'phone' => '123456789',
+            'email' => 'obra@smart.com',
+            'address' => 'Calle 123, Valencia',
+            'image_route' => asset('uploads/logo-1.webp'),
+        ]);
 
         // Crear usuarios
         User::factory(5)->create();
