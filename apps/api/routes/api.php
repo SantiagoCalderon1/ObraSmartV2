@@ -127,7 +127,8 @@ Route::middleware([IsUserAuth::class])->group(function () {
             Route::post('/companies', 'store');
             Route::get('/companies/{company}', 'show');
             Route::put('/companies/{company}', 'update');
-            Route::patch('/companies/{company}', 'update');
+            Route::patch('/companies/{company}', 'updateData');
+            Route::patch('/companies-logo/{company}', 'updateLogo');
             Route::delete('/companies/{company}', 'destroy');
         });
     });
