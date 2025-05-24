@@ -3,24 +3,26 @@
 export async function request(method, url, body = null, routeSet = true) {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token")
     if (!token) {
-        //console.log("No hay token, redirigiendo a /login")
         m.route.set("/login")
         return
+    }
+    let headers = {
+        "Authorization": `Bearer ${token}`
+    }
+    // Solo poner Content-Type si no es FormData
+    if (body && !(body instanceof FormData)) {
+        headers["Content-Type"] = "application/json"
     }
     try {
         const data = await m.request({
             method: method,
             url: url,
             body: body ? body : null,
-            headers: {
-                "Content-Type": body ? "application/json" : "",
-                "Authorization": `Bearer ${token}`
-            }
+            headers: headers
         })
         return data
     } catch (error) {
-        //console.error("Error en la petición:", error)
-        routeSet ? m.route.set("/login") : null
+        if (routeSet) m.route.set("/login")
         throw error
     }
 }

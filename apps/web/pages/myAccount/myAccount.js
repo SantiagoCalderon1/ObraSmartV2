@@ -35,13 +35,19 @@ function Profile() {
         _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
     }
 
-    let user = {}, company = {}
+    let user = {}, company = {}, imageURL = "";
+
+
 
     async function loadData() {
         user = (await fetchUser()).user;
         company = (await fetchCompany(1)).data;
         console.log(user);
         console.log(company);
+        imageURL = company.image_route
+            ? `https://obrasmartv2-production.up.railway.app/${company.image_route}`
+            : "/default-logo.png";
+
 
         m.redraw();
     }
@@ -156,7 +162,6 @@ function Profile() {
 
             const handleLogoSubmit = async (e) => {
                 e.preventDefault();
-
                 if (!company.logo_img) {
                     return Toastify({
                         text: "Debes seleccionar una imagen.",
@@ -164,10 +169,9 @@ function Profile() {
                         duration: 3000,
                     }).showToast();
                 }
-
                 const formData = new FormData();
                 formData.append("image_route", company.logo_img); // <-- Archivo real
-
+                console.log("Company logo ", company.logo_img);
                 try {
                     const response = await updateCompany(formData, company.company_id); // <-- Asegúrate de pasar el ID
                     console.log("Response form img: ", response);
@@ -192,7 +196,7 @@ function Profile() {
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Logo de la Compañía"),
                     m("img", {
-                        src: company.image_preview || company.image_route || "/default-logo.png",
+                        src: company.image_preview || imageURL  ,
                         style: {
                             width: "300px",
                             height: "300px",

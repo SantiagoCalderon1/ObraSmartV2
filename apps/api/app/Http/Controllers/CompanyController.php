@@ -87,8 +87,6 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-
-
     public function update(Request $request, Company $company)
     {
         $validated = $request->validate([
@@ -103,8 +101,7 @@ class CompanyController extends Controller
         if ($request->hasFile('image_route')) {
             // Eliminar la imagen anterior si existe
             if ($company->image_route) {
-                $previousFilename = basename($company->image_route);
-                $previousPath = public_path('uploads/' . $previousFilename);
+                $previousPath = public_path($company->image_route);   
                 if (file_exists($previousPath)) {
                     unlink($previousPath);
                 }
@@ -114,8 +111,9 @@ class CompanyController extends Controller
             $image = $request->file('image_route');
             $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('uploads'), $filename);
-            $validated['image_route'] = url('uploads/' . $filename); // genera URL completa accesible
+            $validated['image_route'] = 'uploads/' . $filename; // ruta relativa, no URL completa
         }
+
 
         $company->update($validated);
 
