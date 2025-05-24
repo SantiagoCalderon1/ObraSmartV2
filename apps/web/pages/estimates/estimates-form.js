@@ -286,7 +286,7 @@ function EstimateFormComponent() {
 
         if (restante <= 0) {
             Toastify({
-                text: `❌ Stock insuficiente para "${selected.name}". (${selected.stock_quantity} disponibles)`,
+                text: ` Stock insuficiente para "${selected.name}". (${selected.stock_quantity} disponibles)`,
                 className: "toastify-error",
                 duration: 4000,
                 close: true,
@@ -304,7 +304,7 @@ function EstimateFormComponent() {
 
         if (restante <= selected.min_stock_alert) {
             Toastify({
-                text: `⚠️ Pocas unidades de "${selected.name}". Quedan ${restante}.`,
+                text: ` Pocas unidades de "${selected.name}". Quedan ${restante}.`,
                 className: "toastify-warning",
                 duration: 4000,
                 close: true,

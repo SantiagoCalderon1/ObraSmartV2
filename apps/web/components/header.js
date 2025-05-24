@@ -1,3 +1,5 @@
+import { fetchCompany } from "../Services/services";
+
 export function Header() {
     const MENU_ITEM = [
         { label: "Presupuestos", route: "/estimates", icon: "fa-file-signature" },
@@ -8,7 +10,17 @@ export function Header() {
         { label: "Mi Cuenta", route: "/my-account", icon: "fa-circle-user" },
         { label: "Cerrar Sesión", route: "/logout", icon: "fa-arrow-right-from-bracket", },
     ]
+
+    let company = {}
+
+    async function loadData() {
+        company = (await fetchCompany(1)).data;
+        // acceso con company.image_route
+        m.redraw();
+    }
+
     return {
+        oncreate: loadData,
         view: function () {
             return m('header.navbar.bg-light.fixed-top', {
                 style: { height: "7.5vh", width: "100%", boxShadow: "0px 10px 50px rgba(0, 0, 0, 0.2)", }
@@ -17,7 +29,7 @@ export function Header() {
                     //.d-none.d-md-block
                     m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
                         m('img', {
-                            src: '/logosObraSmart/logo-1.webp', style: { width: "75px", height: "6vh", cursor: "pointer" },
+                            src: company.image_route, style: { width: "75px", height: "6vh", cursor: "pointer" },
                             onclick: () => m.route.set("/home")
                         }
                         ),

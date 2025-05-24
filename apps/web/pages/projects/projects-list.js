@@ -254,7 +254,7 @@ function ModalDetailsComponent() {
     };
 }
 
-function ModalFormComponent() {
+export function ModalFormComponent() {
     let style = {
         _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
         _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
@@ -284,7 +284,6 @@ function ModalFormComponent() {
         ProjectData: ProjectData(),
         selectedProject: null,
         clients: [],
-        filterClients: "",
     }
 
 
@@ -304,8 +303,6 @@ function ModalFormComponent() {
         },
 
         view: function ({ attrs }) {
-
-
             const handleFormSubmit = async (e) => {
                 const dataToSend = state.ProjectData
                 //console.log("dataToSend: ", dataToSend);
@@ -391,7 +388,6 @@ function ModalFormComponent() {
                                     )
                                 ])
                             ]),
-
 
                             // Fecha de creación
                             m("div.col-md-12.col-lg-4.pt-2", [
@@ -517,7 +513,7 @@ function ModalFormComponent() {
             // Render del modal
             return m(Modal, {
                 idModal: "ModalFormProject",
-                title: state.selectedProject?.project_id ? `Actualizando el cliente` : `Creando Nuevo Project`,
+                title: state.selectedProject?.project_id ? `Actualizando el Project ${state.selectedProject?.name}` : `Creando Nuevo Project`,
                 addBtnClose: false,
                 slots: {
                     //header: ContentHeaderModal(),

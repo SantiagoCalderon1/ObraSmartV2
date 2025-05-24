@@ -19,7 +19,7 @@ export const URL_CLIENTS = `${import.meta.env.VITE_API_URL}/api/clients`;
 
 // Usuarios
 export const URL_USERS = `${import.meta.env.VITE_API_URL}/api/users`;
-export const URL_COMPANY = `${import.meta.env.VITE_API_URL}/api/company`;
+export const URL_COMPANY = `${import.meta.env.VITE_API_URL}/api/companies`;
 
 
 // Proyectos

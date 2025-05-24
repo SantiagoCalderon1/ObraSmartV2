@@ -261,7 +261,6 @@ function ModalDetailsComponent() {
     };
 }
 
-
 function ModalFormComponent() {
     let style = {
         _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },

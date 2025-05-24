@@ -1,81 +1,49 @@
-import Choices from 'choices.js';
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+import Choices from 'choices.js'
+import { Chart, registerables } from 'chart.js'
+Chart.register(...registerables)
 
 // IOMPORTADOR DE COMPONENTES REUTILIZABLES
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Table } from "../../components/table.js"
-import { Button } from "../../components/button.js";
-import { TableModal } from "../../components/table-modal.js";
-
-
+import { Button } from "../../components/button.js"
+import { TableModal } from "../../components/table-modal.js"
+import { Card } from "../../components/card.js"
+import { SpinnerLoading } from "../../components/spinner-loading.js"
+import { ModalFormComponent } from "./projects-list.js"
 
 
 // IMPORTADOR DE FUNCIONES
-import { fetchProject, fetchClients, updateProject, createProject, deleteInvoice, updateInvoice } from "../../Services/services.js";
+import { fetchProject, updateProject, deleteInvoice, updateInvoice, fetchMaterials, createStockMovement } from "../../Services/services.js"
 
 export function ProjectInfoPage() {
-    let style = {
-        containerStyle: {
-            minHeight: "10vh",
-            maxHeight: "45vh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#fff",
-            padding: "25px",
-            borderRadius: "8px",
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-            overflow: "hidden",
-            gap: "1.30rem"
-        }
-    }
-    let project = {};
+    let project = {}
+    let isLoading = true;
+
 
     async function loadProject(id = "") {
-        project = (await fetchProject(id)).data;
-
+        isLoading = true;
+        m.redraw()
+        project = (await fetchProject(id)).data
         if (project?.estimates?.length) {
             project.invoices = project.estimates.map(estimate => ({
                 ...estimate.invoice,
                 estimate: estimate,
                 client: project.client,  //  Cliente del proyecto
                 proyectName: project.name
-            }));
+            }))
         }
-
-        console.log(project);
-        m.redraw();
+        isLoading = false;
+        console.log(project)
+        m.redraw()
     }
-
     return {
         oncreate: function ({ attrs }) {
             loadProject(attrs.id)
         },
-        //onupdate: loadProject,
-        view: function () {
-
-            const Card = {
-                view: ({ attrs, children }) => {
-                    return [
-                        m("h2.py-2.text-uppercase", attrs.title),
-                        m("div.col-11.col-md-10.text-start", { style: style.containerStyle }, [
-                            children
-                        ])
-
-                    ]
-                }
-            };
-
-            if (loadProject == {}) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ]);
+        view: function ({ attrs }) {
+            if (isLoading) {
+                return m(SpinnerLoading);
             }
-
             const PageEsctructure = ({ smallBoxes = [], largeBoxes = [] }) =>
                 m("div.container", [
                     m("div.row", [
@@ -89,7 +57,6 @@ export function ProjectInfoPage() {
                                 )
                             ])
                         ]),
-
                         // Grandes (derecha)
                         m("div.col-12.col-lg-6", [
                             m("div.row", [
@@ -101,9 +68,7 @@ export function ProjectInfoPage() {
                             ])
                         ])
                     ])
-                ]);
-
-
+                ])
             return [
                 m("h1.py-5.text-uppercase", `Proyecto ${project?.name}`),
                 PageEsctructure({
@@ -115,32 +80,33 @@ export function ProjectInfoPage() {
                             m(Card, [m(EstimateStatusChartBox, { project })]),
                             m(Card, [m(InvoicestatusChartBox, { project })])
                         ]
-
                             :
                             m(Card, { title: "Gráficos" }, [m("div", "Cargando gráfico...")]),
-
-
                         m("span", "Caja 4"),
                     ],
                     largeBoxes: [
                         // SECCION DE PRESUPUESTOS
                         m(EstimatesList, { estimates: project?.estimates }),
                         m(InvoicesList, { invoices: project?.invoices }),
+                        m(StockMovementList, { stockMovements: project?.stock_movements, project_id: project?.project_id }),
                     ]
                 }),
                 m(ModalFormComponent, {
                     selectedProject: project,
-                    onProjectSaved: loadProject
+                    onProjectSaved: () => loadProject(attrs.id)
                 }),
-            ];
+
+            ]
         }
-    };
+    }
 }
+
+
 
 function ProjectDetails() {
     return {
         view: ({ attrs }) => {
-            const project = attrs.project || {};
+            const project = attrs.project || {}
             return [
                 m("div.text-start.col-12", [
                     m("label.form-label.ps-1.fw-bold.text-start", "Nombre "),
@@ -187,6 +153,16 @@ function ProjectDetails() {
                         value: project.end_date,
                         disabled: true
                     }),
+                ]),
+                m(Button, {
+                    closeModal: true,
+                    bclass: "btn-warning",
+                    actions: () => {
+                        new bootstrap.Modal(document.getElementById("ModalFormProject")).show()
+                    }
+                }, [
+                    m("i.fa-solid.fa-pen-to-square"),
+                    " Editar Project"
                 ])
             ]
         }
@@ -196,19 +172,19 @@ function ProjectDetails() {
 function ProjectChartBox() {
     return {
         oncreate: ({ dom, attrs }) => {
-            const { project } = attrs;
+            const { project } = attrs
 
-            const ctx = dom.querySelector("canvas").getContext("2d");
+            const ctx = dom.querySelector("canvas").getContext("2d")
 
             const labels = project?.estimates?.map(e => {
-                const est = e.estimate_number || "Presupuesto";
-                const inv = e.invoice.invoice_number || "Factura";
-                return `${est} - ${inv}`;
-            }) || [];
-            const costs = project?.estimates?.map(e => e.total_cost || 0);
-            const invoices = project?.estimates?.map(e => e.invoice?.total_amount || 0);
+                const est = e.estimate_number || "Presupuesto"
+                const inv = e.invoice.invoice_number || "Factura"
+                return `${est} - ${inv}`
+            }) || []
+            const costs = project?.estimates?.map(e => e.total_cost || 0)
+            const invoices = project?.estimates?.map(e => e.invoice?.total_amount || 0)
 
-            console.log(labels, costs, invoices);
+            console.log(labels, costs, invoices)
 
             new Chart(ctx, {
                 type: "bar",
@@ -236,7 +212,7 @@ function ProjectChartBox() {
                         }
                     }
                 }
-            });
+            })
         },
         view: () =>
             m("div", {
@@ -247,23 +223,23 @@ function ProjectChartBox() {
             }, m("canvas"))
     }
 
-};
+}
 
 function EstimateStatusChartBox() {
     return {
         oncreate: ({ dom, attrs }) => {
-            const { project } = attrs;
+            const { project } = attrs
 
-            const ctx = dom.querySelector("canvas").getContext("2d");
+            const ctx = dom.querySelector("canvas").getContext("2d")
 
             const statusCount = (project?.estimates || []).reduce((acc, estimate) => {
-                const status = (estimate.status === "Rechazado" || estimate.status === "Cancelado") ? "Cancelado" : estimate.status || "Desconocido";
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, {});
+                const status = (estimate.status === "Rechazado" || estimate.status === "Cancelado") ? "Cancelado" : estimate.status || "Desconocido"
+                acc[status] = (acc[status] || 0) + 1
+                return acc
+            }, {})
 
-            const labels = Object.keys(statusCount);
-            const data = Object.values(statusCount);
+            const labels = Object.keys(statusCount)
+            const data = Object.values(statusCount)
 
             new Chart(ctx, {
                 type: "doughnut", // o "pie"
@@ -294,7 +270,7 @@ function EstimateStatusChartBox() {
                         }
                     }
                 }
-            });
+            })
         },
         view: () =>
             m("div", {
@@ -304,23 +280,23 @@ function EstimateStatusChartBox() {
                 }
             }, m("canvas"))
     }
-};
+}
 
 function InvoicestatusChartBox() {
     return {
         oncreate: ({ dom, attrs }) => {
-            const { project } = attrs;
+            const { project } = attrs
 
-            const ctx = dom.querySelector("canvas").getContext("2d");
+            const ctx = dom.querySelector("canvas").getContext("2d")
 
             const statusCount = (project?.invoices || []).reduce((acc, invoice) => {
-                const status = (invoice.status === "Rechazado" || invoice.status === "Cancelado") ? "Cancelado" : invoice.status || "Desconocido";
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, {});
+                const status = (invoice.status === "Rechazado" || invoice.status === "Cancelado") ? "Cancelado" : invoice.status || "Desconocido"
+                acc[status] = (acc[status] || 0) + 1
+                return acc
+            }, {})
 
-            const labels = Object.keys(statusCount);
-            const data = Object.values(statusCount);
+            const labels = Object.keys(statusCount)
+            const data = Object.values(statusCount)
 
             new Chart(ctx, {
                 type: "pie", // o "doughnut"
@@ -351,7 +327,7 @@ function InvoicestatusChartBox() {
                         }
                     }
                 }
-            });
+            })
         },
         view: () =>
             m("div", {
@@ -361,303 +337,29 @@ function InvoicestatusChartBox() {
                 }
             }, m("canvas"))
     }
-};
-
-function ModalFormComponent() {
-    let style = {
-        _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
-        _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
-    }
-    const status = [{ value: "completado" }, { value: "en proceso" }, { value: "cancelado" },]
-    let badForm = false
-    const today = new Date().toISOString().split("T")[0]
-    let formElement = null;
-
-    const ProjectData = ({
-        client_id = "",
-        name = "",
-        description = "",
-        status = "en proceso",
-        start_date = "",
-        end_date = "",
-    } = {}) => ({
-        client_id,
-        name,
-        description,
-        status,
-        start_date,
-        end_date,
-    })
-
-    const state = {
-        ProjectData: ProjectData(),
-        selectedProject: null,
-        clients: [],
-        filterClients: "",
-    }
-
-
-    return {
-        oninit: async ({ attrs }) => {
-            state.selectedProject = attrs.selectedProject;
-            state.ProjectData = ProjectData(attrs.selectedProject || {});
-            state.clients = (await fetchClients()).data
-
-        },
-        onupdate: ({ attrs }) => {
-            if (attrs.selectedProject !== state.selectedProject) {
-                state.selectedProject = attrs.selectedProject;
-                state.ProjectData = ProjectData(state.selectedProject || {});
-                //console.log("state.selectedProject: ", state.selectedProject);
-            }
-        },
-
-        view: function ({ attrs }) {
-
-
-            const handleFormSubmit = async (e) => {
-                const dataToSend = state.ProjectData
-                //console.log("dataToSend: ", dataToSend);
-                //console.log("Se envió");
-
-                try {
-                    let response;
-                    if (!!state.selectedProject) {
-                        response = await updateProject(dataToSend, state.selectedProject?.project_id);
-                    } else {
-                        response = await createProject(dataToSend);
-                    }
-                    //console.log("Response form: ", response)
-
-                    Toastify({
-                        text: "¡Operación exitosa!",
-                        className: "toastify-success",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right"
-                    }).showToast()
-                    attrs.onProjectSaved?.(); // Llama al callback si existe
-
-                    const modalElement = document.getElementById("ModalFormProject");
-                    if (modalElement) {
-                        const modalInstance = bootstrap.Modal.getInstance(modalElement)
-                            || new bootstrap.Modal(modalElement);
-                        modalInstance.hide();
-                    }
-
-                } catch (error) {
-                    //console.error("Error al enviar el formulario:", error)
-                    Toastify({
-                        text: "¡Algo salió mal!",
-                        className: "toastify-error",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right"
-                    }).showToast()
-                } finally {
-                    m.redraw()
-                }
-            }
-            const ContentBodyModal = () =>
-                m("form", {
-                    class: "row col-12",
-                    onsubmit: handleFormSubmit,
-                    oncreate: (vnode) => {
-                        formElement = vnode.dom;
-                    }
-                }, [
-                    [m("span", { class: "fw-semibold text-uppercase fs-3 py-3" }, "Datos del proyecto"),
-                    m("div", { class: "row py-3 px-0 m-0 d-flex justify-content-evenly  " }, [
-                        // Datos Projecto
-                        m("div", { class: "row col-xl-8" }, [
-                            m("div", { class: "col-md-12 pt-2" }, [
-                                m("label.form-label.ps-1", `Nombre *`),
-                                m("input.form-control", {
-                                    style: { ...style._input_main },
-                                    value: state.ProjectData.name,
-                                    type: "text",
-                                    required: true,
-                                    oninput: (e) => state.ProjectData.name = e.target.value
-                                })
-                            ]),
-                            // Espacio en blanco
-                            //m("div.col-md-3.pt-2"),
-                            // Estado
-                            m("div.col-md-12.col-lg-4.pt-2", [
-                                m("label.form-label.ps-1", "Estado *"),
-                                m("select.form-select", {
-                                    class: (badForm ? " is-invalid" : ""),
-                                    required: true,
-                                    style: { ...style._input_secondary },
-                                    id: "status",
-                                    value: state.ProjectData?.status || "en proceso",
-                                    onchange: e => { state.ProjectData.status = e.target.value; m.redraw() }
-                                }, [
-                                    ...status.map(opt =>
-                                        m("option", { value: opt.value }, opt.value)
-                                    )
-                                ])
-                            ]),
-
-
-                            // Fecha de creación
-                            m("div.col-md-12.col-lg-4.pt-2", [
-
-                                m("label.form-label.ps-1", "Fecha de inicio *"),
-                                m("input.form-control", {
-                                    class: (badForm ? " is-invalid" : ""),
-                                    required: true,
-                                    style: { ...style._input_secondary },
-                                    type: "date",
-                                    value: state.ProjectData?.start_date || today,
-                                    max: today,
-                                    oninput: e => { state.ProjectData.start_date = e.target.value; m.redraw() }
-                                })
-
-                            ]),
-                            // Fecha de expiración
-                            m("div.col-md-12.col-lg-4.pt-2", [
-                                m("label.form-label.ps-1", "Fecha de fin *"),
-                                m("input.form-control", {
-                                    class: (badForm ? " is-invalid" : ""),
-                                    required: true,
-                                    style: { ...style._input_secondary },
-                                    type: "date",
-                                    value: state.ProjectData?.end_date || today,
-                                    min: today,
-                                    oninput: e => { state.ProjectData.end_date = e.target.value; m.redraw() }
-                                })
-                            ]),
-
-                        ]),
-                        // Cliente
-                        m("div", { class: "row col-xl-4 " }, [
-
-                            // Cliente input
-                            m("div", { class: "col-12 py-1" }, [
-                                m("label.form-label.ps-1", "Cliente *"),
-                                m("select.form-select", {
-                                    class: badForm ? "is-invalid" : "",
-                                    required: true,
-                                    style: { ...style._input_secondary },
-                                    id: "client_id",
-                                    value: state.ProjectData?.client_id,
-                                    onchange: e => {
-                                        state.ProjectData.client_id = e.target.value;
-                                        m.redraw();
-                                    },
-                                    oncreate: ({ dom }) => {
-                                        if (Array.isArray(state.clients) && state.clients.length > 0) {
-                                            dom.choicesInstance = new Choices(dom, {
-                                                allowHTML: false,
-                                                shouldSort: false,
-                                                searchPlaceholderValue: "Buscar cliente...",
-                                                itemSelectText: '',
-                                            });
-                                            dom.choicesInstance.setChoiceByValue(state.ProjectData?.client_id);
-                                        }
-                                    },
-                                    onupdate: ({ dom }) => {
-                                        if (!dom.choicesInstance && Array.isArray(state.clients) && state.clients.length > 0) {
-                                            dom.choicesInstance = new Choices(dom, {
-                                                allowHTML: false,
-                                                shouldSort: false,
-                                                searchPlaceholderValue: "Buscar cliente...",
-                                                itemSelectText: '',
-                                            });
-                                        }
-                                    },
-
-                                }, [
-                                    m("option", {
-                                        value: "",
-                                        disabled: true,
-                                        selected: !state.ProjectData?.client_id
-                                    }, "-- Selecciona Cliente --"),
-                                    ...(Array.isArray(state.clients)
-                                        ? state.clients.map(opt =>
-                                            m("option", {
-                                                value: opt.client_id
-                                            }, opt.name || opt.content || "Sin nombre")
-                                        )
-                                        : [])
-                                ])
-                            ]),
-                        ]),
-                        // Descripcion
-                        m("div", { class: "row" }, [
-                            m("div.pt-2",
-                                m("label.form-label.ps-1", "Descripción *"),
-                                m("input.form-control", {
-                                    style: { ...style._input_main },
-                                    value: state.ProjectData.description,
-                                    type: "text",
-                                    required: true,
-                                    oninput: (e) => state.ProjectData.description = e.target.value
-                                })
-                            )
-                        ]),
-                        // Botones
-                        m("div.col-12.d-flex.justify-content-center.my-5", [
-                            m("div.col-md-8.d-flex.justify-content-between.gap-4", [
-                                m(Button, {
-                                    closeModal: true,
-                                    bclass: "btn-danger",
-                                }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
-                                m(Button, {
-                                    type: "submit",
-                                    actions: async (e) => {
-                                        e.preventDefault()
-                                        if (!formElement.checkValidity()) {
-                                            formElement.reportValidity();
-                                            return;
-                                        }
-                                        await handleFormSubmit();
-                                    },
-                                    style: { backgroundColor: "var(--mainPurple)" }
-                                }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
-                            ])
-                        ])
-
-                    ])]])
-
-            // Render del modal
-            return m(Modal, {
-                idModal: "ModalFormProject",
-                title: state.selectedProject?.project_id ? `Actualizando el cliente` : `Creando Nuevo Project`,
-                addBtnClose: false,
-                slots: {
-                    //header: ContentHeaderModal(),
-                    body: ContentBodyModal(),
-                    //footer: ContentFooterModal()
-                }
-            });
-        }
-    };
 }
+
 
 // SECCION DE PRESUPUESTOS
 function EstimatesList() {
-    let selectedEstimate = null;
+    let selectedEstimate = null
 
     return {
         view: function ({ attrs }) {
-            const { estimates = [] } = attrs;
+            const { estimates = [] } = attrs
 
             const onSelect = (estimate) => {
-                selectedEstimate = estimate;
-                new bootstrap.Modal(document.getElementById("ModalDetailsEstimatesList")).show();
-                m.redraw();
-            };
+                selectedEstimate = estimate
+                new bootstrap.Modal(document.getElementById("ModalDetailsEstimatesList")).show()
+                m.redraw()
+            }
 
             const onDelete = async () => {
                 if (selectedEstimate) {
-                    await deleteEstimate(selectedEstimate.estimate_id);
-                    selectedEstimate = null;
+                    await deleteEstimate(selectedEstimate.estimate_id)
+                    selectedEstimate = null
                 }
-            };
+            }
 
             const columns = [
                 { title: "#", field: "index" },
@@ -672,20 +374,20 @@ function EstimatesList() {
                 { title: "Total", field: "total_cost", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-            ];
+            ]
 
             // Normaliza los datos para la tabla (añade índice y campos planos)            
             const normalizedEstimates = (estimates || []).map((e, i) => ({
                 ...e,
                 index: i + 1,
-            }));
+            }))
 
             if (normalizedEstimates.length === 0) {
                 return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
                     m("div.spinner-border.text-primary", { role: "status" }, [
                         m("span.visually-hidden", "Cargando...")
                     ])
-                ]);
+                ])
             }
 
             return [
@@ -713,23 +415,20 @@ function EstimatesList() {
                     mensaje: `¿Está seguro de eliminar el presupuesto con #${selectedEstimate?.estimate_number}?`,
                     actions: onDelete
                 })
-            ];
+            ]
         }
-    };
+    }
 }
-
-
-
 
 function ModalEstimatesDetailsComponent() {
     return {
         view: function ({ attrs }) {
-            const { estimate = [] } = attrs;
+            const { estimate = [] } = attrs
 
             // Cálculo de subtotales
-            const subtotalMaterials = (estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0);
-            const subtotalLabors = (estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
-            const subtotal = subtotalMaterials + subtotalLabors;
+            const subtotalMaterials = (estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0)
+            const subtotalLabors = (estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0)
+            const subtotal = subtotalMaterials + subtotalLabors
 
             // Columnas para tablas
             const columnsEstimate = [
@@ -742,7 +441,7 @@ function ModalEstimatesDetailsComponent() {
                 },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-            ];
+            ]
 
             const columnsMaterials = [
                 { title: "#", field: "index" },
@@ -751,7 +450,7 @@ function ModalEstimatesDetailsComponent() {
                 { title: "P / U", field: "unit_price", euroSign: "€" },
                 { title: "Descuento", field: "discount", euroSign: "€" },
                 { title: "P / Neto", field: "total_price", euroSign: "€" },
-            ];
+            ]
 
             const columnsLabors = [
                 { title: "#", field: "index" },
@@ -761,7 +460,7 @@ function ModalEstimatesDetailsComponent() {
                 { title: "P / H", field: "cost_per_hour", euroSign: "€" },
                 { title: "Descuento", field: "discount", euroSign: "€" },
                 { title: "P / Neto", field: "total_cost", euroSign: "€" },
-            ];
+            ]
 
             // Normalización de datos
             const normalizedMaterials = (estimate?.materials || []).map((m, i) => ({
@@ -790,7 +489,7 @@ function ModalEstimatesDetailsComponent() {
                     m("h6", `SubTotal: ${(subtotal || 0).toFixed(2)} €`),
                     m("h6", `IVA: ${Number(estimate?.iva || 0)}%`),
                     m("h5.fw-bold", `Total: ${Number(estimate?.total_cost || 0).toFixed(2)} €`)
-                ]);
+                ])
 
             // Header con botones
             const ContentHeaderModal = () => [
@@ -811,7 +510,7 @@ function ModalEstimatesDetailsComponent() {
                     m("i.fa-solid.fa-pen-to-square"),
                     " Editar Presupuesto"
                 ])
-            ];
+            ]
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
@@ -833,7 +532,7 @@ function ModalEstimatesDetailsComponent() {
                     m(TableModal, { columns: columnsLabors, data: normalizedLabors }),
                     m("div.mt-3", [m("span.fw-bold", "Condiciones: "), (estimate?.conditions || "N/A")]),
                     TableFooter()
-                ]);
+                ])
 
             // Footer con botón de PDF
             const ContentFooterModal = () => [
@@ -864,40 +563,39 @@ function ModalEstimatesDetailsComponent() {
                     body: ContentBodyModal(),
                     footer: ContentFooterModal()
                 }
-            });
+            })
         }
-    };
+    }
 }
-
 
 // SECCION DE FACTURAS
 function InvoicesList() {
-    let selectedInvoice = null;
+    let selectedInvoice = null
     return {
         view: function ({ attrs }) {
             const { invoices = [] } = attrs
 
             const onSelect = (invoice) => {
-                selectedInvoice = invoice;
-                new bootstrap.Modal(document.getElementById("ModalDetailsInvoicesList")).show();
-                m.redraw();
-            };
+                selectedInvoice = invoice
+                new bootstrap.Modal(document.getElementById("ModalDetailsInvoicesList")).show()
+                m.redraw()
+            }
 
             const handleInvoiceAction = async (action) => {
-                if (!selectedInvoice) return;
+                if (!selectedInvoice) return
                 try {
                     switch (action) {
                         case "delete":
-                            await deleteInvoice(selectedInvoice.invoice_id);
-                            break;
+                            await deleteInvoice(selectedInvoice.invoice_id)
+                            break
                         case "pay":
-                            await updateInvoice({ status: "pagado" }, selectedInvoice.invoice_id);
-                            break;
+                            await updateInvoice({ status: "pagado" }, selectedInvoice.invoice_id)
+                            break
                         case "rejected":
-                            await updateInvoice({ status: "rechazado" }, selectedInvoice.invoice_id);
-                            break;
+                            await updateInvoice({ status: "rechazado" }, selectedInvoice.invoice_id)
+                            break
                     }
-                    selectedInvoice = null;
+                    selectedInvoice = null
                     m.redraw()
 
                     Toastify({
@@ -921,7 +619,7 @@ function InvoicesList() {
                     }).showToast()
                 }
 
-            };
+            }
 
 
             const columns = [
@@ -940,7 +638,7 @@ function InvoicesList() {
                 { title: "Total", field: "total_amount", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-            ];
+            ]
 
             // Normaliza los datos para la tabla (añade índice y campos planos)            
             const normalizedInvoices = invoices.map((e, i) => ({
@@ -949,14 +647,14 @@ function InvoicesList() {
                 "estimate_number": e?.estimate?.estimate_number || "N/A",
                 "client.name": e?.client?.name || "N/A",
 
-            }));
+            }))
 
             if (normalizedInvoices.length === 0) {
                 return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
                     m("div.spinner-border.text-primary", { role: "status" }, [
                         m("span.visually-hidden", "Cargando...")
                     ])
-                ]);
+                ])
             }
 
             return [
@@ -991,21 +689,21 @@ function InvoicesList() {
                     mensaje: `¿Está seguro de actualizar el estado a RECHAZADO de la factura con #${selectedInvoice?.invoice_number}?`,
                     actions: () => handleInvoiceAction("rejected")
                 }),
-            ];
+            ]
         }
-    };
+    }
 }
 
 function ModalInvoicesDetailsComponent() {
     return {
         view: function ({ attrs }) {
-            const { invoice = [] } = attrs;
-            console.log("invoice: ", invoice);
+            const { invoice = [] } = attrs
+            console.log("invoice: ", invoice)
 
             // Cálculo de subtotales
-            const subtotalMaterials = (invoice?.estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0);
-            const subtotalLabors = (invoice?.estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
-            const subtotal = subtotalMaterials + subtotalLabors;
+            const subtotalMaterials = (invoice?.estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0)
+            const subtotalLabors = (invoice?.estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0)
+            const subtotal = subtotalMaterials + subtotalLabors
 
 
             // Columnas para tablas
@@ -1022,7 +720,7 @@ function ModalInvoicesDetailsComponent() {
                 },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-            ];
+            ]
 
             const columnsClient = [
                 { title: "Nombre", field: "name" },
@@ -1030,7 +728,7 @@ function ModalInvoicesDetailsComponent() {
                 { title: "Telefono", field: "phone" },
                 { title: "Email", field: "email" },
                 { title: "Dirección", field: "address" },
-            ];
+            ]
 
             const columnsMaterials = [
                 { title: "#", field: "index" },
@@ -1039,7 +737,7 @@ function ModalInvoicesDetailsComponent() {
                 { title: "P / U", field: "unit_price", euroSign: "€" },
                 { title: "Descuento", field: "discount", euroSign: "€" },
                 { title: "P / Neto", field: "total_price", euroSign: "€" },
-            ];
+            ]
 
             const columnsLabors = [
                 { title: "#", field: "index" },
@@ -1049,12 +747,12 @@ function ModalInvoicesDetailsComponent() {
                 { title: "P / H", field: "cost_per_hour", euroSign: "€" },
                 { title: "Descuento", field: "discount", euroSign: "€" },
                 { title: "P / Neto", field: "total_cost", euroSign: "€" },
-            ];
+            ]
 
             const normalizedInvoice = {
                 ...invoice,
                 "estimate.estimate_number": invoice?.estimate?.estimate_number || "N/A"
-            };
+            }
 
             // Normalización de datos
             const normalizedMaterials = (invoice?.estimate?.materials || []).map((m, i) => ({
@@ -1083,7 +781,7 @@ function ModalInvoicesDetailsComponent() {
                     m("h6", `SubTotal: ${(subtotal || 0).toFixed(2)} €`),
                     m("h6", `IVA: ${Number(invoice?.estimate?.iva || 0)}%`),
                     m("h5.fw-bold", `Total: ${Number(invoice?.total_amount || 0).toFixed(2)} €`)
-                ]);
+                ])
 
             // Header con botones
             const ContentHeaderModal = () => [
@@ -1151,7 +849,7 @@ function ModalInvoicesDetailsComponent() {
                     m("h5.mt-3", "Mano de Obra"),
                     m(TableModal, { columns: columnsLabors, data: normalizedLabors }),
                     TableFooter()
-                ]);
+                ])
 
             // Footer con botón de PDF
             const ContentFooterModal = () =>
@@ -1161,7 +859,7 @@ function ModalInvoicesDetailsComponent() {
                 }, [
                     "Descargar PDF ",
                     m("i.fa-solid.fa-file-pdf.text-danger")
-                ]);
+                ])
 
             // Render del modal
             return m(Modal, {
@@ -1173,7 +871,281 @@ function ModalInvoicesDetailsComponent() {
                     body: ContentBodyModal(),
                     footer: ContentFooterModal()
                 }
-            });
+            })
         }
-    };
+    }
+}
+
+
+// SECCION DE PRESUPUESTOS
+function StockMovementList() {
+    return {
+        view: function ({ attrs }) {
+            const { stockMovements = [], project_id } = attrs
+
+            const columns = [
+                { title: "#", field: "index" },
+                { title: "Nombre material", field: "material.name", style: () => ({ textWrap: "nowrap" }) },
+                {
+                    title: "Razón", field: "reason", style: (item) => ({
+                        fontWeight: "bold",
+                        textTransform: "uppercase",
+                        color: item.reason === "compra" ? "green" : item.status === "uso" ? "red" : "black"
+                        //
+                    })
+                },
+                { title: "cantidad", field: "quantity" },
+            ]
+
+            // Normaliza los datos para la tabla (añade índice y campos planos)            
+            const normalizedstockMovements = (stockMovements || []).map((e, i) => ({
+                ...e,
+                index: i + 1,
+                "material.name": e?.material?.name || "N/A"
+            }))
+
+            if (normalizedstockMovements.length === 0) {
+                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
+                    m("div.spinner-border.text-primary", { role: "status" }, [
+                        m("span.visually-hidden", "Cargando...")
+                    ])
+                ])
+            }
+
+            return [
+                m("h2.py-2.text-uppercase", "Movimientos de stock"),
+                m(Table, {
+                    columns: columns,
+                    data: normalizedstockMovements,
+                    onRowClick: () => { },
+                    maxHeightTable: "20vh",
+                    offset: ""
+                }, [
+                    m(Button, {
+                        closeModal: true,
+                        bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                        actions: () => {
+                            new bootstrap.Modal(document.getElementById("ModalFormStockMovement")).show()
+                            m.redraw()
+                        }
+                    }, [
+                        " Generar Movimiento "
+                    ])]),
+                m(ModalStockFormComponent, {
+                    onStockMovementSaved: () => { m.redraw },
+                    project_id: project_id
+                }
+                ),]
+        }
+    }
+}
+
+function ModalStockFormComponent() {
+    let style = {
+        _input_main: { backgroundColor: "var(--mainGray)", border: "1px solid var(--mainPurple)" },
+        _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
+    }
+
+    const motivos = [{ value: "ajuste" }, { value: "compra" }, { value: "uso" }]
+
+    let formElement = null
+    let badForm = false
+    let choicesInstance = null
+
+    const StockMovementData = ({
+        material_id = "",
+        project_id = "",
+        quantity = 0,
+        reason = "",
+    } = {}) => ({
+        material_id,
+        project_id,
+        quantity,
+        reason
+    })
+
+    const state = {
+        StockMovementData: StockMovementData(),
+        materials: [],
+    }
+
+    return {
+        oninit: async ({ attrs }) => {
+            state.materials = (await fetchMaterials()).data
+            state.StockMovementData.project_id = attrs.project_id
+            console.log(state.materials)
+        },
+
+        view: function ({ attrs }) {
+            const handleFormSubmit = async () => {
+                try {
+                    console.log("Datos a enviar: ", state.StockMovementData)
+
+                    const response = await createStockMovement(state.StockMovementData)
+
+                    const modalElement = document.getElementById("ModalFormStockMovement")
+                    if (modalElement) {
+                        const modalInstance = bootstrap.Modal.getInstance(modalElement)
+                            || new bootstrap.Modal(modalElement)
+                        modalInstance.hide()
+                    }
+
+                    Toastify({
+                        text: "¡Movimiento de stock creado!",
+                        className: "toastify-success",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right"
+                    }).showToast()
+
+                    attrs.onStockMovementSaved?.()
+                } catch (error) {
+                    Toastify({
+                        text: "¡Error al crear movimiento!",
+                        className: "toastify-error",
+                        duration: 3000,
+                        close: true,
+                        gravity: "top",
+                        position: "right"
+                    }).showToast()
+                } finally {
+                    m.redraw()
+                }
+            }
+
+            const ContentBodyModal = () =>
+                m("form", {
+                    class: "row col-12",
+                    onsubmit: (e) => {
+                        e.preventDefault()
+                        if (!formElement.checkValidity()) {
+                            formElement.reportValidity()
+                            return
+                        }
+                        handleFormSubmit()
+                    },
+                    oncreate: (vnode) => {
+                        formElement = vnode.dom
+
+                        const selectEl = vnode.dom.querySelector("#material_id")
+                        if (selectEl && !choicesInstance) {
+                            choicesInstance = new Choices(selectEl, {
+                                searchEnabled: true,
+                                itemSelectText: "",
+                                shouldSort: false,
+                                searchPlaceholderValue: "Filtrar proyectos...",
+                                placeholder: true,
+                            })
+
+                            // Manejar selección
+                            selectEl.addEventListener("change", (e) => {
+                                state.StockMovementData.material_id = e.target.value
+                            })
+                        }
+                    }
+                }, [
+                    m("span", { class: "fw-semibold text-uppercase fs-3 py-3" }, "Nuevo Movimiento de Stock"),
+                    m("div", { class: "row py-3 px-0 m-0 d-flex justify-content-between" }, [
+                        m("div", { class: "row" }, [
+                            //materials input
+                            m("div", { class: "col-12 py-1" }, [
+                                m("label.form-label.ps-1", "Materiales *"),
+                                m("select.form-select", {
+                                    class: badForm ? "is-invalid" : "",
+                                    required: true,
+                                    style: { ...style._input_secondary },
+                                    id: "client_id",
+                                    value: state.StockMovementData.material_id,
+                                    onchange: e => {
+                                        state.StockMovementData.material_id = e.target.value
+                                        m.redraw()
+                                    },
+                                    oncreate: ({ dom }) => {
+                                        if (Array.isArray(state.materials) && state.materials.length > 0) {
+                                            dom.choicesInstance = new Choices(dom, {
+                                                allowHTML: false,
+                                                shouldSort: false,
+                                                searchPlaceholderValue: "Buscar material...",
+                                                itemSelectText: '',
+                                            })
+                                            dom.choicesInstance.setChoiceByValue(state.StockMovementData.material_id)
+                                        }
+                                    },
+                                    onupdate: ({ dom }) => {
+                                        if (!dom.choicesInstance && Array.isArray(state.materials) && state.materials.length > 0) {
+                                            dom.choicesInstance = new Choices(dom, {
+                                                allowHTML: false,
+                                                shouldSort: false,
+                                                searchPlaceholderValue: "Buscar material...",
+                                                itemSelectText: '',
+                                            })
+                                        }
+                                    },
+
+                                }, [
+                                    m("option", {
+                                        value: "",
+                                        disabled: true,
+                                        selected: !state.StockMovementData.material_id
+                                    }, "-- Selecciona Cliente --"),
+                                    ...(Array.isArray(state.materials)
+                                        ? state.materials.map(opt =>
+                                            m("option", {
+                                                value: opt.material_id
+                                            }, opt.name || opt.content || "Sin nombre")
+                                        )
+                                        : [])
+                                ])
+                            ]),
+                            m("div.col-md-12.col-lg-6.pt-2", [
+                                m("label.form-label.ps-1", "Cantidad *"),
+                                m("input.form-control", {
+                                    style: style._input_main,
+                                    type: "number",
+                                    min: 0,
+                                    required: true,
+                                    value: state.StockMovementData.quantity,
+                                    oninput: (e) => state.StockMovementData.quantity = +e.target.value
+                                })
+                            ]),
+                            m("div.col-md-12.col-lg-6.pt-2", [
+                                m("label.form-label.ps-1", "Motivo *"),
+                                m("select.form-select", {
+                                    style: style._input_main,
+                                    required: true,
+                                    value: state.StockMovementData.reason,
+                                    onchange: (e) => state.StockMovementData.reason = e.target.value
+                                }, [
+                                    m("option", { value: "", disabled: true, selected: !state.StockMovementData.reason }, "Selecciona un motivo"),
+                                    ...motivos.map(o => m("option", { value: o.value }, o.value))
+                                ])
+                            ]),
+
+                        ]),
+                        m("div.col-12.d-flex.justify-content-center.my-5", [
+                            m("div.col-md-8.d-flex.justify-content-between.gap-4", [
+                                m(Button, {
+                                    closeModal: true,
+                                    bclass: "btn-danger",
+                                }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar"]),
+                                m(Button, {
+                                    type: "submit",
+                                    bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                                }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })])
+                            ])
+                        ])
+                    ])
+                ])
+
+            return m(Modal, {
+                idModal: "ModalFormStockMovement",
+                title: `Generando Movimiento de Stock`,
+                addBtnClose: false,
+                slots: {
+                    body: ContentBodyModal()
+                }
+            })
+        }
+    }
 }
