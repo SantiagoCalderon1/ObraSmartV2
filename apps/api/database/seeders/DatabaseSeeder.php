@@ -34,7 +34,7 @@ class DatabaseSeeder extends Seeder
             'phone' => '123456789',
             'email' => 'obra@smart.com',
             'address' => 'Calle 123, Valencia',
-            'image_route' => asset('storage/uploads/logo-1.webp'),
+            'image_route' => asset('uploads/logo-1.webp'),
         ]);
 
         // Crear usuarios
