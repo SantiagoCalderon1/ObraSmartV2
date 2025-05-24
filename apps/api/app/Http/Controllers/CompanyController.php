@@ -46,8 +46,13 @@ class CompanyController extends Controller
             'phone' => 'required|string|unique:companies,phone',
             'email' => 'required|email|unique:companies,email',
             'address' => 'required|string',
-            'url_logo' => 'nullable|string',
+            'image_route' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
         ]);
+
+        if ($request->hasFile('image_route')) {
+            $rutaImg = $request->file('image_route')->store('myimages', 'public'); // en storage/app/public/myimages
+            $validated['image_route'] = $rutaImg;
+        }
 
         $company = Company::create($validated);
 
@@ -56,6 +61,7 @@ class CompanyController extends Controller
             'data' => $company,
         ], 201);
     }
+
 
     /**
      * Display the specified resource.
@@ -80,21 +86,28 @@ class CompanyController extends Controller
     public function update(Request $request, Company $company)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'nif' => 'required|string|unique:companies,nif',
-            'phone' => 'required|string|unique:companies,phone',
-            'email' => 'required|email|unique:companies,email',
-            'address' => 'required|string',
-            'url_logo' => 'nullable|string',
+            'name' => 'sometimes|required|string|max:255',
+            'nif' => 'sometimes|required|string|unique:companies,nif,' . $company->company_id . ',company_id',
+            'phone' => 'sometimes|required|string|unique:companies,phone,' . $company->company_id . ',company_id',
+            'email' => 'sometimes|required|email|unique:companies,email,' . $company->company_id . ',company_id',
+            'address' => 'sometimes|required|string',
+            'image_route' => 'nullable|image|mimes:jpeg,png,jpg|max:4096',
         ]);
+
+        // Si hay imagen nueva
+        if ($request->hasFile('image_route')) {
+            $rutaImg = $request->file('image_route')->store('myimages', 'public');
+            $validated['image_route'] = $rutaImg;
+        }
 
         $company->update($validated);
 
         return response()->json([
-            'message' => 'Compania actualizada correctamente',
-            'data' => $company
+            'message' => 'Compañía actualizada correctamente.',
+            'data' => $company,
         ], 200);
     }
+
 
     /**
      * Remove the specified resource from storage.
