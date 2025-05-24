@@ -40,11 +40,11 @@ class Project extends Model
 
     public function stockMovements()
     {
-        return $this->hasMany(StockMovement::class, 'material_id', 'material_id');
+        return $this->hasMany(StockMovement::class, 'project_id', 'project_id');
     }
 
     public function client()
-{
-    return $this->belongsTo(Client::class, 'client_id', 'client_id');
-}
+    {
+        return $this->belongsTo(Client::class, 'client_id', 'client_id');
+    }
 }
