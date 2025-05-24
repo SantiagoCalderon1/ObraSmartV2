@@ -22,7 +22,7 @@ class CompanyFactory extends Factory
             'phone' => $this->faker->phoneNumber,
             'email' => $this->faker->unique()->companyEmail,
             'address' => $this->faker->address,
-            'url_logo' => $this->faker->imageUrl(200, 200, 'business', true, 'Logo'),
+            'image_route' => $this->faker->imageUrl(200, 200, 'business', true, 'Logo'),
         ];
     }
 }
