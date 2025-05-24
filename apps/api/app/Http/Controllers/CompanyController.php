@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use Illuminate\Http\Request;
+    use Illuminate\Support\Facades\Storage;
+
 
 class CompanyController extends Controller
 {
@@ -85,6 +87,8 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
+ 
+
     public function update(Request $request, Company $company)
     {
         $validated = $request->validate([
@@ -96,16 +100,18 @@ class CompanyController extends Controller
             'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
-
-        if ($company->image_route && file_exists(public_path($company->image_route))) {
-            unlink(public_path($company->image_route));
-        }
-        // Si hay imagen nueva
+        // Si hay nueva imagen
         if ($request->hasFile('image_route')) {
+            // Borra la anterior si existe y está en la carpeta de uploads
+            if ($company->image_route) {
+                $previousPath = str_replace(asset('storage') . '/', '', $company->image_route);
+                Storage::disk('public')->delete($previousPath);
+            }
+
+            // Guarda nueva imagen en storage/app/public/uploads
             $image = $request->file('image_route');
-            $filename = 'logo-' . time() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('uploads'), $filename);
-            $validated['image_route'] = 'uploads/' . $filename;
+            $path = $image->store('uploads', 'public'); // devuelve uploads/logo-xxxx.webp
+            $validated['image_route'] = asset('storage/' . $path); // genera la URL pública accesible
         }
 
         $company->update($validated);
@@ -115,6 +121,7 @@ class CompanyController extends Controller
             'data' => $company,
         ], 200);
     }
+
 
 
     /**
