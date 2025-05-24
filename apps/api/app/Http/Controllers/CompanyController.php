@@ -104,7 +104,7 @@ class CompanyController extends Controller
 
             // Subir nueva imagen
             $rutaImg = $request->file('image_route')->store('uploads');
-            $company->image_route = $rutaImg;
+            $validated['image_route'] = $rutaImg;
         }
         $company->update($validated);
         $company->refresh();
