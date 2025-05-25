@@ -6,6 +6,7 @@ use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use PhpParser\Node\Stmt\TryCatch;
 
 class CompanyController extends Controller
 {
@@ -14,18 +15,22 @@ class CompanyController extends Controller
      */
     public function index()
     {
-        $company = Company::all();
+        $companies = Company::all();
 
-        if ($company->isEmpty()) {
+        if ($companies->isEmpty()) {
             return response()->json([
                 'message' => 'No companies found',
             ], 404);
         }
 
+        /* foreach ($companies as $company) {
+            $company->image_route = asset('storage/' . $company->image_route);
+        } */
+
         //return response()->json($clients, 200);
         return response()->json([
             'message' => 'Lista de compañias',
-            'data' => $company
+            'data' => $companies
         ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
     }
 
@@ -42,24 +47,31 @@ class CompanyController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'nif' => 'required|string|unique:companies,nif',
-            'phone' => 'required|string|unique:companies,phone',
-            'email' => 'required|email|unique:companies,email',
-            'address' => 'required|string',
-            'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'nif' => 'required|string|unique:companies,nif',
+                'phone' => 'required|string|unique:companies,phone',
+                'email' => 'required|email|unique:companies,email',
+                'address' => 'required|string',
+                'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            ]);
 
-        $rutaImg = $request->file('image_route')->store('uploads');
-        $validated['image_route'] = $rutaImg;
+            $rutaImg = $request->file('image_route')->store('uploads');
+            $validated['image_route'] = $rutaImg;
 
-        $company = Company::create($validated);
-
-        return response()->json([
-            'message' => 'Compañía creada correctamente.',
-            'data' => $company,
-        ], 201);
+            $company = Company::create($validated);
+            // Si tiene imagen, genera la URL accesible
+            /*  if ($company->image_route) {
+                $company->image_route = asset('storage/' . $company->image_route);
+            } */
+            return response()->json([
+                'message' => 'Compañía creada correctamente.',
+                'data' => $company,
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 422);
+        }
     }
 
 
@@ -68,7 +80,8 @@ class CompanyController extends Controller
      */
     public function show(Company $company)
     {
-        $company->image_route = asset(Storage::url($company->image_route));
+        /*         $company->image_route = asset(Storage::url($company->image_route));
+ */
         return response()->json([
             'message' => 'Compañía obtenida correctamente',
             'data' => $company,
@@ -94,8 +107,6 @@ class CompanyController extends Controller
         ]);
 
         $company->update($validated);
-        $company->refresh();
-        $company->image_route = asset(Storage::url($company->image_route));
 
         return response()->json([
             'message' => 'Datos de la compañía actualizados correctamente.',
@@ -103,35 +114,42 @@ class CompanyController extends Controller
         ], 200);
     }
 
-    public function updateImage(Request $request, Company $company)
+    public function updateLogo(Request $request, Company $company)
     {
-        $validator = Validator::make($request->all(), [
-            'image_route' => 'nullable|mimes:png,jpeg,jpg|max:4096'
-        ]);
+        try {
+            $validated = $request->validate([
+                'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            ]);
 
-        if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 422);
-        }
+            $rutaImg = '';
 
-        if ($request->hasFile('image_route')) {
-            // Eliminar imagen anterior si existe
-            if ($company->image_route && Storage::exists($company->image_route)) {
-                Storage::delete($company->image_route);
+            if ($request->hasFile('image_route')) {
+                // Eliminar imagen anterior si existe
+                if ($company->image_route && Storage::exists($company->image_route)) {
+                    Storage::delete($company->image_route);
+                }
+
+                // Subir nueva imagen
+                $rutaImg = $request->file('image_route')->store('uploads');
+                $validated['image_route'] = $rutaImg;
             }
-            // Subir nueva imagen
-            $rutaImg = $request->file('image_route')->store('uploads');
-            $company->image_route = $rutaImg;
+
+            $company->update($validated);
+            $company->refresh();
+
+            /* if ($company->image_route) {
+                $company->image_route = asset('storage/' . $company->image_route);
+            } */
+
+            return response()->json([
+                'message' => 'Imagen de la compañía actualizada correctamente.',
+                'data' => $company
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 422);
         }
-
-        $company->update();
-        $company->refresh();
-        $company->image_route = asset(Storage::url($company->image_route));
-
-        return response()->json([
-            'message' => 'Imagen de la compañía actualizada correctamente.',
-            'data' => $company,
-        ], 200);
     }
+
 
 
     /**

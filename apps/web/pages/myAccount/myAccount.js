@@ -1,7 +1,8 @@
 import { Modal, ModalConfirmation } from "../../Util/generalsComponents.js";
+import { URL_IMAGE } from "../../Util/constantes.js";
 
 // IMPORTADOR DE FUNCIONES
-import { fetchCompany, fetchUser, updateUser, updateCompany } from "../../Services/services.js";
+import { fetchCompany, fetchUser, updateUser, updateCompany, updateCompanyLogo } from "../../Services/services.js";
 
 import { Button } from "../../components/button.js";
 
@@ -35,7 +36,7 @@ function Profile() {
         _input_secondary: { backgroundColor: "var(--mainGray)", border: "1px solid var(--secondaryPurple)" },
     }
 
-    let user = {}, company = {} 
+    let user = {}, company = {}
 
 
 
@@ -44,7 +45,7 @@ function Profile() {
         company = (await fetchCompany(1)).data;
         console.log(user);
         console.log(company);
- 
+
         m.redraw();
     }
 
@@ -89,7 +90,7 @@ function Profile() {
                 const dataToSend = company
                 console.log("dataToSend: ", dataToSend);
                 try {
-                    let response = await updateCompany(dataToSend);
+                    let response = await updateCompany(dataToSend, company.company_id);
                     console.log("Response form: ", response);
 
 
@@ -103,6 +104,7 @@ function Profile() {
                         position: "right"
                     }).showToast();
                     attrs.onClientSaved?.();
+
                 } catch (error) {
                     //console.error("Error al enviar el formulario:", error);
                     Toastify({
@@ -166,10 +168,10 @@ function Profile() {
                     }).showToast();
                 }
                 const formData = new FormData();
-                formData.append("image_route", company.logo_img); // <-- Archivo real
+                formData.append("image_route", company.logo_img);
                 console.log("Company logo ", company.logo_img);
                 try {
-                    const response = await updateCompany(formData, company.company_id); // <-- Asegúrate de pasar el ID
+                    const response = await updateCompanyLogo(formData, company.company_id);
                     console.log("Response form img: ", response);
                     Toastify({
                         text: "¡Logo actualizado!",
@@ -192,7 +194,7 @@ function Profile() {
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Logo de la Compañía"),
                     m("img", {
-                        src: company.image_preview || company.image_route  ,
+                        src: company.image_preview || `${URL_IMAGE}${company.image_route}`,
                         style: {
                             width: "300px",
                             height: "300px",
@@ -408,17 +410,7 @@ function Profile() {
                                 oninput: (e) => company.address = e.target.value
                             })
                         ]),
-                        // URL Logo
-                        m("div.col-md-12.py-3", [
-                            m("label.form-label.ps-1", "URL del Logo"),
-                            m("input.form-control", {
-                                style: { ...style._input_secondary },
-                                value: company.url_logo,
-                                required: false,
-                                type: "url",
-                                oninput: (e) => company.url_logo = e.target.value
-                            })
-                        ])
+
                     ])
                 ])
             ];
@@ -429,10 +421,6 @@ function Profile() {
                 // Botones
                 m("div.col-12.d-flex.justify-content-center.my-5", [
                     m("div.col-md-8.d-flex.justify-content-evenly", [
-                        m(Button, {
-                            closeModal: true,
-                            bclass: "btn-danger",
-                        }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
                         m(Button, {
                             type: "submit",
                             style: { backgroundColor: "var(--mainPurple)" }

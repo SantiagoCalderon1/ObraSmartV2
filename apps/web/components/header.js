@@ -1,4 +1,5 @@
 import { fetchCompany } from "../Services/services";
+import { URL_IMAGE } from "../Util/constantes.js";
 
 export function Header() {
     const MENU_ITEM = [
@@ -15,6 +16,8 @@ export function Header() {
 
     async function loadData() {
         company = (await fetchCompany(1)).data;
+        console.log(company);
+
         // acceso con company.image_route
         m.redraw();
     }
@@ -29,7 +32,7 @@ export function Header() {
                     //.d-none.d-md-block
                     m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
                         m('img', {
-                            src: company.image_route, style: { width: "75px", height: "6vh", cursor: "pointer" },
+                            src: `${URL_IMAGE}${company.image_route}`, style: { width: "75px", height: "6vh", cursor: "pointer" },
                             onclick: () => m.route.set("/home")
                         }
                         ),

@@ -1,6 +1,8 @@
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Button } from "../../components/button.js";
 import { Table } from "../../components/table.js"
+import { Card } from "../../components/card.js"
+import { EstimatesResumenCard } from "../../components/card-estimates.js"
 
 
 // IMPORTADOR DE FUNCIONES
@@ -70,18 +72,32 @@ export function EstimatesListPage() {
 
             return [
                 m("h1.py-5.text-uppercase", "Presupuestos"),
-                m(Table, {
-                    columns: columns,
-                    data: normalizedEstimates,
-                    onRowClick: onSelect
-                }, [m(Button,
-                    {
-                        type: "submit",
-                        bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                        actions: () => m.route.set("/estimates/create")
-                    },
-                    ["Crear Presupuesto"]
-                ),]),
+                m("div.container", [
+                    m("div.row", [
+                        m("div", {
+                            class: "pb-5 col-12 col-xl-9 d-flex justify-content-center align-items-center"
+                        }, [
+                            m(Table, {
+                                columns: columns,
+                                data: normalizedEstimates,
+                                onRowClick: onSelect
+                            }, [m(Button,
+                                {
+                                    type: "submit",
+                                    bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                                    actions: () => m.route.set("/estimates/create")
+                                },
+                                ["Crear Presupuesto"]
+                            ),]),
+                        ]),
+                        m("div", {
+                            class: "pb-5 col-12 col-xl-3 d-flex justify-content-center align-items-center"
+                        }, [
+                            m(Card, { title: "Resumen" }, m(EstimatesResumenCard)),
+                        ])
+                    ])
+                ]),
+
                 m(ModalDetailsComponent, {
                     estimate: selectedEstimate,
                 }),

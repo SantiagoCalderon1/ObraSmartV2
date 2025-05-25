@@ -22,11 +22,9 @@ class EstimateMaterialFactory extends Factory
      */
     public function definition(): array
     {
-
         $quantity = fake()->numberBetween(1, 50);
         $unitPrice = fake()->randomFloat(2, 1, 250);
         $discount = fake()->randomFloat(2, 1, 50);
-
         return [
             'estimate_id' => Estimate::inRandomOrder()->value('estimate_id'),
             'material_id' => Material::inRandomOrder()->value('material_id'),

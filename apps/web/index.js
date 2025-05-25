@@ -40,14 +40,12 @@ async function Logout() {
 function authGuard() {
     return {
         isAuthenticated: false,
-        loading: true,
-        oninit: async function () {
+         oninit: async function () {
             try {
                 const data = await request("GET", URL_AUTH) // aquí ya manejamos token + redirección
                 if (data) { this.isAuthenticated = true }
             } finally {
-                this.loading = false
-                m.redraw()
+                
             }
         },
         view: function ({ children }) {

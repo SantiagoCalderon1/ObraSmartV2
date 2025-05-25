@@ -9,38 +9,20 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://components.digitalvalue.es/lib/mithril.min.js"></script>
 
-    <style>
-        body {
-            padding: 20px;
-            background-color: white;
-        }
-
-        .card {
-            margin-bottom: 20px;
-        }
-
-        .table th,
-        .table td {
-            font-size: 0.875rem;
-        }
-
-        .btn-primary {
-            margin-bottom: 20px;
-        }
-
-        .page-break {
-            page-break-before: always;
-        }
-    </style>
+    <script type="module" src="prueba.js" defer></script>
 </head>
 
+</body>
+
+</html>
+
+<!--   <script>
 <body>
-    <script>
-        const PresupuestoView = {
-            view: () =>
-                m("div.container.col-10", [
-                    m("button.btn.btn-primary.p-3", { onclick: generatePDF }, "Descargar PDF"),
-                    m("div#pdf-content.bg-white.px-4.rounded.shadow", [
+    const PresupuestoView = {
+        view: () =>
+        m("div.container.col-10", [
+        m("button.btn.btn-primary.p-3", { onclick: generatePDF }, "Descargar PDF"),
+        m("div#pdf-content.bg-white.px-4.rounded.shadow", [
 
                         // Encabezado
                         m("div.row", [
@@ -297,7 +279,4 @@
 
         m.mount(document.body, PresupuestoView);
         populateData();
-    </script>
-</body>
-
-</html>
+    </script> -->

@@ -31,3 +31,17 @@ export async function request(method, url, body = null, routeSet = true) {
 export const filterList = (list, keyword) => list.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(keyword?.toLowerCase())))
 
 
+export function generateLastMonths(numMonths = 6) {
+    const now = new Date();
+    const months = [];
+
+    for (let i = numMonths - 1; i >= 0; i--) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        months.push({
+            year: date.getFullYear(),
+            month: date.getMonth(),
+            label: date.toLocaleString('default', { month: 'short' })
+        });
+    }
+    return months;
+};

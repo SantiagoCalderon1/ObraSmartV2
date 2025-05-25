@@ -20,11 +20,14 @@ class InvoiceFactory extends Factory
      */
     public function definition(): array
     {
+        // Generar una fecha aleatoria entre hoy y hace 5 meses
+        $issueDate = fake()->dateTimeBetween('-5 months', 'now');
+
         return [
             'invoice_number' => fake()->unique()->numerify('INV-#####'),
             'estimate_id' => Estimate::inRandomOrder()->value('estimate_id'),
-            'issue_date' => fake()->date(),
-            'due_date' => fake()->dateTimeBetween('now', '+1 month')->format('Y-m-d'),
+            'issue_date' => $issueDate->format('Y-m-d'),
+            'due_date' => $issueDate->modify('+6 months')->format('Y-m-d'),
             'total_amount' => fake()->randomFloat(2, 100, 5000),
             'status' => fake()->randomElement(['pagado', 'pendiente', 'rechazado']),
             'pdf_url' => fake()->optional()->url(),

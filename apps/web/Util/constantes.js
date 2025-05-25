@@ -20,6 +20,7 @@ export const URL_CLIENTS = `${import.meta.env.VITE_API_URL}/api/clients`;
 // Usuarios
 export const URL_USERS = `${import.meta.env.VITE_API_URL}/api/users`;
 export const URL_COMPANY = `${import.meta.env.VITE_API_URL}/api/companies`;
+export const URL_COMPANY_LOGO = `${import.meta.env.VITE_API_URL}/api/companies-logo`;
 
 
 // Proyectos
@@ -41,6 +42,8 @@ const URL_ESTIMATE_LABOR = `${import.meta.env.VITE_API_URL}/api/estimate-labor`
 export const URL_INVOICES = `${import.meta.env.VITE_API_URL}/api/invoices`
 export const URL_PAYMENTS = `${import.meta.env.VITE_API_URL}/api/payments`
 
+
+export const URL_IMAGE = `${import.meta.env.VITE_API_URL}/storage/`
 
 
 

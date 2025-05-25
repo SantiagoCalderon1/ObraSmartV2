@@ -10,7 +10,8 @@ import {
     URL_AUTH,
     URL_USER,
     URL_COMPANY,
-    URL_STOCK_MOVEMENTS
+    URL_STOCK_MOVEMENTS,
+    URL_COMPANY_LOGO
 } from "../Util/constantes.js"
 
 // IMPORTADOR DE FUNCIONES
@@ -164,6 +165,9 @@ export async function updatePayment(body, id) { // update
 
 export async function updateUser(body, id) { // update
     return await request("PATCH", `${URL_USER}/${id}`, body);
+}
+export async function updateCompanyLogo(body, id) { // update
+    return await request("POST", `${URL_COMPANY_LOGO}/${id}`, body);
 }
 
 export async function updateCompany(body, id) { // update
