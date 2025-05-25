@@ -114,7 +114,7 @@ Route::middleware([IsUserAuth::class])->group(function () {
         Route::get('/invoices', 'index');
         Route::post('/invoices', 'store');
         Route::get('/invoices/{invoice}', 'show');
-        Route::put('/invoices/{invoice}', 'update');  
+        Route::put('/invoices/{invoice}', 'update');
         Route::patch('/invoices/{invoice}', 'update');
         Route::delete('/invoices/{invoice}', 'destroy');
     });
@@ -127,7 +127,6 @@ Route::middleware([IsUserAuth::class])->group(function () {
             Route::post('/companies', 'store');
             Route::get('/companies/{company}', 'show');
             Route::put('/companies/{company}', 'update');
-            Route::patch('/companies/{company}', 'updateData');
             Route::patch('/companies-logo/{company}', 'updateLogo');
             Route::delete('/companies/{company}', 'destroy');
         });

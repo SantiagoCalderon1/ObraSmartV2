@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-
+use Illuminate\Support\Facades\Validator;
 
 class CompanyController extends Controller
 {
@@ -51,10 +51,8 @@ class CompanyController extends Controller
             'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
         ]);
 
-        if ($request->hasFile('image_route')) {
-            $rutaImg = $request->file('image_route')->store('uploads');
-            $validated['image_route'] = $rutaImg;
-        }
+        $rutaImg = $request->file('image_route')->store('uploads');
+        $validated['image_route'] = $rutaImg;
 
         $company = Company::create($validated);
 
@@ -85,7 +83,7 @@ class CompanyController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateData(Request $request, Company $company)
+    public function update(Request $request, Company $company)
     {
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
@@ -97,6 +95,7 @@ class CompanyController extends Controller
 
         $company->update($validated);
         $company->refresh();
+        $company->image_route = asset(Storage::url($company->image_route));
 
         return response()->json([
             'message' => 'Datos de la compañía actualizados correctamente.',
@@ -106,21 +105,27 @@ class CompanyController extends Controller
 
     public function updateImage(Request $request, Company $company)
     {
-        $request->validate([
-            'image_route' => 'required|image|mimes:jpeg,png,jpg,webp',
+        $validator = Validator::make($request->all(), [
+            'image_route' => 'nullable|mimes:png,jpeg,jpg|max:4096'
         ]);
 
-        // Eliminar imagen anterior si existe
-        if ($company->image_route && Storage::exists($company->image_route)) {
-            Storage::delete($company->image_route);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()], 422);
         }
 
-        // Subir nueva imagen
-        $rutaImg = $request->file('image_route')->store('uploads');
+        if ($request->hasFile('image_route')) {
+            // Eliminar imagen anterior si existe
+            if ($company->image_route && Storage::exists($company->image_route)) {
+                Storage::delete($company->image_route);
+            }
+            // Subir nueva imagen
+            $rutaImg = $request->file('image_route')->store('uploads');
+            $company->image_route = $rutaImg;
+        }
 
-        $company->image_route = $rutaImg;
         $company->update();
         $company->refresh();
+        $company->image_route = asset(Storage::url($company->image_route));
 
         return response()->json([
             'message' => 'Imagen de la compañía actualizada correctamente.',
