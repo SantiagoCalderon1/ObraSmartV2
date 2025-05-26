@@ -1,15 +1,7 @@
-import { fetchInvoices } from "../Services/services.js"
-
-
 export function InvoicesResumenCard() {
-    let invoices = []
     return {
-        oncreate: async function () {
-            invoices = (await fetchInvoices()).data || []
-            console.log("invoices", invoices);
-            m.redraw()
-        },
-        view: function () {
+        view: function ({ attrs }) {
+            const { invoices } = attrs
             const now = new Date()
 
             const a = inv => inv.status === "pagado"

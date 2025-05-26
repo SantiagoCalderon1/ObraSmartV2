@@ -1,5 +1,7 @@
 // IMPORTADOR DE CONSTANTES
 import { URL_LOGOUT, URL_AUTH } from "./Util/constantes.js"
+import { authState } from "./lib/auth.js";
+
 
 // IMPORTADOR DE FUNCIONES
 import { request } from "./Util/util.js";
@@ -39,27 +41,50 @@ async function Logout() {
 // Función para proteger rutas con Bearer Token
 function authGuard() {
     return {
-        isAuthenticated: false,
-         oninit: async function () {
-            try {
-                const data = await request("GET", URL_AUTH) // aquí ya manejamos token + redirección
-                if (data) { this.isAuthenticated = true }
-            } finally {
-                
+        oninit: async function () {
+            if (!authState.checked) {
+                try {
+                    const data = await request("GET", URL_AUTH);
+                    if (data) {
+                        authState.authenticated = true;
+                    }
+                } catch (_) {
+                    authState.authenticated = false;
+                } finally {
+                    authState.checked = true;
+                    m.redraw();
+                }
             }
         },
         view: function ({ children }) {
+            if (!authState.checked) {
+                return m("div.d-flex.justify-content-center.align-items-center", {
+                    style: { height: "100vh" }
+                }, m("div.spinner-border", { role: "status" }));
+            }
+
+            if (!authState.authenticated) {
+                return m(LoginPage);
+            }
 
             return m("div", {
                 id: "container-app",
-                style: { display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", width: "100%", height: "100%" }
+                style: {
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexDirection: "column",
+                    width: "100%",
+                    height: "100%"
+                }
             }, [
-                this.isAuthenticated ? m("header", { id: "header" }, m(Header)) : null,
-                m("main", { id: "app", style: { paddingTop: this.isAuthenticated ? "7.5vh" : "" } }, children),
+                m(Header),
+                m("main", { id: "app", style: { paddingTop: "7.5vh" } }, children),
             ]);
         }
     }
 }
+
 
 
 // Definimos las rutas
@@ -68,9 +93,7 @@ const routes = {
     '/login': { view: () => m(LoginPage) },
     //'/register': { view: () => m(RegisterPage) },
 
-    // Rutas protegidas (Solo accesibles si se está autenticado)
-
-
+    // Rutas protegidas  
     '/logout': { view: () => { Logout(); m(LoginPage) } },
     '/home': { view: () => m(authGuard, m(HomePage)) },
 
@@ -100,4 +123,4 @@ const routes = {
 }
 
 // Montamos en app y actualizamos el layout
-m.route(document.getElementById("app"), "/login", routes);
+m.route(document.body, "/login", routes);

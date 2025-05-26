@@ -38,8 +38,6 @@ function Profile() {
 
     let user = {}, company = {}
 
-
-
     async function loadData() {
         user = (await fetchUser()).user;
         company = (await fetchCompany(1)).data;
@@ -410,7 +408,6 @@ function Profile() {
                                 oninput: (e) => company.address = e.target.value
                             })
                         ]),
-
                     ])
                 ])
             ];
@@ -429,113 +426,76 @@ function Profile() {
                 ]),
             ]
 
-            return m("div", { class: "col-11 d-flex flex-column justify-content-center" }, [
-                m("h1.py-5.text-uppercase.text-center", "configuración de Mi perfil"),
-                m("div", {
-                    class: "col-12 p-3 rounded",
-                    style: { backgroundColor: "var(--mainWhite)", boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)" }
-                }, [
-                    m("div.accordion.accordion-flush", { id: "accordionProfile" }, [
-                        // Your Photo
-                        m("div.accordion-item", [
-                            m("h2.accordion-header", { id: "headingOne" }, [
-                                m("button.accordion-button", {
+            function AccordionSection() {
+                return {
+                    view: function ({ attrs }) {
+                        const { id, title, expanded, formHandler, content } = attrs
+                        return m("div.accordion-item", [
+                            m("h2.accordion-header", { id: `heading-${id}` }, [
+                                m("button.accordion-button" + (expanded ? "" : ".collapsed"), {
                                     type: "button",
                                     "data-bs-toggle": "collapse",
-                                    "data-bs-target": "#collapseOne",
-                                    "aria-expanded": "true",
-                                    "aria-controls": "collapseOne"
-                                }, "Tu Foto")
+                                    "data-bs-target": `#collapse-${id}`,
+                                    "aria-expanded": expanded ? "true" : "false",
+                                    "aria-controls": `collapse-${id}`
+                                }, title)
                             ]),
-                            m("div.accordion-collapse collapse show", {
-                                id: "collapseOne",
-                                "aria-labelledby": "headingOne",
+                            m("div.accordion-collapse.collapse" + (expanded ? ".show" : ""), {
+                                id: `collapse-${id}`,
+                                "aria-labelledby": `heading-${id}`,
                                 "data-bs-parent": "#accordionProfile"
                             }, [
                                 m("form", {
                                     class: "d-flex align-items-center justify-content-center flex-column pt-5",
-                                    onsubmit: handleLogoSubmit,
+                                    onsubmit: formHandler
                                 }, [
-                                    CompanyLogo(),
-                                    Botones()
-                                ])
-                            ])
-                        ]),
-                        // General Information
-                        m("div.accordion-item", [
-                            m("h2.accordion-header", { id: "headingTwo" }, [
-                                m("button.accordion-button collapsed", {
-                                    type: "button",
-                                    "data-bs-toggle": "collapse",
-                                    "data-bs-target": "#collapseTwo",
-                                    "aria-expanded": "false",
-                                    "aria-controls": "collapseTwo"
-                                }, "Información General")
-                            ]),
-                            m("div.accordion-collapse collapse", {
-                                id: "collapseTwo",
-                                "aria-labelledby": "headingTwo",
-                                "data-bs-parent": "#accordionProfile"
-                            }, [
-                                m("form", {
-                                    class: "d-flex align-items-center justify-content-center flex-column pt-5",
-                                    onsubmit: handleFormSubmit,
-                                }, [
-                                    GeneralInformation(),
-                                    Botones()
-                                ])
-                            ])
-                        ]),
-                        // General Information
-                        m("div.accordion-item", [
-                            m("h2.accordion-header", { id: "headingTwo" }, [
-                                m("button.accordion-button collapsed", {
-                                    type: "button",
-                                    "data-bs-toggle": "collapse",
-                                    "data-bs-target": "#collapseThree",
-                                    "aria-expanded": "false",
-                                    "aria-controls": "collapseThree"
-                                }, "Información de la compañía")
-                            ]),
-                            m("div.accordion-collapse collapse", {
-                                id: "collapseThree",
-                                "aria-labelledby": "headingThree",
-                                "data-bs-parent": "#accordionProfile"
-                            }, [
-                                m("form", {
-                                    class: "d-flex align-items-center justify-content-center flex-column pt-5",
-                                    onsubmit: handleCompanyFormSubmit,
-                                }, [
-                                    CompanyInformation(),
-                                    Botones()
-                                ])
-                            ])
-                        ]),
-                        // Reset Password
-                        m("div.accordion-item", [
-                            m("h2.accordion-header", { id: "headingFour" }, [
-                                m("button.accordion-button collapsed", {
-                                    type: "button",
-                                    "data-bs-toggle": "collapse",
-                                    "data-bs-target": "#collapseFour",
-                                    "aria-expanded": "false",
-                                    "aria-controls": "collapseFour"
-                                }, "Cambiar Contraseña")
-                            ]),
-                            m("div.accordion-collapse collapse", {
-                                id: "collapseFour",
-                                "aria-labelledby": "headingFour",
-                                "data-bs-parent": "#accordionProfile"
-                            }, [
-                                m("form", {
-                                    class: "d-flex align-items-center justify-content-center flex-column pt-5",
-                                    onsubmit: handleFormResetPassword,
-                                }, [
-                                    ResetPassword(),
+                                    content,
                                     Botones()
                                 ])
                             ])
                         ])
+                    }
+                }
+            }
+
+
+            return m("div", { class: "col-11 d-flex flex-column justify-content-center" }, [
+                m("h1.py-5.text-uppercase.text-center", "configuración de la cuenta"),
+                m("div", {
+                    class: "col-12 p-3 rounded",
+                    style: {
+                        backgroundColor: "var(--mainWhite)",
+                        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)"
+                    }
+                }, [
+                    m("div.accordion.accordion-flush", { id: "accordionProfile" }, [
+                        m(AccordionSection, {
+                            id: "info-general",
+                            title: "Información General",
+                            expanded: true,
+                            formHandler: handleFormSubmit,
+                            content: GeneralInformation()
+                        }),
+                        m(AccordionSection, {
+                            id: "password",
+                            title: "Cambiar Contraseña",
+                            formHandler: handleFormResetPassword,
+                            content: ResetPassword()
+                        }),
+
+                        user && user?.role == "admin" && [
+                            m(AccordionSection, {
+                                id: "logo",
+                                title: "Logo",
+                                formHandler: handleLogoSubmit,
+                                content: CompanyLogo()
+                            }),
+                            m(AccordionSection, {
+                                id: "compania",
+                                title: "Información de la compañía",
+                                formHandler: handleCompanyFormSubmit,
+                                content: CompanyInformation()
+                            }),],
                     ])
                 ])
             ])

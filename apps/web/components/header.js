@@ -1,6 +1,3 @@
-import { fetchCompany } from "../Services/services";
-import { URL_IMAGE } from "../Util/constantes.js";
-
 export function Header() {
     const MENU_ITEM = [
         { label: "Presupuestos", route: "/estimates", icon: "fa-file-signature" },
@@ -9,21 +6,10 @@ export function Header() {
         { label: "Materiales", route: "/materials", icon: "fa-shapes" },
         { label: "Proyectos", route: "/projects", icon: "fa-hammer" },
         { label: "Mi Cuenta", route: "/my-account", icon: "fa-circle-user" },
-        { label: "Cerrar Sesión", route: "/logout", icon: "fa-arrow-right-from-bracket", },
+        { route: "/logout", icon: "fa-arrow-right-from-bracket", },
     ]
 
-    let company = {}
-
-    async function loadData() {
-        company = (await fetchCompany(1)).data;
-        console.log(company);
-
-        // acceso con company.image_route
-        m.redraw();
-    }
-
     return {
-        oncreate: loadData,
         view: function () {
             return m('header.navbar.bg-light.fixed-top', {
                 style: { height: "7.5vh", width: "100%", boxShadow: "0px 10px 50px rgba(0, 0, 0, 0.2)", }
@@ -32,12 +18,12 @@ export function Header() {
                     //.d-none.d-md-block
                     m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
                         m('img', {
-                            src: `${URL_IMAGE}${company.image_route}`, style: { width: "75px", height: "6vh", cursor: "pointer" },
+                            src: `/dist/logosObraSmart/logo-1.png`, style: { width: "75px", height: "6vh", cursor: "pointer" },
                             onclick: () => m.route.set("/home")
                         }
                         ),
                         m(MainMenuItems, { items: MENU_ITEM }),
-                        m('button.navbar-toggler.d-block.d-lg-none', {
+                        m('button.navbar-toggler.d-block.d-xl-none', {
                             type: 'button',
                             'data-bs-toggle': 'offcanvas',
                             'data-bs-target': '#offcanvasNavbar',
@@ -88,14 +74,14 @@ export function Header() {
     function MainMenuItems() {
         return {
             view: function ({ attrs }) {
-                return m("ul.d-none.d-lg-flex.justify-content-center", { style: { maxWidth: "1200px", gap: "1.5rem", padding: "0", margin: "0", whiteSpace: "nowrap" } }, [
-                    attrs.items.map(({ label, route }) =>
+                return m("ul.d-none.d-xl-flex.justify-content-center", { style: { maxWidth: "1200px", gap: "2rem", padding: "0", margin: "0", whiteSpace: "nowrap" } }, [
+                    attrs.items.map(({ label, route, icon }, index) =>
                         m('li', {
-                            style: { width: "100%", textAlign: "center", listStyle: "none", fontWeight: "600", fontSize: "1.25rem" },
+                            style: { width: "100%", textAlign: "center", listStyle: "none", fontWeight: "600", fontSize: "1.25rem", padding: index == (attrs.items.length - 1) ? "0px 50px" : "" },
                             onmouseenter: function (e) { e.target.style.fontWeight = "900"; },
                             onmouseleave: function (e) { e.target.style.fontWeight = "600"; },
                         },
-                            m(m.route.Link, { href: route, style: { textDecoration: "none", color: "var(--secondaryBlack)" }, }, label)
+                            m(m.route.Link, { href: route, style: { textDecoration: "none", color: "var(--secondaryBlack)" }, }, label ? label : m('i.fa', { class: icon, style: { fontSize: "1.75rem" } }))
                         )
                     )
                 ])

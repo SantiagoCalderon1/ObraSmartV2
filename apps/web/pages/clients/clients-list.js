@@ -4,6 +4,8 @@ import { Button } from "../../components/button.js";
 
 // IMPORTADOR DE FUNCIONES
 import { fetchClients, updateClient, createClient, deleteClient } from "../../Services/services.js";
+import { SpinnerLoading } from "../../components/spinner-loading.js";
+import { TableModal } from "../../components/table-modal.js";
 
 export function ClientsListPage() {
     let clients = [];
@@ -11,13 +13,10 @@ export function ClientsListPage() {
 
     async function loadClients() {
         clients = (await fetchClients()).data;
-        //console.log(clients);
         m.redraw();
     }
-
     return {
         oncreate: loadClients,
-        //onupdate: loadClients,
         view: function () {
             const onSelect = (client) => {
                 selectedClient = client;
@@ -45,42 +44,36 @@ export function ClientsListPage() {
                 index: i + 1,
             }));
 
-
-            if (clients.length === 0) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ]);
-            }
+            if (clients.length === 0) { return m(SpinnerLoading) }
 
             return [
                 m("h1.py-5.text-uppercase", "Clientes"),
-                m(Table, {
-                    columns: columns,
-                    data: normalizedClients,
-                    onRowClick: onSelect
-                }, [m(Button,
-                    {
-                        type: "submit",
-                        bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                        actions: () => {
-                            selectedClient = null;
-                            //m.route.set("/clients/create")
-                            new bootstrap.Modal(document.getElementById("ModalFormClient")).show();
-                            m.redraw();
-                        }
-                    },
-                    ["Crear Cliente"]
-                ),]),
+                m("div.col-10.d-flex.justify-content-center.align-items-center", [
+                    m(Table, {
+                        columns: columns,
+                        data: normalizedClients,
+                        onRowClick: onSelect,
+                        style: { height: "70vh", width: "100%" }
+                    }, [m(Button,
+                        {
+                            type: "submit",
+                            bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                            actions: () => {
+                                selectedClient = null;
+                                new bootstrap.Modal(document.getElementById("ModalFormClient")).show();
+                                m.redraw();
+                            }
+                        },
+                        ["Crear Cliente"]
+                    ),]),
+                ]),
                 m(ModalDetailsComponent, {
                     selectedClient: selectedClient,
                 }),
                 m(ModalFormComponent, {
                     selectedClient: selectedClient,
                     onClientSaved: loadClients
-                }
-                ),
+                }),
                 m(ModalConfirmation, {
                     idModal: "ModalDeleteClient",
                     tituloModal: "Confirmación de eliminación",
@@ -109,7 +102,6 @@ function ModalDetailsComponent() {
 
             const columnsProyects = [
                 { title: "#", field: "index" },
-
                 { title: "Nombre", field: "name" },
                 {
                     title: "Estado", field: "status", style: (item) => ({
@@ -122,49 +114,10 @@ function ModalDetailsComponent() {
                 { title: "Fecha de finalización", field: "end_date" },
             ];
 
-
             const normalizedProjects = (selectedClient?.projects || []).map((m, i) => ({
                 ...m,
                 index: i + 1,
-
             }))
-
-
-            // Tabla reusable
-            const Table = ({ columns, data }) =>
-                m("div.table-responsive", {
-                    style: {
-                        maxHeight: "50vh",
-                    }
-                },
-                    [
-                        m("table", { class: "table table-hover table-striped" }, [
-                            m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
-                                m("tr", [
-                                    ...columns.map(col =>
-                                        m("th.text-nowrap.px-4.py-3", col.title))
-                                ])
-                            ]),
-                            m("tbody", [
-                                data.length > 0
-                                    ? data.map(item =>
-                                        m("tr", [
-                                            ...columns.map(col =>
-                                                m(`td.px-4`, {
-                                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                                }, [
-                                                    item?.[col.field] || "N/A",
-                                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                                ])
-                                            )
-                                        ])
-                                    )
-                                    : m("tr.text-center", m(`td[colspan=${columns.length + 1}]`, "No hay datos disponibles"))
-                            ])
-                        ])
-                    ]);
-
-
 
             // Header con botones
             const ContentHeaderModal = () => [
@@ -181,8 +134,6 @@ function ModalDetailsComponent() {
                     closeModal: true,
                     bclass: "btn-warning",
                     actions: () => {
-                        //m.route.set(`/clients/update/${selectedClient.nif}`)
-                        //m.route.set("/clients/create")
                         new bootstrap.Modal(document.getElementById("ModalFormClient")).show();
                         m.redraw();
                     }
@@ -194,32 +145,14 @@ function ModalDetailsComponent() {
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
-                m("div", {
-                    style: {
-                        maxHeight: "60vh",
-                        overflowY: "auto",
-                        padding: "1rem"
-                    }
-                }, [
+                m("div", { style: { maxHeight: "60vh", overflowY: "auto", padding: "1rem" } }, [
                     m("h5.mt-1", "Detalles"),
-                    Table({ columns: columnsClient, data: [selectedClient] }),
+                    m(TableModal, { columns: columnsClient, data: [selectedClient] }),
                     m("hr"),
                     m("h5.mt-3", "Proyectos"),
-                    Table({ columns: columnsProyects, data: normalizedProjects }),
+                    m(TableModal, { columns: columnsProyects, data: normalizedProjects }),
                 ]);
 
-            // Footer con botón de PDF
-            const ContentFooterModal = () => [
-                m(Button, {
-                    //actions: () => GeneratePDF(estimate),
-                    bclass: "btn-outline-danger"
-                }, [
-                    "Descargar PDF ",
-                    m("i.fa-solid.fa-file-pdf.text-danger")
-                ]),
-            ]
-
-            // Render del modal
             return m(Modal, {
                 idModal: "ModalDetailsClientsList",
                 title: `Cliente con NIF ${selectedClient?.nif}`,
@@ -227,13 +160,11 @@ function ModalDetailsComponent() {
                 slots: {
                     header: ContentHeaderModal(),
                     body: ContentBodyModal(),
-                    //footer: ContentFooterModal()
                 }
             });
         }
     };
 }
-
 
 function ModalFormComponent() {
     let style = {
@@ -260,6 +191,7 @@ function ModalFormComponent() {
         selectedClient: null
     }
 
+    let formElement
 
     return {
         oninit: ({ attrs }) => {
@@ -270,19 +202,12 @@ function ModalFormComponent() {
             if (attrs.selectedClient !== state.selectedClient) {
                 state.selectedClient = attrs.selectedClient;
                 state.ClientData = ClientData(state.selectedClient || {});
-                //console.log("state.selectedClient: ", state.selectedClient);
             }
         },
-
         view: function ({ attrs }) {
 
-
-            const handleFormSubmit = async (e) => {
-                e.preventDefault()
+            const handleFormSubmit = async () => {
                 const dataToSend = state.ClientData
-                //console.log("dataToSend: ", dataToSend);
-                //console.log("Se envió");
-
                 try {
                     let response;
                     if (!!state.selectedClient) {
@@ -290,7 +215,6 @@ function ModalFormComponent() {
                     } else {
                         response = await createClient(dataToSend);
                     }
-                    //console.log("Response form: ", response)
 
                     const modalElement = document.getElementById("ModalFormClient");
                     if (modalElement) {
@@ -299,18 +223,17 @@ function ModalFormComponent() {
                         modalInstance.hide();
                     }
 
-                    Toastify({
-                        text: "¡Operación exitosa!",
-                        className: "toastify-success",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right"
-                    }).showToast()
-                    attrs.onClientSaved?.(); // Llama al callback si existe
-
+                    if (response) {
+                        Toastify({
+                            text: "¡Operación exitosa!",
+                            className: "toastify-success",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right"
+                        }).showToast()
+                    }
                 } catch (error) {
-                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -320,17 +243,24 @@ function ModalFormComponent() {
                         position: "right"
                     }).showToast()
                 } finally {
+                    attrs.onClientSaved?.(); // Llama al callback si existe
                     m.redraw()
+                    state.ClientData = ClientData()
                 }
             }
+
             const ContentBodyModal = () =>
                 m("form", {
                     class: "row col-12",
-                    onsubmit: handleFormSubmit
+                    onsubmit: handleFormSubmit,
+                    oncreate: ({ dom }) => {
+                        formElement = dom
+                    }
                 }, [
                     [m("span", { class: "fw-semibold text-uppercase fs-3 py-3" }, "Datos del cliente"),
                     m("div", { class: "row py-3 px-0 m-0 d-flex justify-content-between" }, [
                         m("div", { class: "row" }, [
+                            // Nombre
                             m("div", { class: "col-md-12 col-lg-6 pt-2" }, [
                                 m("label.form-label.ps-1", `Nombre *`),
                                 m("input.form-control", {
@@ -339,7 +269,6 @@ function ModalFormComponent() {
                                     type: "text",
                                     required: true,
                                     oninput: (e) => state.ClientData.name = e.target.value
-
                                 })
                             ]),
                             // NIF
@@ -351,10 +280,9 @@ function ModalFormComponent() {
                                     type: "text",
                                     required: true,
                                     oninput: (e) => state.ClientData.nif = e.target.value
-
-
                                 })
                             ]),
+                            // Espacio en blanco
                             m("div.col-md-12.col-lg-3.pt-2"),
                             // PHone
                             m("div.col-md-12.col-lg-3.pt-2", [
@@ -365,7 +293,6 @@ function ModalFormComponent() {
                                     type: "text",
                                     required: true,
                                     oninput: (e) => state.ClientData.phone = e.target.value
-
                                 })
                             ]),
                             // Email
@@ -374,10 +301,9 @@ function ModalFormComponent() {
                                 m("input.form-control", {
                                     style: { ...style._input_main },
                                     value: state.ClientData.email,
-                                    type: "text",
+                                    type: "email",
                                     required: true,
                                     oninput: (e) => state.ClientData.email = e.target.value
-
                                 })
                             ]),
                             // address
@@ -389,7 +315,6 @@ function ModalFormComponent() {
                                     type: "text",
                                     required: true,
                                     oninput: (e) => state.ClientData.address = e.target.value
-
                                 })
                             ]),
                         ]),
@@ -399,6 +324,10 @@ function ModalFormComponent() {
                                 m(Button, {
                                     closeModal: true,
                                     bclass: "btn-danger",
+                                    actions: () => {
+                                        state.ClientData = ClientData()
+                                        m.redraw()
+                                    }
                                 }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
                                 m(Button, {
                                     type: "submit",
@@ -414,18 +343,14 @@ function ModalFormComponent() {
                                 }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
                             ])
                         ])
-
                     ])]])
 
-            // Render del modal
             return m(Modal, {
                 idModal: "ModalFormClient",
                 title: state.selectedClient?.nif ? `Actualizando el cliente` : `Creando Nuevo Cliente`,
                 addBtnClose: false,
                 slots: {
-                    //header: ContentHeaderModal(),
                     body: ContentBodyModal(),
-                    //footer: ContentFooterModal()
                 }
             });
         }

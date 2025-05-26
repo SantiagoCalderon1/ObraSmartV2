@@ -134,11 +134,10 @@ class UserController
     // ================================== Métodos comunes para todos los usuarios ====================================
 
     /**
-     * Reset the password of a user (only for admins).
+     * Reset the password of a user  
      */
     public function updatePassword(Request $request)
     {
-        // Obtén al usuario autenticado
         $user = Auth::user();
 
         // Verifica si el usuario existe (aunque en este caso debería estar autenticado, pero es bueno verificarlo)
@@ -146,7 +145,6 @@ class UserController
             return response()->json(['message' => 'Usuario no autenticado.'], 401);
         }
 
-        // Valida los campos que se requieren
         $request->validate([
             'old_password' => 'required|string',
             'new_password' => 'required|string|min:6|confirmed', // Nueva contraseña y confirmación de la nueva contraseña
@@ -159,12 +157,11 @@ class UserController
             ], 403);
         }
 
-        // Si la contraseña antigua es correcta, actualiza la nueva contraseña
         $user->password = bcrypt($request->get('new_password')); // Ciframos la nueva contraseña
 
         $user = User::where('id', $user->id)->first();
         $user->password = bcrypt($request->get('new_password'));
-        $user->save(); 
+        $user->save();
 
         return response()->json([
             'message' => 'Contraseña actualizada correctamente.',

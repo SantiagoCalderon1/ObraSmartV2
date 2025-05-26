@@ -1,9 +1,7 @@
-import Choices from 'choices.js';
-
-
+import Choices from 'choices.js'
 
 import { ModalConfirmation } from "../../components/modal.js"
-import { Button } from "../../components/button.js";
+import { Button } from "../../components/button.js"
 
 // IMPORTADOR DE FUNCIONES
 import {
@@ -23,7 +21,6 @@ export function EstimateFormPage() {
             const { type, estimate_number } = attrs
             const isUpdate = type === "update"
             const title = isUpdate ? `Actualizando el Presupuesto #${estimate_number}` : "Creando Nuevo Presupuesto"
-
             return [
                 m("h1.text-center.fw-semibold.text-uppercase", { style: { padding: "2rem 1rem", textTransform: "uppercase" } }, title),
                 m(EstimateFormComponent, {
@@ -139,15 +136,50 @@ function EstimateFormComponent() {
         }
     }
 
-    const handleFormSubmit = async (e) => {
+    const handleFormSubmit = async (e, type) => {
+        const isUpdate = type === "update"
         e.preventDefault()
         const dataToSend = collectFormData()
         console.log(dataToSend);
-        
+
 
         try {
             state.isLoading = true
-            const isUpdate = !!state.selectedEstimate
+
+            const { client_id, project_id } = state.estimateData;
+
+            const tieneCliente = !!client_id;
+            const tieneProjecto = !!project_id;
+
+            const tieneMaterials = Array.isArray(state.estimateMaterialData) &&
+                state.estimateMaterialData.some(m => !!m.material_id);
+
+            const tieneServicios = Array.isArray(state.estimateLaborsData) &&
+                state.estimateLaborsData.some(l => !!l.labor_type_id);
+
+            if (!tieneCliente || !tieneProjecto) {
+                Toastify({
+                    text: "Debes seleccionar un cliente y un proyecto.",
+                    className: "toastify-error",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right"
+                }).showToast();
+                return;
+            }
+
+            if (!tieneMaterials && !tieneServicios) {
+                Toastify({
+                    text: "Debes agregar al menos un material o un servicio.",
+                    className: "toastify-error",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right"
+                }).showToast();
+                return;
+            }
             const data = isUpdate
                 ? await updateEstimate(dataToSend, state.selectedEstimate.estimate_number)
                 : await createEstimate(dataToSend)
@@ -158,18 +190,19 @@ function EstimateFormComponent() {
                 state.estimateMaterialData = [estimateMaterialData()]
                 state.estimateLaborsData = [estimateLaborsData()]
             }
-
-            Toastify({
-                text: "¡Operación exitosa!",
-                className: "toastify-success",
-                duration: 3000,
-                close: true,
-                gravity: "top",
-                position: "right"
-            }).showToast()
-
-            m.route.set("/estimates")
+            if (data) {
+                Toastify({
+                    text: "¡Operación exitosa!",
+                    className: "toastify-success",
+                    duration: 3000,
+                    close: true,
+                    gravity: "top",
+                    position: "right"
+                }).showToast()
+                m.route.set("/estimates")
+            }
         } catch (error) {
+            console.error(error)
             Toastify({
                 text: "¡Algo salió mal!",
                 className: "toastify-error",
@@ -180,11 +213,10 @@ function EstimateFormComponent() {
             }).showToast()
         } finally {
             state.isLoading = false
+            m.redraw()
         }
     }
 
-    // funcion para filtar las listas con los datos del input de filtrado
-    const filterList = (list, keyword) => list.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(keyword.toLowerCase())))
 
     function updateConceptSubtotal(item) {
         const price = Number(item.unit_price ?? item.cost_per_hour) || 0
@@ -205,12 +237,12 @@ function EstimateFormComponent() {
     const getSubtotal = () => {
         const materialSubtotal = state.estimateMaterialData.reduce(
             (acc, item) => acc + parseFloat(item.total_price || 0), 0
-        );
+        )
         const laborSubtotal = state.estimateLaborsData.reduce(
             (acc, item) => acc + parseFloat(item.total_cost || 0), 0
-        );
-        return Number(materialSubtotal + laborSubtotal).toFixed(2);
-    };
+        )
+        return Number(materialSubtotal + laborSubtotal).toFixed(2)
+    }
 
     // Funcion que obtiene el total con el iva ya aplicado
     const getTotal = () => {
@@ -227,7 +259,7 @@ function EstimateFormComponent() {
             state.laborTypes = (await fetchLaborTypes()).data
             // Solo si es modo edición (update)
             if (estimate_number) {
-                const selected = (await fetchEstimate(estimate_number)).data;
+                const selected = (await fetchEstimate(estimate_number)).data
                 state.selectedEstimate = selected
 
                 // Estimate
@@ -268,7 +300,7 @@ function EstimateFormComponent() {
                         description: item.description,
                         //concept: item.labor_type?.name || "", opcional para mostrar en UI
                     })
-                ) || [];
+                ) || []
 
             }
             m.redraw()
@@ -278,11 +310,11 @@ function EstimateFormComponent() {
     }
 
     function validarStockMaterial(item) {
-        const selected = state.materials.find(mat => mat.material_id == item.material_id);
-        if (!selected) return;
+        const selected = state.materials.find(mat => mat.material_id == item.material_id)
+        if (!selected) return
 
-        const cantidad = Number(item.quantity) || 0;
-        const restante = selected.stock_quantity - cantidad;
+        const cantidad = Number(item.quantity) || 0
+        const restante = selected.stock_quantity - cantidad
 
         if (restante <= 0) {
             Toastify({
@@ -292,16 +324,13 @@ function EstimateFormComponent() {
                 close: true,
                 gravity: "top",
                 position: "right"
-            }).showToast();
-
+            }).showToast()
             // Resetear selección
-            item.quantity = 1;
-
-            updateConceptSubtotal(item);
-            m.redraw();
-            return;
+            item.quantity = 1
+            updateConceptSubtotal(item)
+            m.redraw()
+            return
         }
-
         if (restante <= selected.min_stock_alert) {
             Toastify({
                 text: ` Pocas unidades de "${selected.name}". Quedan ${restante}.`,
@@ -310,11 +339,9 @@ function EstimateFormComponent() {
                 close: true,
                 gravity: "top",
                 position: "right"
-            }).showToast();
+            }).showToast()
         }
     }
-
-
     return {
         oncreate: ({ attrs }) => {
             loadEstimate(attrs.estimate_number)
@@ -344,30 +371,18 @@ function EstimateFormComponent() {
             const renderHeader = () => [
                 m("span", { class: "fw-semibold text-uppercase fs-5 py-3" }, "Cabecera del documento"),
                 m("div", { class: "row col-12 p-0 m-0" }, [
+                    // Cliente input
                     m("div", { class: "col-md-6 col-lg-3" }, [
-                        // Cliente input
                         m("div", { class: "col-12 py-1" }, [
                             m("label.form-label.ps-1", "Cliente *"),
                             m("select.form-select my-choices", {
-                                class: badForm ? "is-invalid" : "",
-                                required: true,
                                 style: { ...style._input_secondary },
                                 id: "client_id",
-                                value: state.estimateData?.client_id || "",
+                                name: "client_id",
+                                value: parseInt(state.estimateData?.client_id) || "",
                                 onchange: e => {
-                                    state.estimateData.client_id = e.target.value;
-                                    m.redraw();
-                                },
-                                oncreate: ({ dom }) => {
-                                    if (Array.isArray(state.clients) && state.clients.length > 0) {
-                                        dom.choicesInstance = new Choices(dom, {
-                                            containerOuter: 'choices my-choices-container',
-                                            allowHTML: false,
-                                            shouldSort: false,
-                                            searchPlaceholderValue: "Buscar cliente...",
-                                            itemSelectText: '',
-                                        });
-                                    }
+                                    state.estimateData.client_id = parseInt(e.target.value)
+                                    m.redraw()
                                 },
                                 onupdate: ({ dom }) => {
                                     if (!dom.choicesInstance && Array.isArray(state.clients) && state.clients.length > 0) {
@@ -376,12 +391,15 @@ function EstimateFormComponent() {
                                             shouldSort: false,
                                             searchPlaceholderValue: "Buscar cliente...",
                                             itemSelectText: '',
-                                        });
+                                        })
+                                    }
+                                    if (dom.choicesInstance && state.estimateData?.client_id) {
+                                        dom.choicesInstance.setChoiceByValue(state.estimateData.client_id.toString());
                                     }
                                 },
                                 onremove: ({ dom }) => {
                                     if (dom.choicesInstance) {
-                                        dom.choicesInstance.destroy();
+                                        dom.choicesInstance.destroy()
                                     }
                                 }
                             }, [
@@ -392,37 +410,26 @@ function EstimateFormComponent() {
                                 }, "-- Selecciona Cliente --"),
                                 ...(Array.isArray(state.clients) ? state.clients.map(opt =>
                                     m("option", {
-                                        value: opt.client_id
+                                        value: parseInt(opt.client_id)
                                     }, opt.name || opt.content || "Sin nombre")
                                 ) : [])
                             ])
                         ]),
-
                     ]),
+                    //projecto input
                     m("div", { class: "col-md-6 col-lg-3" }, [
-                        //projecto input
                         m("div", { class: "col-12 py-1" }, [
                             m("div", { class: "col-12 py-1" }, [
                                 m("label.form-label.ps-1", "Proyecto *"),
                                 m("select.form-select", {
                                     class: badForm ? "is-invalid" : "",
-                                    required: true,
                                     style: { ...style._input_secondary },
                                     id: "project_id",
-                                    value: state.estimateData?.project_id || "",
+                                    name: "project_id",
+                                    value: parseInt(state.estimateData?.project_id) || "",
                                     onchange: e => {
-                                        state.estimateData.project_id = e.target.value;
-                                        m.redraw();
-                                    },
-                                    oncreate: ({ dom }) => {
-                                        if (Array.isArray(state.projects) && state.projects.length > 0) {
-                                            dom.choicesInstance = new Choices(dom, {
-                                                allowHTML: false,
-                                                shouldSort: false,
-                                                searchPlaceholderValue: "Buscar proyecto...",
-                                                itemSelectText: '',
-                                            });
-                                        }
+                                        state.estimateData.project_id = parseInt(e.target.value)
+                                        m.redraw()
                                     },
                                     onupdate: ({ dom }) => {
                                         if (!dom.choicesInstance && Array.isArray(state.projects) && state.projects.length > 0) {
@@ -431,12 +438,15 @@ function EstimateFormComponent() {
                                                 shouldSort: false,
                                                 searchPlaceholderValue: "Buscar proyecto...",
                                                 itemSelectText: '',
-                                            });
+                                            })
+                                        }
+                                        if (dom.choicesInstance && state.ProjectData?.project_id) {
+                                            dom.choicesInstance.setChoiceByValue(state.ProjectData.project_id.toString());
                                         }
                                     },
                                     onremove: ({ dom }) => {
                                         if (dom.choicesInstance) {
-                                            dom.choicesInstance.destroy();
+                                            dom.choicesInstance.destroy()
                                         }
                                     }
                                 }, [
@@ -446,9 +456,9 @@ function EstimateFormComponent() {
                                         selected: !state.estimateData?.project_id
                                     }, "-- Selecciona Proyecto --"),
                                     ...(Array.isArray(state.projects)
-                                        ? filterList(state.projects, state.filterProjects).map(opt =>
+                                        ? (state.projects).map(opt =>
                                             m("option", {
-                                                value: opt.project_id
+                                                value: parseInt(opt.project_id)
                                             }, opt.name || opt.content || "Sin nombre")
                                         )
                                         : [])
@@ -457,8 +467,8 @@ function EstimateFormComponent() {
 
                         ]),
                     ]),
+                    // Estado
                     m("div", { class: "col-md-6 col-lg-3" }, [
-                        // Estado
                         m("div.col-12.py-2", [
                             m("label.form-label.ps-1", "Estado *"),
                             m("select.form-select", {
@@ -469,8 +479,12 @@ function EstimateFormComponent() {
                                 required: true,
                                 style: { ...style._input_secondary },
                                 id: "status",
+                                name: "status",
                                 value: state.estimateData?.status || "Pendiente",
-                                onchange: e => { state.estimateData.status = e.target.value; m.redraw() }
+                                onchange: e => {
+                                    state.estimateData.status = e.target.value
+                                    m.redraw()
+                                }
                             }, [
                                 m("option", { value: "", disabled: true, selected: !state.estimateData?.status }, "-- Selecciona Estado--"),
                                 ...status.map(opt =>
@@ -487,7 +501,10 @@ function EstimateFormComponent() {
                                 style: { ...style._input_secondary },
                                 id: "iva",
                                 value: Number(state.estimateData?.iva) || 21,
-                                onchange: e => { state.estimateData.iva = Number(e.target.value); m.redraw() }
+                                onchange: e => {
+                                    state.estimateData.iva = Number(e.target.value)
+                                    m.redraw()
+                                }
                             }, [
                                 m("option", { value: "", disabled: true, selected: !state.estimateData?.iva }, "-- Selecciona --"),
                                 ...taxes.map(opt =>
@@ -507,9 +524,13 @@ function EstimateFormComponent() {
                                 style: { ...style._input_secondary },
                                 type: "date",
                                 id: "issue_date",
+                                name: "issue_date",
                                 value: state.estimateData?.issue_date || today,
                                 max: today,
-                                oninput: e => { state.estimateData.issue_date = e.target.value; m.redraw() }
+                                oninput: e => {
+                                    state.estimateData.issue_date = e.target.value
+                                    m.redraw()
+                                }
                             })
                         ]),
                         // Fecha de expiración
@@ -521,9 +542,13 @@ function EstimateFormComponent() {
                                 style: { ...style._input_secondary },
                                 type: "date",
                                 id: "due_date",
+                                name: "due_date",
                                 value: state.estimateData?.due_date || today,
                                 min: today,
-                                oninput: e => { state.estimateData.due_date = e.target.value; m.redraw() }
+                                oninput: e => {
+                                    state.estimateData.due_date = e.target.value
+                                    m.redraw()
+                                }
                             })
                         ]),
                     ]),
@@ -531,37 +556,30 @@ function EstimateFormComponent() {
                 ])]
             // Conceptos materiales
             const renderEstimateMaterialData = (item, index) => {
+
                 return m("div", { class: "row   p-0  m-0 my-2 d-flex justify-content-between" }, [
+                    // Materiales
                     m("input", { type: "hidden", value: item.material_id }),
                     m("div", { class: "row" }, [
+                        //material
                         m("div", { class: "col-md-6 col-lg-4 pt-2" }, [
                             m("label.form-label.ps-1", `Material * #${index + 1}`),
                             m("select.form-select", {
                                 class: badForm ? "is-invalid" : "",
-                                required: true,
-                                id: "name",
-                                value: item.material_id || "",
+                                id: "material",
+                                name: "material",
+                                value: parseInt(item.material_id) || "",
                                 onchange: e => {
-                                    item.material_id = e.target.value;
-                                    const selected = state.materials.find(mat => mat.material_id == item.material_id);
+                                    item.material_id = parseInt(e.target.value)
+                                    const selected = state.materials.find(mat => mat.material_id == item.material_id)
                                     if (selected) {
-                                        item.unit = selected.unit || "N/A";
-                                        item.unit_price = parseFloat(selected.price_per_unit) || 0;
-                                        item.quantity = 1;
-                                        item.discount = 0;
-                                        updateConceptSubtotal(item);
+                                        item.unit = selected.unit || "N/A"
+                                        item.unit_price = parseFloat(selected.price_per_unit) || 0
+                                        item.quantity = 1
+                                        item.discount = 0
+                                        updateConceptSubtotal(item)
                                     }
-                                    m.redraw();
-                                },
-                                oncreate: ({ dom }) => {
-                                    if (Array.isArray(state.materials) && state.materials.length > 0) {
-                                        dom.choicesInstance = new Choices(dom, {
-                                            allowHTML: false,
-                                            shouldSort: false,
-                                            searchPlaceholderValue: "Buscar material...",
-                                            itemSelectText: '',
-                                        });
-                                    }
+                                    m.redraw()
                                 },
                                 onupdate: ({ dom }) => {
                                     if (!dom.choicesInstance && Array.isArray(state.materials) && state.materials.length > 0) {
@@ -570,12 +588,15 @@ function EstimateFormComponent() {
                                             shouldSort: false,
                                             searchPlaceholderValue: "Buscar material...",
                                             itemSelectText: '',
-                                        });
+                                        })
+                                    }
+                                    if (dom.choicesInstance && item?.material_id) {
+                                        dom.choicesInstance.setChoiceByValue(item.material_id.toString());
                                     }
                                 },
                                 onremove: ({ dom }) => {
                                     if (dom.choicesInstance) {
-                                        dom.choicesInstance.destroy();
+                                        dom.choicesInstance.destroy()
                                     }
                                 }
                             }, [
@@ -585,14 +606,12 @@ function EstimateFormComponent() {
                                     selected: !item.material_id
                                 }, "-- Selecciona Material --"),
                                 ...(Array.isArray(state.materials)
-                                    ? state.materials.map(opt =>
-                                        m("option", { value: opt.material_id }, opt.name || opt.content || "Sin nombre")
+                                    ? (state.materials).map(opt =>
+                                        m("option", { value: parseInt(opt.material_id) }, opt.name || opt.content || "Sin nombre")
                                     )
                                     : [])
                             ])
-                        ])
-
-                        ,
+                        ]),
                         // Espacio en blanco
                         m("div.col-md-3.col-lg-8.pt-2"),
                         // Cantidad
@@ -601,13 +620,15 @@ function EstimateFormComponent() {
                             m("input.form-control", {
                                 class: (badForm ? " is-invalid" : ""),
                                 required: true,
+                                id: "quantity",
+                                name: "quantity",
                                 style: { ...style._input_secondary },
                                 type: "number",
                                 min: 0,
                                 value: item.quantity,
                                 oninput: e => {
                                     item.quantity = +e.target.value
-                                    validarStockMaterial(item);
+                                    validarStockMaterial(item)
                                     updateConceptSubtotal(item)
                                     m.redraw()
                                 }
@@ -627,6 +648,8 @@ function EstimateFormComponent() {
                             m("input.form-control", {
                                 class: (badForm ? " is-invalid" : ""),
                                 required: true,
+                                id: "unit_price",
+                                name: "unit_price",
                                 style: { ...style._input_secondary },
                                 type: "number",
                                 min: 0,
@@ -643,6 +666,8 @@ function EstimateFormComponent() {
                             m("label.form-label.ps-1", "Descuento"),
                             m("input.form-control", {
                                 style: { ...style._input_secondary },
+                                id: "discount",
+                                name: "discount",
                                 type: "number",
                                 step: "any",
                                 min: 0,
@@ -669,35 +694,27 @@ function EstimateFormComponent() {
                 return m("div", { class: "row col-12 p-0 m-0 my-2" }, [
                     m("input", { type: "hidden", value: item.labor_type_id }),
                     m("div", { class: "col-lg-12 row" }, [
+                        //Labor type
                         m("div", { class: "col-md-6 col-lg-4 pt-2" }, [
+                            // Servicio
                             m("label.form-label.ps-1", `Servicio * #${index + 1}`),
                             m("select.form-select", {
                                 class: badForm ? "is-invalid" : "",
-                                required: true,
+                                id: "labor_type",
+                                name: "labor_type",
                                 style: { ...style._input_secondary },
-                                value: item.labor_type_id || "",
+                                value: parseInt(item.labor_type_id) || "",
                                 onchange: e => {
-                                    item.labor_type_id = parseInt(e.target.value);
-                                    const selected = state.laborTypes.find(l => l.labor_type_id == item.labor_type_id);
+                                    item.labor_type_id = parseInt(e.target.value)
+                                    const selected = state.laborTypes.find(l => l.labor_type_id == item.labor_type_id)
                                     if (selected) {
-                                        item.cost_per_hour = parseFloat(selected.cost_per_hour) || 0;
-                                        item.hours = 1;
-                                        item.discount = 0;
-                                        item.description = selected.description || "";
-                                        updateConceptSubtotal(item);
-
+                                        item.cost_per_hour = parseFloat(selected.cost_per_hour) || 0
+                                        item.hours = 1
+                                        item.discount = 0
+                                        item.description = selected.description || ""
+                                        updateConceptSubtotal(item)
                                     }
-                                    m.redraw();
-                                },
-                                oncreate: ({ dom }) => {
-                                    if (Array.isArray(state.laborTypes) && state.laborTypes.length > 0) {
-                                        dom.choicesInstance = new Choices(dom, {
-                                            allowHTML: false,
-                                            shouldSort: false,
-                                            searchPlaceholderValue: "Buscar servicio...",
-                                            itemSelectText: '',
-                                        });
-                                    }
+                                    m.redraw()
                                 },
                                 onupdate: ({ dom }) => {
                                     if (!dom.choicesInstance && Array.isArray(state.laborTypes) && state.laborTypes.length > 0) {
@@ -706,12 +723,14 @@ function EstimateFormComponent() {
                                             shouldSort: false,
                                             searchPlaceholderValue: "Buscar servicio...",
                                             itemSelectText: '',
-                                        });
+                                        })
+                                    } if (dom.choicesInstance && item?.labor_type_id) {
+                                        dom.choicesInstance.setChoiceByValue(item.labor_type_id.toString());
                                     }
                                 },
                                 onremove: ({ dom }) => {
                                     if (dom.choicesInstance) {
-                                        dom.choicesInstance.destroy();
+                                        dom.choicesInstance.destroy()
                                     }
                                 }
                             }, [
@@ -721,13 +740,12 @@ function EstimateFormComponent() {
                                     selected: !item.labor_type_id
                                 }, "-- Selecciona Servicio --"),
                                 ...(Array.isArray(state.laborTypes)
-                                    ? state.laborTypes.map(opt =>
-                                        m("option", { value: opt.labor_type_id }, opt.name || opt.content || "Sin nombre")
+                                    ? (state.laborTypes).map(opt =>
+                                        m("option", { value: parseInt(opt.labor_type_id) }, opt.name || opt.content || "Sin nombre")
                                     )
                                     : [])
                             ])
                         ]),
-
                         // Espacio en blanco
                         m("div.col-md-6.d-lg-6.pt-2"),
                         // Descripción
@@ -735,12 +753,15 @@ function EstimateFormComponent() {
                             m("label.form-label.ps-1", "Descripción *"),
                             m("input.form-control", {
                                 class: (badForm ? " is-invalid" : ""),
+                                id: "description",
+                                name: "description",
                                 required: true,
                                 style: { ...style._input_secondary },
                                 value: item.description || "",
                                 oninput: e => item.description = e.target.value
                             })
                         ]),
+                        //Espacio en blanco
                         m("div.col-lg-2.pt-2"),
                         // Horas
                         m("div.col-md-3.col-lg-2.pt-2", [
@@ -748,6 +769,8 @@ function EstimateFormComponent() {
                             m("input.form-control", {
                                 class: (badForm ? " is-invalid" : ""),
                                 required: true,
+                                id: "hours",
+                                name: "hours",
                                 style: { ...style._input_secondary },
                                 type: "number",
                                 min: 0,
@@ -764,6 +787,8 @@ function EstimateFormComponent() {
                             m("input.form-control", {
                                 class: (badForm ? " is-invalid" : ""),
                                 required: true,
+                                id: "price_per_hour",
+                                name: "price_per_hour",
                                 style: { ...style._input_secondary },
                                 type: "number",
                                 min: 0,
@@ -780,6 +805,8 @@ function EstimateFormComponent() {
                             m("label.form-label.ps-1", "Descuento"),
                             m("input.form-control", {
                                 style: { ...style._input_secondary },
+                                id: "discount",
+                                name: "discount",
                                 type: "number",
                                 step: "any",
                                 min: 0,
@@ -807,7 +834,6 @@ function EstimateFormComponent() {
                 m("h5", "Conceptos"),
                 m("hr"),
                 m("h6", "Materiales"),
-
                 // Conceptos de materiales
                 ...state.estimateMaterialData?.map(renderEstimateMaterialData),
                 btnsAction({
@@ -816,7 +842,6 @@ function EstimateFormComponent() {
                 }),
                 m("hr.mt-5"),
                 m("h6", "Servicios"),
-
                 // Conceptos de mano de obra
                 ...state.estimateLaborsData?.map(renderEstimateLaborsData),
                 btnsAction({
@@ -883,6 +908,9 @@ function EstimateFormComponent() {
                 ])
             ]
 
+            console.log(state.estimateMaterialData);
+            
+
             //Formulario completo y renderizado
             return m("div",
                 {
@@ -891,7 +919,7 @@ function EstimateFormComponent() {
                 }, [
                 m("form", {
                     class: "row col-12",
-                    onsubmit: handleFormSubmit
+                    onsubmit: e => handleFormSubmit(e, type)
                 }, [
                     m("hr"),
                     renderHeader(),

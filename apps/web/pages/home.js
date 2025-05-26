@@ -7,8 +7,6 @@ import { fetchProjects, fetchEstimates, fetchInvoices } from "../Services/servic
 import { generateLastMonths } from "../Util/util.js"
 
 import { Card } from "../components/card.js"
- import { InvoicesResumenCard } from "../components/card-invoices.js"
-import { ProjectsResumenCard } from "../components/card-projects.js"
 
 export function HomePage() {
     let style = { width: "100%", minHeight: "92.5vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f0f0" };
@@ -20,32 +18,22 @@ export function HomePage() {
     return {
         oncreate: async function () {
             window.scrollTo(0, 0);
-            try {
-                projects = (await fetchProjects()).data || []
-                console.log("projects", projects);
-                invoices = (await fetchInvoices()).data || []
-                console.log("invoices", invoices);
-                estimates = (await fetchEstimates()).data || []
-                console.log("estimates", estimates);
-            } catch (err) {
-                console.error("Error al cargar datos:", err)
-            } finally {
-                loading = false
-                m.redraw()
-            }
+            projects = (await fetchProjects()).data || []
+            invoices = (await fetchInvoices()).data || []
+            estimates = (await fetchEstimates()).data || []
+            loading = false
+            m.redraw()
         },
         view: function () {
-            if (loading) {
-                return m("div", { style }, m(SpinnerLoading))
-            }
-
+            if (loading) { return m("div", { style }, m(SpinnerLoading)) }
+            
             return m("div", { style }, [
                 m("h1.py-5.text-uppercase", "¡Bienvenido!"),
                 m("div.container", [
                     m("div.row", [
                         m("div.col-12.col-lg-6", [
                             m("div.row", [
-                                m(Card, { title: "facturación mensual" }, m(FacturacionMensualChart, { invoices })),
+                                m(Card, { title: "facturación mensual", style: { height: "100%", maxHeight: "45vh" } }, m(FacturacionMensualChart, { invoices })),
                                 m(Card, { title: "top proyectos" }, m(FacturacionProyectosChart, { projects: projects, type: 2 })),
                                 m(Card, { title: "" }, m(FacturacionProyectosChart, { projects: projects, type: 1 })),
                             ])
@@ -54,8 +42,6 @@ export function HomePage() {
                             m("div.row", [
                                 m(Card, { title: "Estado Proyectos" }, m(ProjectStatusChartBox, { projects })),
                                 m(Card, { title: "Presupuestación mensual" }, m(PresupuestacionMensualChart, { estimates })),
-                                 m(Card, { title: "Resumen Facturas" }, m(InvoicesResumenCard)),
-                                m(Card, { title: "Resumen Proyectos" }, m(ProjectsResumenCard)),
                             ])
                         ])
                     ])

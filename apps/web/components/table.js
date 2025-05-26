@@ -1,19 +1,17 @@
 export function Table() {
-    let style = {
-        containerStyle: {
-            minHeight: "10vh",
-            maxHeight: "70vh",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: "#fff",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
-            overflow: "hidden"
-        }
+    let containerStyle = {
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#fff",
+        padding: "20px",
+        borderRadius: "8px",
+        boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+        overflow: "hidden"
     }
+
     let localData = []
     let filteredData = []
     let searchValue = ""
@@ -83,7 +81,7 @@ export function Table() {
         },
         view: function ({ attrs, children }) {
             const { columns = [], onRowClick = null, maxHeightTable = "45vh", offset = "offset-md-6" } = attrs
-            return m("div.col-11.col-md-10", { style: style.containerStyle }, [
+            return m("div.col-11.col-md-10", { style: { ...containerStyle, ...attrs.style } }, [
                 m("div.col-12", [
                     m("div.row", [
                         m("div.col-12", {

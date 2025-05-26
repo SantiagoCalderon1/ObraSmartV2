@@ -1,39 +1,44 @@
 import { Modal, ModalConfirmation } from "../../components/modal.js"
-import { Button } from "../../components/button.js";
+import { Button } from "../../components/button.js"
 import { Table } from "../../components/table.js"
 import { Card } from "../../components/card.js"
 import { EstimatesResumenCard } from "../../components/card-estimates.js"
+import { PageEstructure } from "../../components/page-estrcuture.js"
+import { TableModal } from "../../components/table-modal.js"
+import { SpinnerLoading } from "../../components/spinner-loading.js"
 
 
 // IMPORTADOR DE FUNCIONES
-import { fetchEstimates, deleteEstimate } from "../../Services/services.js";
+import { fetchEstimates, deleteEstimate } from "../../Services/services.js"
 
 export function EstimatesListPage() {
-    let estimates = [];
-    let selectedEstimate = null;
+    let style = { width: "100%", minHeight: "92.5vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f0f0" };
 
+    let estimates = []
+    let selectedEstimate = null
+
+    // funcion asincrona que trae los datos
     async function loadEstimates() {
-        estimates = (await fetchEstimates()).data;
-        //console.log(estimates);
-        m.redraw();
+        estimates = (await fetchEstimates()).data
+        m.redraw()
     }
-
     return {
         oncreate: loadEstimates,
         view: function () {
+
             const onSelect = (estimate) => {
-                selectedEstimate = estimate;
-                new bootstrap.Modal(document.getElementById("ModalDetailsEstimatesList")).show();
-                m.redraw();
-            };
+                selectedEstimate = estimate
+                new bootstrap.Modal(document.getElementById("ModalDetailsEstimatesList")).show()
+                m.redraw()
+            }
 
             const onDelete = async () => {
                 if (selectedEstimate) {
-                    await deleteEstimate(selectedEstimate.estimate_id);
-                    selectedEstimate = null;
-                    await loadEstimates();
+                    await deleteEstimate(selectedEstimate.estimate_id)
+                    selectedEstimate = null
+                    await loadEstimates()
                 }
-            };
+            }
 
             const columns = [
                 { title: "#", field: "index" },
@@ -50,54 +55,39 @@ export function EstimatesListPage() {
                 { title: "Total", field: "total_cost", euroSign: "€", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
+            ]
 
-            ];
-
-            // Normaliza los datos para la tabla (añade índice y campos planos)            
             const normalizedEstimates = (estimates || []).map((e, i) => ({
                 ...e,
                 index: i + 1,
                 "client.name": e.client?.name || "N/A",
                 "project.name": e.project?.name || "N/A",
                 "user.name": e.user?.name || "N/A",
-            }));
+            }))
 
-            if (estimates.length === 0) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ]);
-            }
-
+            if (estimates.length === 0) { return m(SpinnerLoading) }
             return [
-                m("h1.py-5.text-uppercase", "Presupuestos"),
-                m("div.container", [
-                    m("div.row", [
-                        m("div", {
-                            class: "pb-5 col-12 col-xl-9 d-flex justify-content-center align-items-center"
-                        }, [
-                            m(Table, {
-                                columns: columns,
-                                data: normalizedEstimates,
-                                onRowClick: onSelect
-                            }, [m(Button,
-                                {
-                                    type: "submit",
-                                    bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                                    actions: () => m.route.set("/estimates/create")
-                                },
-                                ["Crear Presupuesto"]
-                            ),]),
-                        ]),
-                        m("div", {
-                            class: "pb-5 col-12 col-xl-3 d-flex justify-content-center align-items-center"
-                        }, [
-                            m(Card, { title: "Resumen" }, m(EstimatesResumenCard)),
-                        ])
-                    ])
-                ]),
+                m("h1.py-4.text-uppercase", "Presupuestos"),
+                m(PageEstructure, [
+                    m(Table, {
+                        columns: columns,
+                        data: normalizedEstimates,
+                        onRowClick: onSelect,
+                        style: { height: "70vh", width: "100%" }
 
+                    }, [m(Button,
+                        {
+                            type: "submit",
+                            bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                            actions: () => m.route.set("/estimates/create")
+                        },
+                        ["Crear Presupuesto"]
+                    ),]),
+                    m(Card, {
+                        title: "Resumen",
+                        style: { height: "70vh", width: "100%" }
+                    }, m(EstimatesResumenCard, { estimates })),
+                ]),
                 m(ModalDetailsComponent, {
                     estimate: selectedEstimate,
                 }),
@@ -107,23 +97,20 @@ export function EstimatesListPage() {
                     mensaje: `¿Está seguro de eliminar el presupuesto con #${selectedEstimate?.estimate_number}?`,
                     actions: onDelete
                 })
-            ];
+            ]
         }
-    };
+    }
 }
 
 function ModalDetailsComponent() {
     return {
         view: function ({ attrs }) {
-            const { estimate = [] } = attrs;
+            const { estimate = [] } = attrs
 
-            // Cálculo de subtotales
-            const subtotalMaterials = (estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0);
-            const subtotalLabors = (estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0);
-            const subtotal = subtotalMaterials + subtotalLabors;
+            const subtotalMaterials = (estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0)
+            const subtotalLabors = (estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0)
+            const subtotal = subtotalMaterials + subtotalLabors
 
-
-            // Columnas para tablas
             const columnsEstimate = [
                 {
                     title: "Estado", field: "status", style: (item) => ({
@@ -135,10 +122,9 @@ function ModalDetailsComponent() {
                 { title: "Cliente", field: "client.name" },
                 { title: "Proyecto", field: "project.name" },
                 { title: "Usuario", field: "user.name" },
-
                 { title: "Fecha creación", field: "issue_date" },
                 { title: "Fecha Expiración", field: "due_date" },
-            ];
+            ]
 
             const columnsMaterials = [
                 { title: "#", field: "index" },
@@ -147,7 +133,7 @@ function ModalDetailsComponent() {
                 { title: "P / U", field: "unit_price", euroSign: "€" },
                 { title: "Descuento", field: "discount", euroSign: "€" },
                 { title: "P / Neto", field: "total_price", euroSign: "€" },
-            ];
+            ]
 
             const columnsLabors = [
                 { title: "#", field: "index" },
@@ -157,9 +143,8 @@ function ModalDetailsComponent() {
                 { title: "P / H", field: "cost_per_hour", euroSign: "€" },
                 { title: "Descuento", field: "discount", euroSign: "€" },
                 { title: "P / Neto", field: "total_cost", euroSign: "€" },
-            ];
+            ]
 
-            // Normalización de datos
             const normalizedMaterials = (estimate?.materials || []).map((m, i) => ({
                 ...m,
                 index: i + 1,
@@ -174,45 +159,12 @@ function ModalDetailsComponent() {
                 ...l,
                 index: i + 1,
                 "labor_type.name": l.labor_type?.name || "N/A",
+                "description": l.description || "N/A",
                 "hours": l.hours || "N/A",
                 "cost_per_hour": l.cost_per_hour || "N/A",
                 "discount": l.discount || "N/A",
                 "total_cost": l.total_cost || "N/A",
             }))
-
-            // Tabla reusable
-            const Table = ({ columns, data }) =>
-                m("div.table-responsive", {
-                    style: {
-                        maxHeight: "50vh",
-                    }
-                },
-                    [
-                        m("table", { class: "table table-hover table-striped" }, [
-                            m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
-                                m("tr", [
-                                    ...columns.map(col =>
-                                        m("th.text-nowrap.px-4.py-3", col.title))
-                                ])
-                            ]),
-                            m("tbody", [
-                                data.length > 0
-                                    ? data.map(item =>
-                                        m("tr", [
-                                            ...columns.map(col =>
-                                                m(`td.px-4${col.field === 'description' ? '' : '.text-nowrap'}`, {
-                                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                                }, [
-                                                    item?.[col.field] || "N/A",
-                                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                                ])
-                                            )
-                                        ])
-                                    )
-                                    : m("tr.text-center", m(`td[colspan=${columns.length + 1}]`, "No hay datos disponibles"))
-                            ])
-                        ])
-                    ]);
 
             // Footer con totales
             const TableFooter = () =>
@@ -220,7 +172,7 @@ function ModalDetailsComponent() {
                     m("h6", `SubTotal: ${(subtotal || 0).toFixed(2)} €`),
                     m("h6", `IVA: ${Number(estimate?.iva || 0)}%`),
                     m("h5.fw-bold", `Total: ${Number(estimate?.total_cost || 0).toFixed(2)} €`)
-                ]);
+                ])
 
             // Header con botones
             const ContentHeaderModal = () => [
@@ -241,7 +193,7 @@ function ModalDetailsComponent() {
                     m("i.fa-solid.fa-pen-to-square"),
                     " Editar Presupuesto"
                 ])
-            ];
+            ]
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
@@ -253,17 +205,17 @@ function ModalDetailsComponent() {
                     }
                 }, [
                     m("h5.mt-1", "Detalles"),
-                    Table({ columns: columnsEstimate, data: [estimate] }),
+                    m(TableModal, { columns: columnsEstimate, data: [estimate] }),
                     m("hr"),
                     m("h5.mt-3", "Conceptos"),
                     m("hr"),
                     m("h5.mt-3", "Materiales"),
-                    Table({ columns: columnsMaterials, data: normalizedMaterials }),
+                    m(TableModal, { columns: columnsMaterials, data: normalizedMaterials }),
                     m("h5.mt-3", "Mano de Obra"),
-                    Table({ columns: columnsLabors, data: normalizedLabors }),
+                    m(TableModal, { columns: columnsLabors, data: normalizedLabors }),
                     m("div.mt-3", [m("span.fw-bold", "Condiciones: "), (estimate?.conditions || "N/A")]),
                     TableFooter()
-                ]);
+                ])
 
             // Footer con botón de PDF
             const ContentFooterModal = () => [
@@ -284,7 +236,6 @@ function ModalDetailsComponent() {
                 ]) : null,
             ]
 
-            // Render del modal
             return m(Modal, {
                 idModal: "ModalDetailsEstimatesList",
                 title: `Presupuesto #${estimate?.estimate_number}`,
@@ -294,8 +245,8 @@ function ModalDetailsComponent() {
                     body: ContentBodyModal(),
                     footer: ContentFooterModal()
                 }
-            });
+            })
         }
-    };
+    }
 }
 

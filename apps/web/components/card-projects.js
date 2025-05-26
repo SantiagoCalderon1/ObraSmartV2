@@ -1,15 +1,7 @@
-import { fetchProjects } from "../Services/services.js"
-
-
 export function ProjectsResumenCard() {
-    let projects = []
     return {
-        oncreate: async function () {
-            projects = (await fetchProjects()).data || []
-            console.log("projects", projects);
-            m.redraw()
-        },
-        view: function () {
+        view: function ({ attrs }) {
+            const { projects } = attrs
             const now = new Date()
             const mesAux = new Date()
             mesAux.setMonth(now.getMonth() - 6)

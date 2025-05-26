@@ -22,3 +22,8 @@ export async function login(body) {
     throw error;
   }
 }
+
+export const authState = {
+    authenticated: false,
+    checked: false
+}

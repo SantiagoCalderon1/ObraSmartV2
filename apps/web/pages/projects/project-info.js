@@ -13,12 +13,11 @@ import { ModalFormComponent } from "./projects-list.js"
 
 
 // IMPORTADOR DE FUNCIONES
-import { fetchProject, updateProject, deleteInvoice, updateInvoice, fetchMaterials, createStockMovement } from "../../Services/services.js"
+import { fetchProject, deleteInvoice, updateInvoice, fetchMaterials, createStockMovement } from "../../Services/services.js"
 
 export function ProjectInfoPage() {
     let project = {}
     let isLoading = true;
-
 
     async function loadProject(id = "") {
         isLoading = true;
@@ -28,12 +27,11 @@ export function ProjectInfoPage() {
             project.invoices = project.estimates.map(estimate => ({
                 ...estimate.invoice,
                 estimate: estimate,
-                client: project.client,  //  Cliente del proyecto
+                client: project.client,
                 proyectName: project.name
             }))
         }
         isLoading = false;
-        console.log(project)
         m.redraw()
     }
     return {
@@ -41,67 +39,42 @@ export function ProjectInfoPage() {
             loadProject(attrs.id)
         },
         view: function ({ attrs }) {
-            if (isLoading) {
-                return m(SpinnerLoading);
-            }
-            const PageEsctructure = ({ smallBoxes = [], largeBoxes = [] }) =>
+            if (isLoading) { return m(SpinnerLoading); }
+
+            return [
+                m("h1.py-5.text-uppercase", `Proyecto ${project?.name}`),
+
                 m("div.container", [
                     m("div.row", [
-                        // Pequeñas (izquierda)
                         m("div.col-12.col-lg-6", [
                             m("div.row", [
-                                ...smallBoxes.map((boxContent, i) =>
-                                    m("div.col-12.mb-3.d-flex.justify-content-center.align-items-center.flex-column", [
-                                        boxContent
-                                    ])
-                                )
+                                m(Card, { title: "Detalles" }, [m(ProjectDetails, { project })]),
+                                project.estimates && project.estimates.length ? [
+                                    m(Card, { title: "Gráficos" }, [m(ProjectChartBox, { project }),]),
+                                    m(Card, [m(EstimateStatusChartBox, { project })]),
+                                    m(Card, [m(InvoicestatusChartBox, { project })])
+                                ]
+                                    :
+                                    m(Card, { title: "Gráficos" }, [m("div", "Cargando gráfico...")]),
                             ])
                         ]),
-                        // Grandes (derecha)
                         m("div.col-12.col-lg-6", [
                             m("div.row", [
-                                ...largeBoxes.map((boxContent, i) =>
-                                    m("div.col-12.mb-3.d-flex.justify-content-center.align-items-center.flex-column", [
-                                        boxContent
-                                    ])
-                                )
+                                m(Card, { title: "PResupuestos" }, [m(EstimatesList, { estimates: project?.estimates })]),
+                                m(Card, { title: "Facturas" }, [m(InvoicesList, { invoices: project?.invoices })]),
+                                m(Card, { title: "Movimientos de stock" }, [m(StockMovementList, { stockMovements: project?.stock_movements, project_id: project?.project_id })]),
                             ])
                         ])
                     ])
-                ])
-            return [
-                m("h1.py-5.text-uppercase", `Proyecto ${project?.name}`),
-                PageEsctructure({
-                    smallBoxes: [
-                        m(Card, { title: "Detalles" }, [m(ProjectDetails, { project })]),
-                        //m(ProjectCard, { project }),
-                        project.estimates && project.estimates.length ? [
-                            m(Card, { title: "Gráficos" }, [m(ProjectChartBox, { project }),]),
-                            m(Card, [m(EstimateStatusChartBox, { project })]),
-                            m(Card, [m(InvoicestatusChartBox, { project })])
-                        ]
-                            :
-                            m(Card, { title: "Gráficos" }, [m("div", "Cargando gráfico...")]),
-                        m("span", "Caja 4"),
-                    ],
-                    largeBoxes: [
-                        // SECCION DE PRESUPUESTOS
-                        m(EstimatesList, { estimates: project?.estimates }),
-                        m(InvoicesList, { invoices: project?.invoices }),
-                        m(StockMovementList, { stockMovements: project?.stock_movements, project_id: project?.project_id }),
-                    ]
-                }),
+                ]),
                 m(ModalFormComponent, {
                     selectedProject: project,
                     onProjectSaved: () => loadProject(attrs.id)
                 }),
-
             ]
         }
     }
 }
-
-
 
 function ProjectDetails() {
     return {
@@ -156,7 +129,7 @@ function ProjectDetails() {
                 ]),
                 m(Button, {
                     closeModal: true,
-                    bclass: "btn-warning",
+                    bclass: "btn-warning mt-3",
                     actions: () => {
                         new bootstrap.Modal(document.getElementById("ModalFormProject")).show()
                     }
@@ -333,11 +306,9 @@ function InvoicestatusChartBox() {
     }
 }
 
-
 // SECCION DE PRESUPUESTOS
 function EstimatesList() {
     let selectedEstimate = null
-
     return {
         view: function ({ attrs }) {
             const { estimates = [] } = attrs
@@ -370,22 +341,14 @@ function EstimatesList() {
                 { title: "Fecha Expiración", field: "due_date" },
             ]
 
-            // Normaliza los datos para la tabla (añade índice y campos planos)            
             const normalizedEstimates = (estimates || []).map((e, i) => ({
                 ...e,
                 index: i + 1,
             }))
 
-            if (normalizedEstimates.length === 0) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ])
-            }
+            if (estimates.length === 0) { return m(SpinnerLoading); }
 
             return [
-                m("h2.py-2.text-uppercase", "Presupuestos"),
                 m(Table, {
                     columns: columns,
                     data: normalizedEstimates,
@@ -508,13 +471,7 @@ function ModalEstimatesDetailsComponent() {
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
-                m("div", {
-                    style: {
-                        maxHeight: "60vh",
-                        overflowY: "auto",
-                        padding: "1rem"
-                    }
-                }, [
+                m("div", { style: { maxHeight: "60vh", overflowY: "auto", padding: "1rem" } }, [
                     m("h5.mt-1", "Detalles"),
                     m(TableModal, { columns: columnsEstimate, data: [estimate] }),
                     m("hr"),
@@ -547,7 +504,6 @@ function ModalEstimatesDetailsComponent() {
                 ]) : null,
             ]
 
-            // Render del modal
             return m(Modal, {
                 idModal: "ModalDetailsEstimatesList",
                 title: `Presupuesto #${estimate?.estimate_number}`,
@@ -578,31 +534,29 @@ function InvoicesList() {
             const handleInvoiceAction = async (action) => {
                 if (!selectedInvoice) return
                 try {
+                    let response
                     switch (action) {
                         case "delete":
-                            await deleteInvoice(selectedInvoice.invoice_id)
+                            response = await deleteInvoice(selectedInvoice.invoice_id)
                             break
                         case "pay":
-                            await updateInvoice({ status: "pagado" }, selectedInvoice.invoice_id)
+                            response = await updateInvoice({ status: "pagado" }, selectedInvoice.invoice_id)
                             break
                         case "rejected":
-                            await updateInvoice({ status: "rechazado" }, selectedInvoice.invoice_id)
+                            response = await updateInvoice({ status: "rechazado" }, selectedInvoice.invoice_id)
                             break
                     }
-                    selectedInvoice = null
-                    m.redraw()
-
-                    Toastify({
-                        text: "¡Operación exitosa!",
-                        className: "toastify-success",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right"
-                    }).showToast()
-
+                    if (response) {
+                        Toastify({
+                            text: "¡Operación exitosa!",
+                            className: "toastify-success",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right"
+                        }).showToast()
+                    }
                 } catch (error) {
-                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -611,10 +565,11 @@ function InvoicesList() {
                         gravity: "top",
                         position: "right"
                     }).showToast()
+                } finally {
+                    selectedInvoice = null
+                    m.redraw()
                 }
-
             }
-
 
             const columns = [
                 { title: "#", field: "index" },
@@ -634,34 +589,23 @@ function InvoicesList() {
                 { title: "Fecha Expiración", field: "due_date" },
             ]
 
-            // Normaliza los datos para la tabla (añade índice y campos planos)            
             const normalizedInvoices = invoices.map((e, i) => ({
                 ...e,
                 index: i + 1,
                 "estimate_number": e?.estimate?.estimate_number || "N/A",
                 "client.name": e?.client?.name || "N/A",
-
             }))
 
-            if (normalizedInvoices.length === 0) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ])
-            }
+            if (invoices.length === 0) { return m(SpinnerLoading); }
 
             return [
-                m("h1.py-5.text-uppercase", "Facturas"),
                 m(Table, {
                     columns: columns,
                     data: normalizedInvoices,
                     onRowClick: onSelect,
                     maxHeightTable: "20vh",
                     offset: ""
-                },
-                    //[m(Button, { type: "submit", bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" }, actions: () => m.route.set("/invoices/create") }, ["Crear Factura"] ),]
-                ),
+                }),
                 m(ModalInvoicesDetailsComponent, {
                     invoice: selectedInvoice,
                 }),
@@ -692,18 +636,12 @@ function ModalInvoicesDetailsComponent() {
     return {
         view: function ({ attrs }) {
             const { invoice = [] } = attrs
-            console.log("invoice: ", invoice)
-
-            // Cálculo de subtotales
             const subtotalMaterials = (invoice?.estimate?.materials || []).reduce((sum, item) => sum + Number(item.total_price || 0), 0)
             const subtotalLabors = (invoice?.estimate?.labors || []).reduce((sum, item) => sum + Number(item.total_cost || 0), 0)
             const subtotal = subtotalMaterials + subtotalLabors
 
-
-            // Columnas para tablas
             const columnsInvoice = [
                 { title: "Núm Presupuesto", field: "estimate.estimate_number", style: () => ({ textWrap: "nowrap" }) },
-                //{ title: "Cliente", field: "client.name" },
                 { title: "Proyecto", field: "proyectName" },
                 {
                     title: "Estado", field: "status", style: (item) => ({
@@ -748,7 +686,6 @@ function ModalInvoicesDetailsComponent() {
                 "estimate.estimate_number": invoice?.estimate?.estimate_number || "N/A"
             }
 
-            // Normalización de datos
             const normalizedMaterials = (invoice?.estimate?.materials || []).map((m, i) => ({
                 ...m,
                 index: i + 1,
@@ -791,10 +728,6 @@ function ModalInvoicesDetailsComponent() {
             ]
 
             const ButtonsActions = () => [
-                /* 
-    No se puede editar la factura es casi ilegal, pero lo dejo por si algunas vez se requiere
-    Lo que si se puede cambiar es el estado, de pendiente a aceptado  o rechazado, pero no al reves   
-*/
                 invoice?.status === "pendiente" ? [
                     m("h5.text-center.pt-3", "Actualizar Estado"),
                     m("div.d-flex.justify-content-evenly.pb-3", [
@@ -822,13 +755,7 @@ function ModalInvoicesDetailsComponent() {
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
-                m("div", {
-                    style: {
-                        maxHeight: "60vh",
-                        overflowY: "auto",
-                        padding: "1rem"
-                    }
-                }, [
+                m("div", { style: { maxHeight: "60vh", overflowY: "auto", padding: "1rem" } }, [
                     ButtonsActions(),
                     m("h5.mt-1", "Detalles"),
                     m("hr"),
@@ -870,13 +797,16 @@ function ModalInvoicesDetailsComponent() {
     }
 }
 
-
-// SECCION DE PRESUPUESTOS
+// MOVIMINETOS DE STOCK
 function StockMovementList() {
     return {
         view: function ({ attrs }) {
             const { stockMovements = [], project_id } = attrs
 
+            const onClick = () => {
+                new bootstrap.Modal(document.getElementById("ModalFormStockMovement")).show()
+                m.redraw()
+            }
             const columns = [
                 { title: "#", field: "index" },
                 { title: "Nombre material", field: "material.name", style: () => ({ textWrap: "nowrap" }) },
@@ -884,30 +814,21 @@ function StockMovementList() {
                     title: "Razón", field: "reason", style: (item) => ({
                         fontWeight: "bold",
                         textTransform: "uppercase",
-                        color: item.reason === "compra" ? "green" : item.status === "uso" ? "red" : "black"
-                        //
+                        color: item.reason === "compra" ? "green" : item.reason === "uso" ? "red" : "black"
                     })
                 },
                 { title: "cantidad", field: "quantity" },
             ]
 
-            // Normaliza los datos para la tabla (añade índice y campos planos)            
             const normalizedstockMovements = (stockMovements || []).map((e, i) => ({
                 ...e,
                 index: i + 1,
                 "material.name": e?.material?.name || "N/A"
             }))
 
-            if (normalizedstockMovements.length === 0) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ])
-            }
+            if (stockMovements.length === 0) { return m(SpinnerLoading); }
 
             return [
-                m("h2.py-2.text-uppercase", "Movimientos de stock"),
                 m(Table, {
                     columns: columns,
                     data: normalizedstockMovements,
@@ -918,18 +839,12 @@ function StockMovementList() {
                     m(Button, {
                         closeModal: true,
                         bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                        actions: () => {
-                            new bootstrap.Modal(document.getElementById("ModalFormStockMovement")).show()
-                            m.redraw()
-                        }
+                        actions: onClick
                     }, [
                         " Generar Movimiento "
                     ])]),
-                m(ModalStockFormComponent, {
-                    onStockMovementSaved: () => { m.redraw },
-                    project_id: project_id
-                }
-                ),]
+                m(ModalStockFormComponent, { project_id: project_id })
+            ]
         }
     }
 }
@@ -944,7 +859,6 @@ function ModalStockFormComponent() {
 
     let formElement = null
     let badForm = false
-    let choicesInstance = null
 
     const StockMovementData = ({
         material_id = "",
@@ -975,6 +889,18 @@ function ModalStockFormComponent() {
                 try {
                     console.log("Datos a enviar: ", state.StockMovementData)
 
+                    if (!state.StockMovementData.material_id) {
+                        Toastify({
+                            text: "Debes elegir un material.",
+                            className: "toastify-error",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right"
+                        }).showToast();
+                        return;
+                    }
+
                     const response = await createStockMovement(state.StockMovementData)
 
                     const modalElement = document.getElementById("ModalFormStockMovement")
@@ -984,16 +910,16 @@ function ModalStockFormComponent() {
                         modalInstance.hide()
                     }
 
-                    Toastify({
-                        text: "¡Movimiento de stock creado!",
-                        className: "toastify-success",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right"
-                    }).showToast()
-
-                    attrs.onStockMovementSaved?.()
+                    if (response) {
+                        Toastify({
+                            text: "¡Operación exitosa!",
+                            className: "toastify-success",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right"
+                        }).showToast()
+                    }
                 } catch (error) {
                     Toastify({
                         text: "¡Error al crear movimiento!",
@@ -1004,6 +930,7 @@ function ModalStockFormComponent() {
                         position: "right"
                     }).showToast()
                 } finally {
+                    state.StockMovementData = StockMovementData()
                     m.redraw()
                 }
             }
@@ -1011,60 +938,25 @@ function ModalStockFormComponent() {
             const ContentBodyModal = () =>
                 m("form", {
                     class: "row col-12",
-                    onsubmit: (e) => {
-                        e.preventDefault()
-                        if (!formElement.checkValidity()) {
-                            formElement.reportValidity()
-                            return
-                        }
-                        handleFormSubmit()
+                    onsubmit: handleFormSubmit,
+                    oncreate: ({ dom }) => {
+                        formElement = dom
                     },
-                    oncreate: (vnode) => {
-                        formElement = vnode.dom
-
-                        const selectEl = vnode.dom.querySelector("#material_id")
-                        if (selectEl && !choicesInstance) {
-                            choicesInstance = new Choices(selectEl, {
-                                searchEnabled: true,
-                                itemSelectText: "",
-                                shouldSort: false,
-                                searchPlaceholderValue: "Filtrar proyectos...",
-                                placeholder: true,
-                            })
-
-                            // Manejar selección
-                            selectEl.addEventListener("change", (e) => {
-                                state.StockMovementData.material_id = e.target.value
-                            })
-                        }
-                    }
                 }, [
                     m("span", { class: "fw-semibold text-uppercase fs-3 py-3" }, "Nuevo Movimiento de Stock"),
                     m("div", { class: "row py-3 px-0 m-0 d-flex justify-content-between" }, [
                         m("div", { class: "row" }, [
-                            //materials input
+                            //material input
                             m("div", { class: "col-12 py-1" }, [
                                 m("label.form-label.ps-1", "Materiales *"),
                                 m("select.form-select", {
                                     class: badForm ? "is-invalid" : "",
-                                    required: true,
                                     style: { ...style._input_secondary },
                                     id: "client_id",
-                                    value: state.StockMovementData.material_id,
+                                    value: parseInt(state.StockMovementData.material_id) || "",
                                     onchange: e => {
-                                        state.StockMovementData.material_id = e.target.value
+                                        state.StockMovementData.material_id = parseInt(e.target.value)
                                         m.redraw()
-                                    },
-                                    oncreate: ({ dom }) => {
-                                        if (Array.isArray(state.materials) && state.materials.length > 0) {
-                                            dom.choicesInstance = new Choices(dom, {
-                                                allowHTML: false,
-                                                shouldSort: false,
-                                                searchPlaceholderValue: "Buscar material...",
-                                                itemSelectText: '',
-                                            })
-                                            dom.choicesInstance.setChoiceByValue(state.StockMovementData.material_id)
-                                        }
                                     },
                                     onupdate: ({ dom }) => {
                                         if (!dom.choicesInstance && Array.isArray(state.materials) && state.materials.length > 0) {
@@ -1075,8 +967,10 @@ function ModalStockFormComponent() {
                                                 itemSelectText: '',
                                             })
                                         }
+                                        if (dom.choicesInstance && state.StockMovementData?.material_id) {
+                                            dom.choicesInstance.setChoiceByValue(state.StockMovementData.material_id.toString());
+                                        }
                                     },
-
                                 }, [
                                     m("option", {
                                         value: "",
@@ -1086,12 +980,13 @@ function ModalStockFormComponent() {
                                     ...(Array.isArray(state.materials)
                                         ? state.materials.map(opt =>
                                             m("option", {
-                                                value: opt.material_id
+                                                value: parseInt(opt.material_id)
                                             }, opt.name || opt.content || "Sin nombre")
                                         )
                                         : [])
                                 ])
                             ]),
+                            // Cantidad
                             m("div.col-md-12.col-lg-6.pt-2", [
                                 m("label.form-label.ps-1", "Cantidad *"),
                                 m("input.form-control", {
@@ -1103,6 +998,7 @@ function ModalStockFormComponent() {
                                     oninput: (e) => state.StockMovementData.quantity = +e.target.value
                                 })
                             ]),
+                            //  Motivo
                             m("div.col-md-12.col-lg-6.pt-2", [
                                 m("label.form-label.ps-1", "Motivo *"),
                                 m("select.form-select", {
@@ -1115,8 +1011,8 @@ function ModalStockFormComponent() {
                                     ...motivos.map(o => m("option", { value: o.value }, o.value))
                                 ])
                             ]),
-
                         ]),
+                        //  Botones
                         m("div.col-12.d-flex.justify-content-center.my-5", [
                             m("div.col-md-8.d-flex.justify-content-between.gap-4", [
                                 m(Button, {
@@ -1126,6 +1022,14 @@ function ModalStockFormComponent() {
                                 m(Button, {
                                     type: "submit",
                                     bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                                    actions: async (e) => {
+                                        e.preventDefault()
+                                        if (!formElement.checkValidity()) {
+                                            formElement.reportValidity();
+                                            return;
+                                        }
+                                        await handleFormSubmit();
+                                    },
                                 }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })])
                             ])
                         ])

@@ -2,12 +2,15 @@ import Choices from 'choices.js';
 
 import { Modal, ModalConfirmation } from "../../components/modal.js"
 import { Table } from "../../components/table.js"
-
 import { Button } from "../../components/button.js";
-
 
 // IMPORTADOR DE FUNCIONES
 import { fetchProjects, fetchClients, updateProject, createProject, deleteProject } from "../../Services/services.js";
+import { SpinnerLoading } from '../../components/spinner-loading.js';
+import { PageEstructure } from '../../components/page-estrcuture.js';
+import { Card } from '../../components/card.js';
+import { ProjectsResumenCard } from '../../components/card-projects.js';
+import { TableModal } from '../../components/table-modal.js';
 
 export function ProjectsListPage() {
     let projects = [];
@@ -15,7 +18,6 @@ export function ProjectsListPage() {
 
     async function loadProjects() {
         projects = (await fetchProjects()).data;
-        //console.log(projects);
         m.redraw();
     }
 
@@ -48,7 +50,6 @@ export function ProjectsListPage() {
                     })
                 },
                 { title: "Cliente", field: "client.name", style: () => ({ textWrap: "nowrap" }) },
-                //{ title: "Descripción", field: "description" },
                 { title: "Fecha de inicio", field: "start_date", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha de fin", field: "end_date", style: () => ({ textWrap: "nowrap" }) },
             ];
@@ -59,34 +60,32 @@ export function ProjectsListPage() {
                 "client.name": e?.client?.name || " "
             }));
 
-
-            if (projects.length === 0) {
-                return m("div.d-flex.justify-content-center.align-items-center", { style: { height: "30vh" } }, [
-                    m("div.spinner-border.text-primary", { role: "status" }, [
-                        m("span.visually-hidden", "Cargando...")
-                    ])
-                ]);
-            }
+            if (projects.length === 0) { return m(SpinnerLoading) }
 
             return [
                 m("h1.py-5.text-uppercase", "Proyectos"),
-                m(Table, {
-                    columns: columns,
-                    data: normalizedProjects,
-                    onRowClick: onSelect
-                }, [m(Button,
-                    {
-                        type: "submit",
-                        bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
-                        actions: () => {
-                            selectedProject = null;
-                            //m.route.set("/projects/create")
-                            new bootstrap.Modal(document.getElementById("ModalFormProject")).show();
-                            m.redraw();
-                        }
-                    },
-                    ["Crear Proyecto"]
-                ),]),
+                m(PageEstructure, [
+                    m(Table, {
+                        columns: columns,
+                        data: normalizedProjects,
+                        onRowClick: onSelect
+                    }, [m(Button,
+                        {
+                            type: "submit",
+                            bclass: "btn text-white py-md-2 text-nowrap rounded-pill fw-normal", style: { backgroundColor: "var(--mainPurple)" },
+                            actions: () => {
+                                selectedProject = null;
+                                new bootstrap.Modal(document.getElementById("ModalFormProject")).show();
+                                m.redraw();
+                            }
+                        },
+                        ["Crear Proyecto"]
+                    ),]),
+                    m(Card, {
+                        title: "Resumen",
+                        style: { height: "70vh", width: "100%" }
+                    }, m(ProjectsResumenCard, { projects })),
+                ]),
                 m(ModalDetailsComponent, {
                     selectedProject: selectedProject,
                 }),
@@ -108,12 +107,9 @@ export function ProjectsListPage() {
 
 function ModalDetailsComponent() {
     return {
-
         view: function ({ attrs }) {
             const { selectedProject = {}, } = attrs;
-            console.log("selectedProject: ", selectedProject);
 
-            // Columnas para tablas
             const columnsProject = [
                 { title: "Nombre", field: "name", style: () => ({ textWrap: "nowrap" }) },
                 {
@@ -125,7 +121,6 @@ function ModalDetailsComponent() {
                     })
                 },
                 { title: "Cliente", field: "client.name", style: () => ({ textWrap: "nowrap" }) },
-                //{ title: "Descripción", field: "description" },
                 { title: "Fecha de inicio", field: "start_date", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Fecha de fin", field: "end_date", style: () => ({ textWrap: "nowrap" }) },
             ];
@@ -137,42 +132,6 @@ function ModalDetailsComponent() {
                 { title: "Email", field: "email", style: () => ({ textWrap: "nowrap" }) },
                 { title: "Dirección", field: "address", style: () => ({ textWrap: "nowrap" }) },
             ];
-
-            // Tabla reusable
-            const Table = ({ columns, data }) =>
-                m("div.table-responsive", {
-                    style: {
-                        maxHeight: "50vh",
-                    }
-                },
-                    [
-                        m("table", { class: "table table-hover table-striped" }, [
-                            m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
-                                m("tr", [
-                                    ...columns.map(col =>
-                                        m("th.text-nowrap.px-4.py-3", col.title))
-                                ])
-                            ]),
-                            m("tbody", [
-                                data.length > 0
-                                    ? data.map(item =>
-                                        m("tr", [
-                                            ...columns.map(col =>
-                                                m(`td.px-4`, {
-                                                    style: typeof col.style === "function" ? col.style(item) : {}
-                                                }, [
-                                                    item?.[col.field] || "N/A",
-                                                    col.euroSign && item[col.field] ? col.euroSign : ""
-                                                ])
-                                            )
-                                        ])
-                                    )
-                                    : m("tr.text-center", m(`td[colspan=${columns.length + 1}]`, "No hay datos disponibles"))
-                            ])
-                        ])
-                    ]);
-
-
 
             // Header con botones
             const ContentHeaderModal = () => [
@@ -202,22 +161,16 @@ function ModalDetailsComponent() {
 
             // Body con las dos tablas
             const ContentBodyModal = () =>
-                m("div", {
-                    style: {
-                        maxHeight: "60vh",
-                        overflowY: "auto",
-                        padding: "1rem"
-                    }
-                }, [
+                m("div", { style: { maxHeight: "60vh", overflowY: "auto", padding: "1rem" } }, [
                     m("h5.mt-1", "Detalles"),
-                    Table({ columns: columnsProject, data: [selectedProject] }),
+                    m(TableModal, { columns: columnsProject, data: [selectedProject] }),
                     m("div.py-3", [
                         m("h5", "Descripción"),
                         m("p", selectedProject?.description),
                     ]),
                     m("hr"),
                     m("h5.mt-3", "Cliente propietario"),
-                    Table({ columns: columnsClient, data: [selectedProject?.client] }),
+                    m(TableModal, { columns: columnsClient, data: [selectedProject?.client] }),
                 ]);
 
             // Footer con botón de PDF
@@ -239,7 +192,6 @@ function ModalDetailsComponent() {
                 ]),
             ]
 
-            // Render del modal
             return m(Modal, {
                 idModal: "ModalDetailsProjectsList",
                 title: `Project - ${selectedProject?.name}`,
@@ -286,47 +238,44 @@ export function ModalFormComponent() {
         clients: [],
     }
 
-
     return {
         oninit: async ({ attrs }) => {
             state.selectedProject = attrs.selectedProject;
             state.ProjectData = ProjectData(attrs.selectedProject || {});
             state.clients = (await fetchClients()).data
+            console.log(state.clients);
 
         },
         onupdate: ({ attrs }) => {
             if (attrs.selectedProject !== state.selectedProject) {
                 state.selectedProject = attrs.selectedProject;
                 state.ProjectData = ProjectData(state.selectedProject || {});
-                //console.log("state.selectedProject: ", state.selectedProject);
             }
         },
-
         view: function ({ attrs }) {
-            const handleFormSubmit = async (e) => {
+            const handleFormSubmit = async () => {
                 const dataToSend = state.ProjectData
-                //console.log("dataToSend: ", dataToSend);
-                //console.log("Se envió");
-
                 try {
+                    const { client_id, } = state.ProjectData;
+                    const tieneCliente = !!client_id;
+                    if (!tieneCliente) {
+                        Toastify({
+                            text: "Debes seleccionar un cliente.",
+                            className: "toastify-error",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right"
+                        }).showToast();
+                        return;
+                    }
+
                     let response;
                     if (!!state.selectedProject) {
                         response = await updateProject(dataToSend, state.selectedProject?.project_id);
                     } else {
                         response = await createProject(dataToSend);
                     }
-                    //console.log("Response form: ", response)
-
-                    Toastify({
-                        text: "¡Operación exitosa!",
-                        className: "toastify-success",
-                        duration: 3000,
-                        close: true,
-                        gravity: "top",
-                        position: "right"
-                    }).showToast()
-                    attrs.onProjectSaved?.(); // Llama al callback si existe
-
                     const modalElement = document.getElementById("ModalFormProject");
                     if (modalElement) {
                         const modalInstance = bootstrap.Modal.getInstance(modalElement)
@@ -334,8 +283,17 @@ export function ModalFormComponent() {
                         modalInstance.hide();
                     }
 
+                    if (response) {
+                        Toastify({
+                            text: "¡Operación exitosa!",
+                            className: "toastify-success",
+                            duration: 3000,
+                            close: true,
+                            gravity: "top",
+                            position: "right"
+                        }).showToast()
+                    }
                 } catch (error) {
-                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -345,6 +303,8 @@ export function ModalFormComponent() {
                         position: "right"
                     }).showToast()
                 } finally {
+                    attrs.onProjectSaved?.() // Llama al callback si existe
+                    state.ProjectData = ProjectData()
                     m.redraw()
                 }
             }
@@ -352,14 +312,15 @@ export function ModalFormComponent() {
                 m("form", {
                     class: "row col-12",
                     onsubmit: handleFormSubmit,
-                    oncreate: (vnode) => {
-                        formElement = vnode.dom;
+                    oncreate: ({ dom }) => {
+                        formElement = dom
                     }
                 }, [
                     [m("span", { class: "fw-semibold text-uppercase fs-3 py-3" }, "Datos del proyecto"),
                     m("div", { class: "row py-3 px-0 m-0 d-flex justify-content-evenly  " }, [
                         // Datos Projecto
                         m("div", { class: "row col-xl-8" }, [
+                            // Nombre
                             m("div", { class: "col-md-12 pt-2" }, [
                                 m("label.form-label.ps-1", `Nombre *`),
                                 m("input.form-control", {
@@ -370,8 +331,6 @@ export function ModalFormComponent() {
                                     oninput: (e) => state.ProjectData.name = e.target.value
                                 })
                             ]),
-                            // Espacio en blanco
-                            //m("div.col-md-3.pt-2"),
                             // Estado
                             m("div.col-md-12.col-lg-4.pt-2", [
                                 m("label.form-label.ps-1", "Estado *"),
@@ -388,10 +347,8 @@ export function ModalFormComponent() {
                                     )
                                 ])
                             ]),
-
                             // Fecha de creación
                             m("div.col-md-12.col-lg-4.pt-2", [
-
                                 m("label.form-label.ps-1", "Fecha de inicio *"),
                                 m("input.form-control", {
                                     class: (badForm ? " is-invalid" : ""),
@@ -402,7 +359,6 @@ export function ModalFormComponent() {
                                     max: today,
                                     oninput: e => { state.ProjectData.start_date = e.target.value; m.redraw() }
                                 })
-
                             ]),
                             // Fecha de expiración
                             m("div.col-md-12.col-lg-4.pt-2", [
@@ -416,35 +372,21 @@ export function ModalFormComponent() {
                                     min: today,
                                     oninput: e => { state.ProjectData.end_date = e.target.value; m.redraw() }
                                 })
-                            ]),
-
+                            ])
                         ]),
                         // Cliente
                         m("div", { class: "row col-xl-4 " }, [
-
                             // Cliente input
                             m("div", { class: "col-12 py-1" }, [
                                 m("label.form-label.ps-1", "Cliente *"),
                                 m("select.form-select", {
                                     class: badForm ? "is-invalid" : "",
-                                    required: true,
                                     style: { ...style._input_secondary },
                                     id: "client_id",
-                                    value: state.ProjectData?.client_id,
+                                    value: parseInt(state.ProjectData?.client_id) || "",
                                     onchange: e => {
-                                        state.ProjectData.client_id = e.target.value;
+                                        state.ProjectData.client_id = parseInt(e.target.value);;
                                         m.redraw();
-                                    },
-                                    oncreate: ({ dom }) => {
-                                        if (Array.isArray(state.clients) && state.clients.length > 0) {
-                                            dom.choicesInstance = new Choices(dom, {
-                                                allowHTML: false,
-                                                shouldSort: false,
-                                                searchPlaceholderValue: "Buscar cliente...",
-                                                itemSelectText: '',
-                                            });
-                                            dom.choicesInstance.setChoiceByValue(state.ProjectData?.client_id);
-                                        }
                                     },
                                     onupdate: ({ dom }) => {
                                         if (!dom.choicesInstance && Array.isArray(state.clients) && state.clients.length > 0) {
@@ -455,8 +397,15 @@ export function ModalFormComponent() {
                                                 itemSelectText: '',
                                             });
                                         }
+                                        if (dom.choicesInstance && state.ProjectData?.client_id) {
+                                            dom.choicesInstance.setChoiceByValue(state.ProjectData.client_id.toString());
+                                        }
                                     },
-
+                                    onremove: ({ dom }) => {
+                                        if (dom.choicesInstance) {
+                                            dom.choicesInstance.destroy()
+                                        }
+                                    }
                                 }, [
                                     m("option", {
                                         value: "",
@@ -466,7 +415,7 @@ export function ModalFormComponent() {
                                     ...(Array.isArray(state.clients)
                                         ? state.clients.map(opt =>
                                             m("option", {
-                                                value: opt.client_id
+                                                value: parseInt(opt.client_id)
                                             }, opt.name || opt.content || "Sin nombre")
                                         )
                                         : [])
@@ -492,6 +441,10 @@ export function ModalFormComponent() {
                                 m(Button, {
                                     closeModal: true,
                                     bclass: "btn-danger",
+                                    actions: () => {
+                                        state.ProjectData = ProjectData()
+                                        m.redraw()
+                                    }
                                 }, [m("i.fa.fa-arrow-left.me-2.ms-2.text-light"), "Cancelar",]),
                                 m(Button, {
                                     type: "submit",
@@ -507,19 +460,13 @@ export function ModalFormComponent() {
                                 }, ["Aceptar", m("i.fa.fa-check.me-2.ms-2", { style: { color: "white" } })]),
                             ])
                         ])
-
                     ])]])
 
-            // Render del modal
             return m(Modal, {
                 idModal: "ModalFormProject",
                 title: state.selectedProject?.project_id ? `Actualizando el Project ${state.selectedProject?.name}` : `Creando Nuevo Project`,
                 addBtnClose: false,
-                slots: {
-                    //header: ContentHeaderModal(),
-                    body: ContentBodyModal(),
-                    //footer: ContentFooterModal()
-                }
+                slots: { body: ContentBodyModal(), }
             });
         }
     };
