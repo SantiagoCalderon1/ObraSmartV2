@@ -58,7 +58,7 @@ function authGuard() {
             }
 
             if (!authState.authenticated) {
-                return m(HomePage);
+                return m(LoginPage);
             }
 
             return m("div", {
@@ -114,13 +114,6 @@ const routes = {
     // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
 
-    // Ruta comodín para rutas desconocidas
-    '*': {
-        onmatch: () => {
-            m.route.set('/home')
-            return null
-        }
-    }
 }
 
 // Montamos en app y actualizamos el layout
