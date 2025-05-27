@@ -1,5 +1,3 @@
-// api.js
-
 export async function request(method, url, body = null, routeSet = true) {
     const token = localStorage.getItem("token") || sessionStorage.getItem("token")
     if (!token) {
@@ -22,14 +20,9 @@ export async function request(method, url, body = null, routeSet = true) {
         })
         return data
     } catch (error) {
-        if (routeSet) m.route.set("/login")
         throw error
     }
 }
-
-// funcion para filtar las listas con los datos del input de filtrado
-export const filterList = (list, keyword) => list.filter(item => Object.values(item).some(val => String(val).toLowerCase().includes(keyword?.toLowerCase())))
-
 
 export function generateLastMonths(numMonths = 6) {
     const now = new Date();

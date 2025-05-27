@@ -13,12 +13,7 @@ export function MyAccountPage() {
                 case "show":
                     content = m(Profile);
                     break;
-                /*    case "create":
-                       content = m(MaterialFormPage, { type: "create" });
-                       break;
-                   case "update":
-                       content = m(MaterialFormPage, { type: "update", material_id: attrs.id });
-                       break; */
+
                 default:
                     content = m("div", "Vista no encontrada");
             }

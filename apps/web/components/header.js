@@ -16,8 +16,7 @@ export function Header() {
                 style: { height: "7.5vh", width: "100%", boxShadow: "0px 10px 50px rgba(0, 0, 0, 0.2)", }
             },
                 m('.container-fluid', [
-                    //.d-none.d-md-block
-                    m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
+                     m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
                         m('img', {
                             src: `/dist/logosObraSmart/logo-1.png`, style: { width: "75px", height: "6vh", cursor: "pointer" },
                             onclick: () => m.route.set("/home")

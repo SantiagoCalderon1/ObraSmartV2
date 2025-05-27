@@ -30,8 +30,7 @@ export function GeneratePDF() {
             setTimeout(() => generatePDF(), 10000)
         },
         view: function () {
-            // -- Helpers
-            const headerDocument = () => [
+             const headerDocument = () => [
                 m("div.row", [
                     m("div.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [

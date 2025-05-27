@@ -18,14 +18,7 @@ import { MaterialsPage } from "./pages/materials/materials.js";
 import { MyAccountPage } from "./pages/myAccount/myAccount.js";
 import { GeneratePDF } from "./components/generate-pdf.js";
 
-
-/*
-import { RegisterPage } from "./pages/register.js" 
-import { ProfilePage } from "./pages/profile.js" 
-import { AboutPage } from "./pages/about.js" 
-import { ContactPage } from "./pages/contact.js" 
-import { NotFoundPage } from "./pages/notfound.js" 
-*/
+ 
 
 async function Logout() {
     try {
@@ -120,7 +113,6 @@ const routes = {
 
     // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
-    '/pdf': { view: () => m(authGuard, m(GeneratePDF)) },
 
 }
 

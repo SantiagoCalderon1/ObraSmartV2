@@ -11,6 +11,7 @@
     "vite": "6.3.5"
   },
   "dependencies": {
+    "chart.js": "^4.4.9",
     "choices.js": "^11.1.0"
   }
 }
