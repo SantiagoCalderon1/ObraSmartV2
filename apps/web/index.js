@@ -86,7 +86,7 @@ function authGuard() {
 
 // Definimos las rutas
 const routes = {
-    '/': { view: () => m(authGuard, m(HomePage)) },
+    '/': { view: () => m(LoginPage) },
     '/login': { view: () => m(LoginPage) },
     //'/register': { view: () => m(RegisterPage) },
 
