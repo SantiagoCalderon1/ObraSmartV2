@@ -18,7 +18,7 @@ export function Header() {
                 m('.container-fluid', [
                      m("div", { style: { height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between" } }, [
                         m('img', {
-                            src: `/dist/logosObraSmart/logo-1.png`, style: { width: "75px", height: "6vh", cursor: "pointer" },
+                            src: `/logosObraSmart/logo-1.png`, style: { width: "75px", height: "6vh", cursor: "pointer" },
                             onclick: () => m.route.set("/home")
                         }
                         ),
