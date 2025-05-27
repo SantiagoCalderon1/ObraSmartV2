@@ -8,7 +8,7 @@ export function GeneratePDF() {
     return {
         oncreate: async function ({ attrs }) {
             company = (await fetchCompany(1)).data
-            
+
             title = attrs.title
             if (attrs.invoice) {
                 invoice = attrs.invoice
@@ -30,7 +30,7 @@ export function GeneratePDF() {
             setTimeout(() => generatePDF(), 10000)
         },
         view: function () {
-             const headerDocument = () => [
+            const headerDocument = () => [
                 m("div.row", [
                     m("div.mt-5.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [
@@ -97,7 +97,9 @@ export function GeneratePDF() {
             ]
 
             const footerDocument = () => [
-                headerDocument(),
+                m("div.mt-5",
+                    headerDocument(),
+                ),
                 //subHeaderDocument(),
                 // Condiciones
                 m("div.row.mt-5.py-2.mb-5", [
