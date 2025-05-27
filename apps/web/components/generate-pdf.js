@@ -31,8 +31,8 @@ export function GeneratePDF() {
         },
         view: function () {
              const headerDocument = () => [
-                m("div.mt-4.row", [
-                    m("div.col-md-12.d-flex.justify-content-between.align-items-center", [
+                m("div.mt-t.row", [
+                    m("div.mt-5.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [
                             m("img", {
                                 src: `${URL_IMAGE}${company?.image_route}` || "",
