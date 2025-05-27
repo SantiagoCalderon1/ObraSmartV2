@@ -42,7 +42,7 @@ function authGuard() {
                     if (data) {
                         authState.authenticated = true;
                     }
-                } catch (_) {
+                } catch (error) {
                     authState.authenticated = false;
                 } finally {
                     authState.checked = true;
@@ -114,6 +114,13 @@ const routes = {
     // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
 
+    // Ruta comodín para rutas desconocidas
+    '*': {
+        onmatch: () => {
+            m.route.set('/home')
+            return null
+        }
+    }
 }
 
 // Montamos en app y actualizamos el layout
