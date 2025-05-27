@@ -31,7 +31,7 @@ export function GeneratePDF() {
         },
         view: function () {
              const headerDocument = () => [
-                m("div.mt-t.row", [
+                m("div.row", [
                     m("div.mt-5.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [
                             m("img", {
@@ -214,7 +214,7 @@ export function GeneratePDF() {
             laborPages.forEach((chunk, i) => {
                 pages.push(
                     m("div", {
-                        class: "page-break",
+                        class: "page-break mt-5",
                         style: { pageBreakAfter: "always" }
                     }, [
                         headerDocument(),
