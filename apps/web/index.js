@@ -58,8 +58,10 @@ function authGuard() {
             }
 
             if (!authState.authenticated) {
-                return m(LoginPage);
+                m.route.set("/login");
+                return null;
             }
+
 
             return m("div", {
                 id: "container-app",
