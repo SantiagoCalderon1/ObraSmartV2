@@ -18,7 +18,7 @@ import { MaterialsPage } from "./pages/materials/materials.js";
 import { MyAccountPage } from "./pages/myAccount/myAccount.js";
 import { GeneratePDF } from "./components/generate-pdf.js";
 
- 
+
 
 async function Logout() {
     try {
@@ -84,7 +84,7 @@ function authGuard() {
 
 // Definimos las rutas
 const routes = {
-    '/': { view: () => m(LoginPage) },
+    '/': { view: () => m(authGuard, m(HomePage)) },
     '/login': { view: () => m(LoginPage) },
     //'/register': { view: () => m(RegisterPage) },
 
