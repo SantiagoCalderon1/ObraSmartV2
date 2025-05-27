@@ -242,7 +242,7 @@ export function GeneratePDF() {
                 }
             }, [
                 //m("button.btn.btn-primary.p-3.my-3", { onclick: generatePDF }, "Descargar PDF"),
-                m("div.container.col-11", { id: "pdf-content" }, pages)
+                m("div.container.col-11.pt-2", { id: "pdf-content" }, pages)
             ])
         }
     }
