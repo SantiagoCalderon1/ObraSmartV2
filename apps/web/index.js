@@ -117,4 +117,4 @@ const routes = {
 }
 
 // Montamos en app y actualizamos el layout
-m.route(document.body, "/login", routes);
+m.route(document.body, "/", routes);
