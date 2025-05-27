@@ -26,7 +26,7 @@ class ClientFactory extends Factory
             'nif' => strtoupper(fake()->bothify('########A')),
             'phone' => fake()->phoneNumber(),
             'email' => fake()->unique()->safeEmail(),
-            'address' => fake()->unique()->address(),
+            'address' => fake()->streetAddress(),
         ];
     }
 }

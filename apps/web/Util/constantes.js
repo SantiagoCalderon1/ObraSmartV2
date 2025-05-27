@@ -44,6 +44,6 @@ export const URL_PAYMENTS = `${import.meta.env.VITE_API_URL}/api/payments`
 
 
 export const URL_IMAGE = `${import.meta.env.VITE_API_URL}/storage/`
-
+ 
 
 

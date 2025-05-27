@@ -19,19 +19,23 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-
         // Crear un usuario de prueba
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+            'name' => 'Test Admin',
+            'email' => 'admin@example.com',
             'role' => 'admin',
         ]);
 
+        User::factory()->create([
+            'name' => 'Test Worker',
+            'email' => 'worker@example.com',
+            'role' => 'worker',
+        ]);
 
         Company::factory()->create([
             'name' => 'ObraSmart S.A',
             'nif' => 'A12345678',
-            'phone' => '123456789',
+            'phone' => '987654321',
             'email' => 'obra@smart.com',
             'address' => 'Calle 123, Valencia',
             'image_route' => 'uploads/3lIh7pC9aFYNBYzFCSn6L2L6dL4cFhtjElFQl06s.png',
@@ -45,7 +49,7 @@ class DatabaseSeeder extends Seeder
         LaborType::factory(10)->create();
 
         // Crear clientes
-        Client::factory(10)->create()->each(function ($client) {
+        Client::factory(20)->create()->each(function ($client) {
             // Cada cliente con 1-3 proyectos
             Project::factory(rand(1, 3))
                 ->for($client)

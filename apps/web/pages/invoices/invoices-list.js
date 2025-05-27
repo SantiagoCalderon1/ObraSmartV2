@@ -9,15 +9,16 @@ import { SpinnerLoading } from "../../components/spinner-loading.js"
 
 // IMPORTADOR DE FUNCIONES
 import { fetchInvoices, deleteInvoice, updateInvoice } from "../../Services/services.js"
+//import { GeneratePDF } from "../../components/generate-pdf.js";
 
 export function InvoicesListPage() {
-    let style = { width: "100%", minHeight: "92.5vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", backgroundColor: "#f0f0f0" };
-
     let invoices = []
     let selectedInvoice = null
 
     async function loadInvoices() {
         invoices = (await fetchInvoices()).data
+        console.log(invoices[0]);
+
         m.redraw()
     }
     return {
@@ -284,8 +285,14 @@ function ModalDetailsComponent() {
             // Footer con botón de PDF
             const ContentFooterModal = () =>
                 m(Button, {
-                    //actions: () => GeneratePDF(invoice),
-                    bclass: "btn-outline-danger"
+                    actions: () => {
+                        m.mount(document.getElementById("hidden-pdf"), {
+                            view: () => m(GeneratePDF, {
+                                invoice: invoice,
+                                title: "factura",
+                            })
+                        })
+                    }, bclass: "btn-outline-danger"
                 }, [
                     "Descargar PDF ",
                     m("i.fa-solid.fa-file-pdf.text-danger")

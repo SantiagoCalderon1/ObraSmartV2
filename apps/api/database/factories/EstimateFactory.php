@@ -26,7 +26,7 @@ class EstimateFactory extends Factory
             'status' => fake()->randomElement(['aceptado', 'pendiente', 'rechazado']),
             'issue_date' => $issueDate->format('Y-m-d'),
             'due_date' => $issueDate->modify('+6 months')->format('Y-m-d'),
-            'conditions' => fake()->paragraph(2),
+            'conditions' => fake()->paragraph(3),
         ];
     }
 }

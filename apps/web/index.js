@@ -16,6 +16,7 @@ import { ClientsPage } from "./pages/clients/clients.js";
 import { ProjectsPage } from "./pages/projects/projects.js";
 import { MaterialsPage } from "./pages/materials/materials.js";
 import { MyAccountPage } from "./pages/myAccount/myAccount.js";
+import { GeneratePDF } from "./components/generate-pdf.js";
 
 
 /*
@@ -80,6 +81,7 @@ function authGuard() {
             }, [
                 m(Header),
                 m("main", { id: "app", style: { paddingTop: "7.5vh" } }, children),
+                m("div", { id: "hidden-pdf" })
             ]);
         }
     }
@@ -118,7 +120,7 @@ const routes = {
 
     // Routes MyAccount
     '/my-account': { view: () => m(authGuard, m(MyAccountPage, { option: "show" })) },
-
+    '/pdf': { view: () => m(authGuard, m(GeneratePDF)) },
 
 }
 

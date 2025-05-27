@@ -1,4 +1,3 @@
-import { Modal, ModalConfirmation } from "../../Util/generalsComponents.js";
 import { URL_IMAGE } from "../../Util/constantes.js";
 
 // IMPORTADOR DE FUNCIONES
@@ -457,7 +456,6 @@ function Profile() {
                     }
                 }
             }
-
 
             return m("div", { class: "col-11 d-flex flex-column justify-content-center" }, [
                 m("h1.py-5.text-uppercase.text-center", "configuración de la cuenta"),

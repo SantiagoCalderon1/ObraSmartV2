@@ -1,7 +1,5 @@
 import { EstimatesListPage } from "./estimates-list.js";
 import { EstimateFormPage } from "./estimates-form.js";
-
-
 export function EstimatesPage() {
     return {
         view: function ({ attrs }) {
@@ -25,8 +23,6 @@ export function EstimatesPage() {
         }
     }
 }
-
-
 
 function GeneratePDF(budget, budgetDetails) {
     const PresupuestoView = {

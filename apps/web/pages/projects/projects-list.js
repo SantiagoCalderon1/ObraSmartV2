@@ -68,7 +68,8 @@ export function ProjectsListPage() {
                     m(Table, {
                         columns: columns,
                         data: normalizedProjects,
-                        onRowClick: onSelect
+                        onRowClick: onSelect,
+                        style: { height: "70vh", width: "100%" }
                     }, [m(Button,
                         {
                             type: "submit",
@@ -175,13 +176,6 @@ function ModalDetailsComponent() {
 
             // Footer con botón de PDF
             const ContentFooterModal = () => [
-                m(Button, {
-                    //actions: () => GeneratePDF(estimate),
-                    bclass: "btn-outline-danger"
-                }, [
-                    "Descargar PDF ",
-                    m("i.fa-solid.fa-file-pdf.text-danger")
-                ]),
                 m(Button, {
                     closeModal: true,
                     actions: () => m.route.set(`/projects/${selectedProject?.project_id}`),

@@ -14,7 +14,6 @@ import {
     fetchLaborTypes,
 } from "../../Services/services.js"
 
-
 export function EstimateFormPage() {
     return {
         view: function ({ attrs }) {

@@ -1,11 +1,12 @@
 export function Header() {
     const MENU_ITEM = [
+        { label: "Proyectos", route: "/projects", icon: "fa-hammer" },
         { label: "Presupuestos", route: "/estimates", icon: "fa-file-signature" },
         { label: "Facturas", route: "/invoices", icon: "fa-file-invoice-dollar" },
         { label: "Clientes", route: "/clients", icon: "fa-users" },
         { label: "Materiales", route: "/materials", icon: "fa-shapes" },
-        { label: "Proyectos", route: "/projects", icon: "fa-hammer" },
         { label: "Mi Cuenta", route: "/my-account", icon: "fa-circle-user" },
+        { label: "PDF", route: "/pdf", icon: "fa-circle-user" },
         { route: "/logout", icon: "fa-arrow-right-from-bracket", },
     ]
 

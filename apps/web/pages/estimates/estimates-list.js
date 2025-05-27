@@ -6,6 +6,7 @@ import { EstimatesResumenCard } from "../../components/card-estimates.js"
 import { PageEstructure } from "../../components/page-estrcuture.js"
 import { TableModal } from "../../components/table-modal.js"
 import { SpinnerLoading } from "../../components/spinner-loading.js"
+import { GeneratePDF } from "../../components/generate-pdf.js"
 
 
 // IMPORTADOR DE FUNCIONES
@@ -220,7 +221,14 @@ function ModalDetailsComponent() {
             // Footer con botón de PDF
             const ContentFooterModal = () => [
                 m(Button, {
-                    //actions: () => GeneratePDF(estimate),
+                    actions: () => {
+                        m.mount(document.getElementById("hidden-pdf"), {
+                            view: () => m(GeneratePDF, {
+                                estimate: estimate,
+                                title: "presupuesto",
+                            })
+                        })
+                    },
                     bclass: "btn-outline-danger"
                 }, [
                     "Descargar PDF ",

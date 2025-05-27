@@ -99,7 +99,13 @@ class InvoicesController
     public function show(Invoice $invoice)
     {
         // Cargar relaciones si las hay. Aquí sólo tienes estimate y payments según tu modelo.
-        $invoice->load(['estimate', 'payments']);
+        $invoice->load([
+            'estimate.materials.material',
+            'estimate.labors.laborType',
+            'estimate.client',
+            'estimate.project',
+            'payments'
+        ]);
 
         return response()->json([
             'message' => 'Factura obtenida correctamente',
@@ -122,33 +128,33 @@ class InvoicesController
      * Esta creado para casos excepcionales
      */
     public function update(Request $request, Invoice $invoice)
-{
-    try {
-        $validated = $request->validate([
-            'status' => 'required|string|in:pagado,rechazado,pendiente',
-        ]);
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|string|in:pagado,rechazado,pendiente',
+            ]);
 
-        $invoice->update([
-            'status' => $validated['status'],
-            'user_id' => Auth::id(),
-        ]);
+            $invoice->update([
+                'status' => $validated['status'],
+                'user_id' => Auth::id(),
+            ]);
 
-        return response()->json([
-            'message' => 'Estado de la factura actualizado correctamente.',
-            'data' => $invoice->fresh(),
-        ], 200);
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'message' => 'Datos inválidos.',
-            'errors' => $e->errors(),
-        ], 422);
-    } catch (\Exception $e) {
-        return response()->json([
-            'message' => 'Error al actualizar el estado de la factura.',
-            'error' => $e->getMessage(),
-        ], 500);
+            return response()->json([
+                'message' => 'Estado de la factura actualizado correctamente.',
+                'data' => $invoice->fresh(),
+            ], 200);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Datos inválidos.',
+                'errors' => $e->errors(),
+            ], 422);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Error al actualizar el estado de la factura.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
 
 
 

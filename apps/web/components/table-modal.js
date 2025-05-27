@@ -1,10 +1,10 @@
 export function TableModal() {
     return {
         view: function ({ attrs }) {
-            const { columns, data } = attrs
+            const { columns, data, maxHeight = true, toPDF = false } = attrs
             return m("div.table-responsive", {
                 style: {
-                    maxHeight: "50vh",
+                    maxHeight: maxHeight ? "50vh" : "",
                 }
             },
                 [
@@ -12,7 +12,9 @@ export function TableModal() {
                         m("thead", { class: "py-5 bg-light sticky-top top-0" }, [
                             m("tr", [
                                 ...columns.map(col =>
-                                    m("th.text-nowrap.px-4.py-3", col.title))
+                                    m("th", {
+                                        class: ` ${toPDF ? '' : 'px-4 py-3 text-nowrap'}`
+                                    }, col.title))
                             ])
                         ]),
                         m("tbody", [
@@ -20,7 +22,9 @@ export function TableModal() {
                                 ? data.map(item =>
                                     m("tr", [
                                         ...columns.map(col =>
-                                            m(`td.px-4${col.field === 'description' ? '' : '.text-nowrap'}`, {
+                                            m(`td`, {
+                                                class: ` ${toPDF ? "" : (col.field === 'description' ? '' : 'px-4 py-3 text-nowrap')}  `,
+
                                                 style: typeof col.style === "function" ? col.style(item) : {}
                                             }, [
                                                 item?.[col.field] || "N/A",

@@ -1,8 +1,5 @@
 import { ProjectsListPage } from "./projects-list.js";
 import { ProjectInfoPage } from "./project-info.js";
-//import { ProjectFormPage } from "./client-form.js";
-
-
 export function ProjectsPage() {
     return {
         view: function ({ attrs }) {
@@ -13,11 +10,7 @@ export function ProjectsPage() {
                     break;
                 case "show-info":
                     content = m(ProjectInfoPage, { id: attrs.id });
-                    break;  
-                /*
-                  case "update":
-                      content = m(ProjectFormPage, { type: "update", estimate_number: attrs.id });
-                      break; */
+                    break;
                 default:
                     content = m("div", "Vista no encontrada");
             }

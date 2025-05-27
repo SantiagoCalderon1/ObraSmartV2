@@ -30,7 +30,7 @@ class InvoiceFactory extends Factory
             'due_date' => $issueDate->modify('+6 months')->format('Y-m-d'),
             'total_amount' => fake()->randomFloat(2, 100, 5000),
             'status' => fake()->randomElement(['pagado', 'pendiente', 'rechazado']),
-            'pdf_url' => fake()->optional()->url(),
+            'pdf_url' => "",
         ];
     }
 }

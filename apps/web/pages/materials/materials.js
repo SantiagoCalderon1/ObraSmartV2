@@ -1,7 +1,4 @@
-import { MaterialsListPage } from "./materials-list.js";
-//import { MaterialFormPage } from "./Material-form.js";
-
-
+import { MaterialsListPage } from "./materials-list.js"; 
 export function MaterialsPage() {
     return {
         view: function ({ attrs }) {
@@ -10,12 +7,6 @@ export function MaterialsPage() {
                 case "show":
                     content = m(MaterialsListPage);
                     break;
-                /*    case "create":
-                       content = m(MaterialFormPage, { type: "create" });
-                       break;
-                   case "update":
-                       content = m(MaterialFormPage, { type: "update", material_id: attrs.id });
-                       break; */
                 default:
                     content = m("div", "Vista no encontrada");
             }
