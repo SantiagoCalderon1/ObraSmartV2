@@ -19,6 +19,8 @@ import { MyAccountPage } from "./pages/myAccount/myAccount.js";
 import { GeneratePDF } from "./components/generate-pdf.js";
 
 
+//import { RegisterPage } from "./pages/register.js" 
+
 
 async function Logout() {
     try {
@@ -42,7 +44,7 @@ function authGuard() {
                     if (data) {
                         authState.authenticated = true;
                     }
-                } catch (error) {
+                } catch (_) {
                     authState.authenticated = false;
                 } finally {
                     authState.checked = true;
@@ -117,4 +119,4 @@ const routes = {
 }
 
 // Montamos en app y actualizamos el layout
-m.route(document.body, "/", routes);
+m.route(document.body, "/login", routes);
