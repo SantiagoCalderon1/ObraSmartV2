@@ -31,7 +31,7 @@ export function GeneratePDF() {
         },
         view: function () {
              const headerDocument = () => [
-                m("div.pt-2.row", [
+                m("div.mt-4.row", [
                     m("div.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [
                             m("img", {
@@ -62,7 +62,7 @@ export function GeneratePDF() {
 
             const estimateData = () => [
                 m("div.text-start", [
-                    m("p.mb-0", `Nº: ${estimate?.invoice_number || ""}`),
+                    m("p.mb-0", `Nº: ${estimate?.estimate_number || ""}`),
                     m("p.mb-0", `Fecha emisión: ${estimate?.issue_date || ""}`),
                     m("p.mb-0", `Válido hasta: ${estimate?.issue_date || ""}`),
                 ]),
