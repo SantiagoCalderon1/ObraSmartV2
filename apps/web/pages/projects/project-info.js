@@ -157,7 +157,7 @@ function ProjectChartBox() {
             const costs = project?.estimates?.map(e => e.total_cost || 0)
             const invoices = project?.estimates?.map(e => e.invoice?.total_amount || 0)
 
-            console.log(labels, costs, invoices)
+            //console.log(labels, costs, invoices)
 
             new Chart(ctx, {
                 type: "bar",
@@ -881,13 +881,13 @@ function ModalStockFormComponent() {
         oninit: async ({ attrs }) => {
             state.materials = (await fetchMaterials()).data
             state.StockMovementData.project_id = attrs.project_id
-            console.log(state.materials)
+            //console.log(state.materials)
         },
 
         view: function ({ attrs }) {
             const handleFormSubmit = async () => {
                 try {
-                    console.log("Datos a enviar: ", state.StockMovementData)
+                    //console.log("Datos a enviar: ", state.StockMovementData)
 
                     if (!state.StockMovementData.material_id) {
                         Toastify({

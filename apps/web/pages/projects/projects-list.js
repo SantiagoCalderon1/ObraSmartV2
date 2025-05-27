@@ -237,7 +237,7 @@ export function ModalFormComponent() {
             state.selectedProject = attrs.selectedProject;
             state.ProjectData = ProjectData(attrs.selectedProject || {});
             state.clients = (await fetchClients()).data
-            console.log(state.clients);
+            //console.log(state.clients);
 
         },
         onupdate: ({ attrs }) => {

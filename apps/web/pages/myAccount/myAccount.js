@@ -35,8 +35,8 @@ function Profile() {
     async function loadData() {
         user = (await fetchUser()).user;
         company = (await fetchCompany(1)).data;
-        console.log(user);
-        console.log(company);
+        //console.log(user);
+        //console.log(company);
 
         m.redraw();
     }
@@ -80,10 +80,10 @@ function Profile() {
             const handleCompanyFormSubmit = async (e) => {
                 e.preventDefault();
                 const dataToSend = company
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 try {
                     let response = await updateCompany(dataToSend, company.company_id);
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
 
 
                     //console.log("Response form: ", response);
@@ -161,17 +161,17 @@ function Profile() {
                 }
                 const formData = new FormData();
                 formData.append("image_route", company.logo_img);
-                console.log("Company logo ", company.logo_img);
+                //console.log("Company logo ", company.logo_img);
                 try {
                     const response = await updateCompanyLogo(formData, company.company_id);
-                    console.log("Response form img: ", response);
+                    //console.log("Response form img: ", response);
                     Toastify({
                         text: "¡Logo actualizado!",
                         className: "toastify-success",
                         duration: 3000,
                     }).showToast();
                 } catch (err) {
-                    console.error("Error al enviar el formulario de cambio de logo:", err);
+                    //console.error("Error al enviar el formulario de cambio de logo:", err);
                     Toastify({
                         text: "Error al subir logo.",
                         className: "toastify-error",

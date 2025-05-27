@@ -19,11 +19,11 @@ export function GeneratePDF() {
                 client = estimate?.client
             }
 
-            console.log("Company: ", company)
-            console.log("Invoice: ", invoice)
-            console.log("Estimate: ", estimate)
-            console.log("Client: ", client)
-            console.log("Title: ", title)
+            //console.log("Company: ", company)
+            //console.log("Invoice: ", invoice)
+            //console.log("Estimate: ", estimate)
+            //console.log("Client: ", client)
+            //console.log("Title: ", title)
             m.redraw()
 
             // Espera 10s a que se renderice el componente

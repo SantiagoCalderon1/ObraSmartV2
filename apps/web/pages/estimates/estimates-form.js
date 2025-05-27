@@ -139,7 +139,7 @@ function EstimateFormComponent() {
         const isUpdate = type === "update"
         e.preventDefault()
         const dataToSend = collectFormData()
-        console.log(dataToSend);
+        //console.log(dataToSend);
 
 
         try {
@@ -201,7 +201,7 @@ function EstimateFormComponent() {
                 m.route.set("/estimates")
             }
         } catch (error) {
-            console.error(error)
+            //console.error(error)
             Toastify({
                 text: "¡Algo salió mal!",
                 className: "toastify-error",
@@ -907,7 +907,7 @@ function EstimateFormComponent() {
                 ])
             ]
 
-            console.log(state.estimateMaterialData);
+            //console.log(state.estimateMaterialData);
             
 
             //Formulario completo y renderizado
