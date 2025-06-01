@@ -203,7 +203,7 @@ function Profile() {
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Logo de la Compañía"),
                     m("img", {
-                        src: company.image_preview || company.image_base64 || "/logosObraSmart/logo-1.png",
+                        src: company.image_preview || company.image_base64,
                         style: {
                             width: "300px",
                             height: "300px",
