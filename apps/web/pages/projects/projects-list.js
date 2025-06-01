@@ -263,7 +263,7 @@ export function ModalFormComponent() {
             state.selectedProject = attrs.selectedProject;
             state.ProjectData = ProjectData(attrs.selectedProject || {});
             state.clients = (await fetchClients()).data
-            console.log(state.ProjectData);
+            //console.log(state.ProjectData);
 
         },
         onupdate: ({ attrs }) => {
@@ -277,7 +277,7 @@ export function ModalFormComponent() {
                 state.ProjectData.client_id = String(state.ProjectData.client_id);
 
                 const dataToSend = state.ProjectData
-                console.log(dataToSend);
+                //console.log(dataToSend);
 
                 try {
                     const { client_id, } = state.ProjectData;
@@ -319,7 +319,7 @@ export function ModalFormComponent() {
                         }).showToast()
                     }
                 } catch (error) {
-                    console.error(error);
+                    //console.error(error);
 
                     Toastify({
                         text: "¡Algo salió mal!",

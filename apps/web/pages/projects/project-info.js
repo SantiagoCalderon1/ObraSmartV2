@@ -34,7 +34,7 @@ export function ProjectInfoPage() {
                 proyectName: project.name
             }))
         }
-        console.log(project);
+        //console.log(project);
 
         isLoading = false;
         lastUpdated = Date.now()

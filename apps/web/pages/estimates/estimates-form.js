@@ -139,7 +139,7 @@ function EstimateFormComponent() {
         const isUpdate = type === "update"
         e.preventDefault()
         const dataToSend = collectFormData()
-        console.log(dataToSend);
+        //console.log(dataToSend);
 
 
         try {
@@ -183,7 +183,7 @@ function EstimateFormComponent() {
                 ? await updateEstimate(dataToSend, state.selectedEstimate.estimate_number)
                 : await createEstimate(dataToSend)
 
-            console.log(data);
+            //console.log(data);
             
             // Resetear solo si se creó nuevo
             if (!isUpdate) {
@@ -247,13 +247,13 @@ function EstimateFormComponent() {
 
     // Funcion que obtiene el total con el iva ya aplicado
     const getTotal = () => {
-        console.log("En getTotal");
+        //console.log("En getTotal");
 
         const subtotal = parseFloat(getSubtotal()) || 0
         const ivaPercent = parseFloat(state.estimateData?.iva) || 21
         const iva = ivaPercent / 100
         const total = subtotal * (1 + iva)
-        console.log("Total: ", Number(total).toFixed(2));
+        //console.log("Total: ", Number(total).toFixed(2));
 
         return Number(total).toFixed(2)
 
@@ -503,7 +503,7 @@ function EstimateFormComponent() {
                                 value: Number(state.estimateData?.iva),
                                 onchange: e => {
                                     state.estimateData.iva = Number(e.target.value)
-                                    console.log(state.estimateData.iva);
+                                    //console.log(state.estimateData.iva);
 
                                     m.redraw()
                                 }

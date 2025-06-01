@@ -26,10 +26,10 @@ export function GeneratePDF() {
             }
 
 
-            console.log("Factura: ", invoice);
-            console.log("Estimado: ", estimate);
+            //console.log("Factura: ", invoice);
+            //console.log("Estimado: ", estimate);
 
-            console.log("creando pdf");
+            //console.log("creando pdf");
 
             m.redraw()
             // Espera 10s a que se renderice el componente
@@ -277,7 +277,7 @@ export function GeneratePDF() {
             pagebreak: { mode: ['css', 'legacy'] }
         }).from(element).save().then(() => {
             // Elimina el contenedor del DOM después de guardar
-            console.log("eliminado elemento");
+            //console.log("eliminado elemento");
 
             element?.remove()
         })

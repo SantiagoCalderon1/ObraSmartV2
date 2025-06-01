@@ -36,7 +36,7 @@ function Profile() {
         user = (await fetchUser()).user;
         company = (await fetchCompany(1)).data;
         //console.log(user);
-        console.log(company);
+        //console.log(company);
 
 
 
@@ -50,12 +50,12 @@ function Profile() {
             const handleFormSubmit = async (e) => {
                 e.preventDefault();
                 const dataToSend = user;
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 try {
                     let response;
                     response = await updateUser(dataToSend, user.user_id);
 
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
                     if (response) {
                         Toastify({
                             text: "¡Operación exitosa!",
@@ -67,7 +67,7 @@ function Profile() {
                         }).showToast()
                     }
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error);
+                    //console.error("Error al enviar el formulario:", error);
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -85,10 +85,10 @@ function Profile() {
             const handleCompanyFormSubmit = async (e) => {
                 e.preventDefault();
                 const dataToSend = company
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
                 try {
                     let response = await updateCompany(dataToSend, company.company_id);
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
 
                     if (response) {
                         Toastify({
@@ -102,7 +102,7 @@ function Profile() {
                     }
 
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error);
+                    //console.error("Error al enviar el formulario:", error);
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -124,11 +124,11 @@ function Profile() {
                     new_password: user.newPassword,
                     new_password_confirmation: user.passwordConfirmation
                 };
-                console.log("dataToSend: ", dataToSend);
+                //console.log("dataToSend: ", dataToSend);
 
                 try {
                     let response = await updatePassword(dataToSend);
-                    console.log("Response form: ", response);
+                    //console.log("Response form: ", response);
 
                     if (response) {
                         Toastify({
@@ -141,7 +141,7 @@ function Profile() {
                         }).showToast()
                     }
                 } catch (error) {
-                    console.error("Error al enviar el formulario de cambio de contraseña:", error);
+                    //console.error("Error al enviar el formulario de cambio de contraseña:", error);
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
@@ -166,10 +166,10 @@ function Profile() {
                 }
                 const formData = new FormData();
                 formData.append("image_route", company.logo_img);
-                console.log("Company logo ", company.logo_img);
+                //console.log("Company logo ", company.logo_img);
                 try {
                     const response = await updateCompanyLogo(formData, company.company_id);
-                    console.log("Response form img: ", response);
+                    //console.log("Response form img: ", response);
                     if (response) {
                         Toastify({
                             text: "¡Operación exitosa!",
@@ -181,7 +181,7 @@ function Profile() {
                         }).showToast()
                     }
                 } catch (err) {
-                    console.error("Error al enviar el formulario de cambio de logo:", err);
+                    //console.error("Error al enviar el formulario de cambio de logo:", err);
                     Toastify({
                         text: "Error al subir logo.",
                         className: "toastify-error",

@@ -19,7 +19,7 @@ export function InvoicesListPage() {
     async function loadInvoices() {
         invoices = (await fetchInvoices()).data
         lastUpdated = Date.now()
-        console.log(invoices[0]);
+        //console.log(invoices[0]);
         m.redraw()
     }
     return {
@@ -59,7 +59,7 @@ export function InvoicesListPage() {
                         m.route.set("/invoices")
                     }
                 } catch (error) {
-                    console.error("Error al enviar el formulario:", error)
+                    //console.error("Error al enviar el formulario:", error)
                     Toastify({
                         text: "¡Algo salió mal!",
                         className: "toastify-error",
