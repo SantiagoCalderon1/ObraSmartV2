@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('email')->unique();
             $table->string('address');
-            $table->string('image_route')->nullable();
+            $table->mediumText('image_route')->nullable();
             $table->timestamps();
         });
     }

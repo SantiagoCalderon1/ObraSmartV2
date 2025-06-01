@@ -1,8 +1,7 @@
 import { fetchCompany, fetchEstimate, fetchInvoice } from "../Services/services.js"
 import { URL_IMAGE } from "../Util/constantes.js"
 import { TableModal } from "./table-modal.js"
-import { toBase64FromURL } from "../Util/util.js"
-
+ 
 
 export function GeneratePDF() {
     let company = {}, invoice = {}, estimate = {}, client = {}, title = "", iva = 0
@@ -10,13 +9,7 @@ export function GeneratePDF() {
         oncreate: async function ({ attrs }) {
             company = (await fetchCompany(1)).data
 
-            if (company?.image_route) {
-                try {
-                    company.image_base64 = await toBase64FromURL(`${URL_IMAGE}${company.image_route}`)
-                } catch (err) {
-                    //console.error("Error convirtiendo imagen a base64:", err)
-                }
-            }
+ 
 
             title = attrs.title
             if (attrs.invoice) {
@@ -48,7 +41,7 @@ export function GeneratePDF() {
                     m("div.mt-5.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [
                             m("img", {
-                                src: company.image_base64 || "/logosObraSmart/logo-1.png",
+                                src: company.image_route || "/logosObraSmart/logo-1.png",
                                 alt: "Logo",
                                 style: "width: 100px; height: 100px;"
                             }),

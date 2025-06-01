@@ -121,25 +121,19 @@ class CompanyController extends Controller
                 'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
             ]);
 
-            $rutaImg = '';
-
             if ($request->hasFile('image_route')) {
-                // Eliminar imagen anterior si existe
-                if ($company->image_route && Storage::exists($company->image_route)) {
-                    Storage::delete($company->image_route);
-                }
+            
 
-                // Subir nueva imagen
-                $rutaImg = $request->file('image_route')->store('uploads');
-                $validated['image_route'] = $rutaImg;
+                $file = $request->file('image_route');
+                $mime = $file->getMimeType();  
+                $data = base64_encode(file_get_contents($file));
+                $base64Image = "data:$mime;base64,$data";
+
+                $validated['image_route'] = $base64Image;
             }
 
             $company->update($validated);
             $company->refresh();
-
-            /* if ($company->image_route) {
-                $company->image_route = asset('storage/' . $company->image_route);
-            } */
 
             return response()->json([
                 'message' => 'Imagen de la compañía actualizada correctamente.',
@@ -149,6 +143,37 @@ class CompanyController extends Controller
             return response()->json(['error' => $th->getMessage()], 422);
         }
     }
+
+
+    /* public function updateLogo(Request $request, Company $company)
+    {
+        try {
+            $validated = $request->validate([
+                'image_route' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:4096',
+            ]);
+            $rutaImg = '';
+            if ($request->hasFile('image_route')) {
+                // Eliminar imagen anterior si existe
+                if ($company->image_route && Storage::exists($company->image_route)) {
+                    Storage::delete($company->image_route);
+                }
+                // Subir nueva imagen
+                $rutaImg = $request->file('image_route')->store('uploads');
+                $validated['image_route'] = $rutaImg;
+            }
+            $company->update($validated);
+            $company->refresh();
+             if ($company->image_route) {
+                $company->image_route = asset('storage/' . $company->image_route);
+            } 
+            return response()->json([
+                'message' => 'Imagen de la compañía actualizada correctamente.',
+                'data' => $company
+            ], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['error' => $th->getMessage()], 422);
+        }
+    } */
 
 
 
