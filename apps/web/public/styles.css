@@ -1,0 +1,226 @@
+/* VARIABLES GLOBALES PARA LOS ESTILOS */
+:root {
+  --mainWhite: #fff;
+  --mainBlack: #000;
+  --mainGray: #F3F4F8;
+  --mainDarkBlue: #2D558C;
+  --mainPurple: #8044fe;
+
+  --secondaryWhite: #f0f0f0;
+  --secondaryBlack: #1d1d1d;
+  --secondaryDarkBlue: #284B7D;
+  --secondaryRed: #D83B2E;
+  --secondaryPurple: #8044FE80;
+
+
+  --secondaryLigthGreen: #00B2A9;
+  --secondaryLigthBlue: #18A0FB;
+}
+
+
+* {
+  color: #1d1d1d;
+  padding: 0;
+  margin: 0;
+  /* font-family: 'Pacifico','Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif; */
+  font-family: "Source Code Pro", monospace, "Playwrite DE Grund", system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.primaryBtn {
+  background-color: #F2A516;
+}
+
+.secondaryBtn {
+  background-color: #38BDF2;
+}
+
+#container-app {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+#header,
+#app,
+#footer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toastify {
+  margin-top: 8vh;
+  border-radius: 10px;
+  padding: 15px;
+  font-size: 16px;
+  background-color: green !important;
+}
+
+.notifySuccess {
+  background: "none";
+}
+
+.notifyError {
+  background-color: red !important;
+}
+
+a {
+  text-decoration: none;
+}
+
+p {
+  margin: 0;
+  padding: 0;
+}
+
+
+
+/* Contenedor principal Choices */
+.choices {
+  font-size: var(--font-size, 1rem) !important;
+  width: 100%;
+}
+
+/* Caja de entrada principal */
+.choices__inner {
+  color: #000 !important;
+  background-color: var(--mainGray) !important;
+  border: 1px solid var(--mainPurple) !important;
+  border-radius: 0.375rem !important;
+  padding: 0 !important;
+  min-height: 38px !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.choices__list,
+.choices__list--single {
+  padding: 0 !important;
+  color: #000 !important;
+}
+
+/* Al enfocar */
+.choices.is-focused .choices__inner {
+  border-color: var(--mainPurple) !important;
+  box-shadow: 0 0 0 2px rgba(123, 63, 228, 0.15);
+}
+
+/* Dropdown */
+.choices__list--dropdown {
+  background-color: var(--mainGray) !important;
+  border: 1px solid var(--secondaryPurple) !important;
+  border-radius: 0 0 0.375rem 0.375rem !important;
+  max-height: 300px !important;
+  overflow-y: auto ;
+  margin: 0  0 20px 0 !important;
+}
+
+/* Items del dropdown */
+.choices__item--selectable {
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* Hover o seleccionado */
+.choices__item--selectable.is-highlighted {
+  background-color: var(--secondaryPurple) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+}
+
+/* Clase para envolver y aplicar  */
+.my-choices-container .choices__inner {
+  background-color: var(--mainGray) !important;
+  border: 1px solid var(--mainPurple) !important;
+}
+
+
+
+
+
+/* Estilos personalizados para Toastify */
+.toastify-success {
+  background: #28a745 !important;
+  /* Verde */
+  color: #fff;
+  border-radius: 10px;
+}
+
+.toastify-error {
+  background: #dc3545 !important;
+  /* Rojo */
+  color: #fff;
+  border-radius: 10px;
+}
+
+.toastify-warning {
+  background: #ffc107 !important;
+  /* Amarillo */
+  color: #000;
+  border-radius: 10px;
+}
+
+.toastify-info {
+  background: #17a2b8 !important;
+  /* Azul clarito */
+  color: #fff;
+  border-radius: 10px;
+}
+
+/* Opcional: Estilo general para todos */
+.toastify {
+  font-size: 16px;
+  padding: 15px 20px;
+  margin-top: 8vh;
+  /* Para que no tape el header */
+}
+
+/* 
+
+// Notificación de éxito
+Toastify({
+  text: "¡Operación exitosa!",
+  className: "toastify-success",
+  duration: 3000,
+  close: true,
+  gravity: "top", // "top" o "bottom"
+  position: "right" // "left", "center" o "right"
+}).showToast();
+
+// Notificación de error
+Toastify({
+  text: "¡Algo salió mal!",
+  className: "toastify-error",
+  duration: 3000,
+  close: true,
+  gravity: "top",
+  position: "right"
+}).showToast();
+
+// Notificación de advertencia
+Toastify({
+  text: "¡Cuidado con esto!",
+  className: "toastify-warning",
+  duration: 3000,
+  close: true,
+  gravity: "top",
+  position: "right"
+}).showToast();
+
+// Notificación de información
+Toastify({
+  text: "Dato interesante",
+  className: "toastify-info",
+  duration: 3000,
+  close: true,
+  gravity: "top",
+  position: "right"
+}).showToast();
+
+
+*/

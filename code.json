@@ -1,0 +1,323 @@
+{
+    "invoice_id": 1,
+    "invoice_number": "INV-89216",
+    "estimate_id": 1,
+    "issue_date": "2025-03-14",
+    "due_date": "2025-09-14",
+    "total_amount": "3658.00",
+    "status": "pendiente",
+    "pdf_url": "http://www.block.com/",
+    "created_at": "2025-05-26T22:11:54.000000Z",
+    "updated_at": "2025-05-26T22:11:54.000000Z",
+    "estimate": {
+        "estimate_id": 1,
+        "user_id": 1,
+        "estimate_number": "EST-12336",
+        "project_id": 1,
+        "client_id": 1,
+        "issue_date": "2025-03-05",
+        "due_date": "2025-09-05",
+        "status": "Aceptado",
+        "discount": null,
+        "iva": 10,
+        "total_cost": "594.99",
+        "conditions": "Qui consequatur consectetur omnis nisi ex. Eius architecto odio animi omnis.",
+        "created_at": "2025-05-26T22:11:54.000000Z",
+        "updated_at": "2025-05-26T22:11:54.000000Z",
+        "materials": [
+            {
+                "estimate_material_id": 1,
+                "estimate_id": 1,
+                "material_id": 17,
+                "quantity": 15,
+                "unit_price": "72.01",
+                "discount": "42.97",
+                "total_price": "1037.18",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "material": {
+                    "material_id": 17,
+                    "name": "odio",
+                    "unit": "m2",
+                    "price_per_unit": "38.97",
+                    "stock_quantity": 215,
+                    "min_stock_alert": 20,
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_material_id": 2,
+                "estimate_id": 1,
+                "material_id": 16,
+                "quantity": 43,
+                "unit_price": "231.89",
+                "discount": "13.08",
+                "total_price": "9958.19",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "material": {
+                    "material_id": 16,
+                    "name": "omnis",
+                    "unit": "lt",
+                    "price_per_unit": "34.66",
+                    "stock_quantity": 324,
+                    "min_stock_alert": 48,
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_material_id": 3,
+                "estimate_id": 1,
+                "material_id": 19,
+                "quantity": 2,
+                "unit_price": "152.28",
+                "discount": "41.54",
+                "total_price": "263.02",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "material": {
+                    "material_id": 19,
+                    "name": "dolore",
+                    "unit": "m2",
+                    "price_per_unit": "23.68",
+                    "stock_quantity": 470,
+                    "min_stock_alert": 45,
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_material_id": 4,
+                "estimate_id": 1,
+                "material_id": 6,
+                "quantity": 32,
+                "unit_price": "78.29",
+                "discount": "38.49",
+                "total_price": "2466.79",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "material": {
+                    "material_id": 6,
+                    "name": "enim",
+                    "unit": "unidades",
+                    "price_per_unit": "43.75",
+                    "stock_quantity": 100,
+                    "min_stock_alert": 10,
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            }
+        ],
+        "labors": [
+            {
+                "estimate_labor_id": 1,
+                "estimate_id": 1,
+                "labor_type_id": 2,
+                "hours": 4,
+                "cost_per_hour": "85.58",
+                "discount": "23.70",
+                "total_cost": "318.62",
+                "description": "Amet quia assumenda accusamus ad vitae aut. Quas libero amet sunt fugiat adipisci enim.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 2,
+                    "name": "Chemistry Teacher",
+                    "cost_per_hour": "14.70",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 2,
+                "estimate_id": 1,
+                "labor_type_id": 8,
+                "hours": 29,
+                "cost_per_hour": "47.21",
+                "discount": "16.82",
+                "total_cost": "1352.27",
+                "description": "Esse sed nisi ratione. Eligendi optio qui unde dolorem dolorem.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 8,
+                    "name": "Home Appliance Installer",
+                    "cost_per_hour": "21.61",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 3,
+                "estimate_id": 1,
+                "labor_type_id": 6,
+                "hours": 26,
+                "cost_per_hour": "82.48",
+                "discount": "36.70",
+                "total_cost": "2107.78",
+                "description": "Sunt dolor ea perferendis quisquam tempore reiciendis. Voluptate et consequatur deleniti illum ex dolor.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 6,
+                    "name": "Terrazzo Workes and Finisher",
+                    "cost_per_hour": "21.20",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 4,
+                "estimate_id": 1,
+                "labor_type_id": 1,
+                "hours": 3,
+                "cost_per_hour": "86.70",
+                "discount": "45.39",
+                "total_cost": "214.71",
+                "description": "Autem minus aut ducimus sint enim quis. Libero eum mollitia maxime quia dicta illo.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 1,
+                    "name": "Credit Checker",
+                    "cost_per_hour": "48.80",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 5,
+                "estimate_id": 1,
+                "labor_type_id": 5,
+                "hours": 13,
+                "cost_per_hour": "97.41",
+                "discount": "17.67",
+                "total_cost": "1248.66",
+                "description": "Et facere vitae rerum natus vitae autem. Dolorem ad quia voluptatem nisi facilis doloremque tenetur nam. Reiciendis corrupti autem est assumenda.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 5,
+                    "name": "Paste-Up Worker",
+                    "cost_per_hour": "22.69",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 6,
+                "estimate_id": 1,
+                "labor_type_id": 1,
+                "hours": 3,
+                "cost_per_hour": "28.10",
+                "discount": "41.75",
+                "total_cost": "42.55",
+                "description": "Exercitationem est quae praesentium iure corrupti ullam rerum. Quia labore quidem earum delectus asperiores.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 1,
+                    "name": "Credit Checker",
+                    "cost_per_hour": "48.80",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 7,
+                "estimate_id": 1,
+                "labor_type_id": 3,
+                "hours": 1,
+                "cost_per_hour": "92.99",
+                "discount": "24.84",
+                "total_cost": "68.15",
+                "description": "Quasi sunt dolor commodi expedita voluptatem. Tenetur tempore qui soluta illo nihil et ex.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 3,
+                    "name": "Detective",
+                    "cost_per_hour": "37.61",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            },
+            {
+                "estimate_labor_id": 8,
+                "estimate_id": 1,
+                "labor_type_id": 8,
+                "hours": 7,
+                "cost_per_hour": "94.03",
+                "discount": "43.64",
+                "total_cost": "614.57",
+                "description": "Provident exercitationem consequatur necessitatibus blanditiis sit quas. Eaque sit quo quae et qui.",
+                "created_at": "2025-05-26T22:11:54.000000Z",
+                "updated_at": "2025-05-26T22:11:54.000000Z",
+                "labor_type": {
+                    "labor_type_id": 8,
+                    "name": "Home Appliance Installer",
+                    "cost_per_hour": "21.61",
+                    "created_at": "2025-05-26T22:11:53.000000Z",
+                    "updated_at": "2025-05-26T22:11:53.000000Z"
+                }
+            }
+        ],
+        "client": {
+            "client_id": 1,
+            "name": "Reilly Ltd",
+            "nif": "56381828A",
+            "phone": "+1-534-601-5064",
+            "email": "frederique.hirthe@example.com",
+            "address": "1760 Luz Lakes\nSwifthaven, KS 98971-7886",
+            "created_at": "2025-05-26T22:11:53.000000Z",
+            "updated_at": "2025-05-26T22:11:53.000000Z"
+        },
+        "project": {
+            "project_id": 1,
+            "client_id": 1,
+            "name": "Ad est est.",
+            "description": "Et illum animi ut quisquam nobis corrupti. Animi nihil magni iure.",
+            "status": "completado",
+            "start_date": "2025-03-13",
+            "end_date": "2025-09-13",
+            "created_at": "2025-05-26T22:11:54.000000Z",
+            "updated_at": "2025-05-26T22:11:54.000000Z"
+        },
+        "user": {
+            "user_id": 1,
+            "name": "Test User",
+            "lastname": "Kulas",
+            "email": "test@example.com",
+            "role": "admin",
+            "email_verified_at": "2025-05-26T22:11:52.000000Z",
+            "phone": "1-313-484-0222",
+            "profile_picture": null,
+            "created_at": "2025-05-26T22:11:52.000000Z",
+            "updated_at": "2025-05-26T22:11:52.000000Z"
+        }
+    },
+    "payments": [
+        {
+            "payment_id": 1,
+            "invoice_id": 1,
+            "payment_method": "Stripe",
+            "amount": "476.11",
+            "payment_date": "1997-10-07",
+            "transaction_id": "39d2af3d-0efd-3c2d-9b26-21a3b53793b5",
+            "created_at": "2025-05-26T22:11:54.000000Z",
+            "updated_at": "2025-05-26T22:11:54.000000Z"
+        },
+        {
+            "payment_id": 2,
+            "invoice_id": 1,
+            "payment_method": "Paypal",
+            "amount": "254.96",
+            "payment_date": "1989-06-11",
+            "transaction_id": "e05e144f-50e5-362f-8ffb-01ac906e8aa4",
+            "created_at": "2025-05-26T22:11:54.000000Z",
+            "updated_at": "2025-05-26T22:11:54.000000Z"
+        }
+    ]
+}

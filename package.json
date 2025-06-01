@@ -1,0 +1,23 @@
+{
+  "name": "obrasmartv2",
+  "version": "2.0.0",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build --cache-dir=.turbo"
+  },
+  "devDependencies": {
+    "turbo": "2.5.3"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "npm@8.5.0",
+  "dependencies": {
+    "chart.js": "^4.4.9",
+    "choices.js": "^11.1.0",
+    "jspdf": "^3.0.1",
+    "jspdf-autotable": "^5.0.2",
+    "tabulator-tables": "^6.3.1"
+  }
+}
