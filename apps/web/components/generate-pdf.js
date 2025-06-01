@@ -1,18 +1,8 @@
 import { fetchCompany, fetchEstimate, fetchInvoice } from "../Services/services.js"
 import { URL_IMAGE } from "../Util/constantes.js"
 import { TableModal } from "./table-modal.js"
+import { toBase64FromURL } from "../Util/util.js"
 
-async function toBase64FromURL(url) {
-    const response = await fetch(url)
-    const blob = await response.blob()
-
-    return await new Promise((resolve, reject) => {
-        const reader = new FileReader()
-        reader.onloadend = () => resolve(reader.result)
-        reader.onerror = reject
-        reader.readAsDataURL(blob)
-    })
-}
 
 export function GeneratePDF() {
     let company = {}, invoice = {}, estimate = {}, client = {}, title = "", iva = 0
@@ -293,10 +283,10 @@ export function GeneratePDF() {
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: ['css', 'legacy'] }
         }).from(element).save().then(() => {
-                // Elimina el contenedor del DOM después de guardar
-                console.log("eliminado elemento");
-                
-                element?.remove()
-            })
+            // Elimina el contenedor del DOM después de guardar
+            console.log("eliminado elemento");
+
+            element?.remove()
+        })
     }
 }  

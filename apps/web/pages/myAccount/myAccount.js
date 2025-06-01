@@ -4,6 +4,7 @@ import { URL_IMAGE } from "../../Util/constantes.js";
 import { fetchCompany, fetchUser, updateUser, updateCompany, updateCompanyLogo, updatePassword } from "../../Services/services.js";
 
 import { Button } from "../../components/button.js";
+import { toBase64FromURL } from "../../Util/util.js";
 
 export function MyAccountPage() {
     return {
@@ -37,6 +38,14 @@ function Profile() {
         company = (await fetchCompany(1)).data;
         //console.log(user);
         console.log(company);
+
+        if (company?.image_route) {
+            try {
+                company.image_base64 = await toBase64FromURL(`${URL_IMAGE}${company.image_route}`)
+            } catch (err) {
+                //console.error("Error convirtiendo imagen a base64:", err)
+            }
+        }
 
         m.redraw();
     }
@@ -194,7 +203,7 @@ function Profile() {
                 m("div", { class: "col-12 d-flex flex-column justify-content-center align-items-center gap-3" }, [
                     m("h3", "Logo de la Compañía"),
                     m("img", {
-                        src: company.image_preview || `${URL_IMAGE}${company.image_route}`,
+                        src: company.image_preview || company.image_base64 || "/logosObraSmart/logo-1.png",
                         style: {
                             width: "300px",
                             height: "300px",
