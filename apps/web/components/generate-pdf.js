@@ -48,7 +48,7 @@ export function GeneratePDF() {
                     m("div.mt-5.col-md-12.d-flex.justify-content-between.align-items-center", [
                         m("div.text-center", [
                             m("img", {
-                                src: company.image_base64 ,
+                                src: company.image_base64 || "/logosObraSmart/logo-1.png",
                                 alt: "Logo",
                                 style: "width: 100px; height: 100px;"
                             }),
