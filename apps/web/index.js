@@ -86,8 +86,9 @@ function authGuard() {
 
 // Definimos las rutas
 const routes = {
-    '/': { view: () => m(LoginPage) },
-    '/login': { view: () => m(LoginPage) },
+    //'/': { view: () => m(LoginPage) },
+    '/': { view: () => m(HomePage) },
+    //'/login': { view: () => m(LoginPage) },
     //'/register': { view: () => m(RegisterPage) },
 
     // Rutas protegidas  
