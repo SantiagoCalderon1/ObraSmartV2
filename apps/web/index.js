@@ -53,13 +53,13 @@ function authGuard() {
             }
         },
         view: function ({ children }) {
-            if (!authState.checked) {
+            if (!authState.checked || false) {
                 return m("div.d-flex.justify-content-center.align-items-center", {
                     style: { height: "100vh" }
                 }, m("div.spinner-border", { role: "status" }));
             }
 
-            if (!authState.authenticated) {
+            if (!authState.authenticated || false) {
                 return m(LoginPage);
             }
 
